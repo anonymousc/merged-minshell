@@ -1,6 +1,6 @@
 #include "builtins.h"
 
-void my_pwd()
+int my_pwd()
 {
     char path[1024];
 
@@ -8,6 +8,7 @@ void my_pwd()
         printf ("%s", path);
     else
         perror ("error\n");
+    return 0;
 }
 
 // int main ()

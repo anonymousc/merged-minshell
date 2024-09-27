@@ -126,7 +126,7 @@ t_env *get_last(t_env *envir)
     return envir;
 }
 
-static size_t	count_words(char const *str, char sep)
+size_t	count_words(char const *str, char sep)
 {
 	int		is_word;
 	size_t	counter;

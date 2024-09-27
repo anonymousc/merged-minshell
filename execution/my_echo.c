@@ -23,7 +23,7 @@ bool check_newline(int ac, char **av, int *start_i)
     return new_line;
 }
 
-void my_echo (int ac, char **av)
+int my_echo (int ac, char **av)
 {
     int start_i;
     bool new_line;
@@ -39,6 +39,7 @@ void my_echo (int ac, char **av)
 
     if (new_line)
         printf ("\n");
+    return 0;
 }
 
 // int main (int ac , char **av)

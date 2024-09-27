@@ -3,7 +3,7 @@ NAME = minishell
 CFLAGS = -fsanitize=address -g3 # -Wall -Wextra -Werror 
 
 
-SRCS =  my_cd.c my_export.c my_echo.c my_env.c my_pwd.c utils.c main.c
+SRCS =  my_cd.c my_export.c my_echo.c my_env.c my_pwd.c utils.c merged_parsing.c
 
 OBJ = $(SRCS:.c=.o)
 %.o:%.c

@@ -202,8 +202,8 @@ int my_export(t_execution *exec)
     {
         char *arg = exec->av[i];
 
-        // if (is_valid_identifier(arg) < 0)
-            // return 1;
+        if (is_valid_identifier(arg) < 0)
+            return 1;
 
         if (!process_export_arg(exec, arg))
             return 1;
