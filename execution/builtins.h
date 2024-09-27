@@ -30,6 +30,7 @@ typedef struct s_execution
 //utils
 int list_len(t_env *env);
 char	*ft_strjoin(char *s1, char *s2);
+size_t	count_words(char const *str, char sep);
 char	**ft_split(char const *s, char sep);
 size_t	ft_strlen(char *str);
 void print_env(t_env *env);
@@ -40,13 +41,16 @@ char *ft_strdup (char *str);
 void add_back(t_env **envir, t_env *var);
 t_env *get_last(t_env *envir);
 //my_env
-void my_env(t_env *env);
+int my_env(t_env *env);
 void free_env(t_env *env);
 //pwd
-void my_pwd();
+int my_pwd();
 //export
-// int my_export(t_env **env, char **args);
 int my_export(t_execution *exec);
 //cd
 int my_cd(t_execution *exec);
+//echo
+int my_echo (int ac, char **av);
+//execute builtins
+int execute_builtins(t_execution *exec);
 #endif

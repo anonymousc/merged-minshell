@@ -36,13 +36,14 @@ t_env *make_env(t_execution *exec)
     return envir;
 }
 
-void my_env(t_env *env) 
+int my_env(t_env *env) 
 {
     while (env) 
     {
         printf("%s=%s\n", env->variable, env->value);
         env = env->next;
     }
+    return 0;
 }
 
 void free_env(t_env *env)
