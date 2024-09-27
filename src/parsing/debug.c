@@ -41,6 +41,8 @@ void print_tokens(t_token *list)
 		}
 		if(list->value == WORD)
 			printf("token type : WORD its_data == %s\n" , list->data);
+		if(list->value == WHITESPACE)
+			printf("token type : WHITESPACE its_data == %d\n" ,  (*list->data));
 		list = list->next;
 	}
 }

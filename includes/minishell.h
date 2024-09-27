@@ -88,7 +88,7 @@ char		*quotes_holder2(char *s, int  *i);
 void		skip_space2(char *str , int *pos);
 Token		get_token (char *str);
 int			is_separators(char c);
-char		**split_to_lex(char const *s , int *flag);
+char		**split_to_lex(char const *s);
 int			is_quotes(char c);
 void		tokenization(char **line , t_token **fill_line);
 /* **************************** */

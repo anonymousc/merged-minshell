@@ -2,7 +2,7 @@
 
 int	is_separators(char c)
 {
-	if (c == '|' || c == '>' || c == '<')
+	if (c == '|' || c == '>' || c == '<' || is_space(c))
 		return 1;
 	return 0;
 }
@@ -60,7 +60,7 @@ int quotes_cout_word(char *s,char q)
 	return i;
 }
 
-static char	**str_all_fill_v2(char **str, char const *s , int *flag)
+static char	**str_all_fill_v2(char **str, char const *s)
 {
 	const char	*start;
 	int			i;
@@ -107,13 +107,14 @@ static char	**str_all_fill_v2(char **str, char const *s , int *flag)
 			}
 			else if(t == WHITESPACE)
 			{
-				*flag  = 1;
+				str[i] = ft_strdup(is_space_veta(*s));
+				s++;
 			}
 			if (!str[i])
 				return (fri_ol_v2(str));
 			i++;
 		}
-		else if (!is_separators(*s) && !is_space(*s))
+		else if (!is_separators(*s))
 		{
 			start = s;
 			while (*s && !is_separators(*s))
@@ -142,6 +143,6 @@ char	**split_to_lex(char const *s)
 	str = malloc((word_count_v2(s) + 1) * sizeof(char *));
 	if (!str)
 		return (NULL);
-	return (str_all_fill_v2(str, s , flag));
+	return (str_all_fill_v2(str, s));
 }
 

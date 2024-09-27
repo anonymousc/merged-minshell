@@ -71,6 +71,7 @@ int		ft_memcmp(const void *s1, const void *s2, size_t n);
 int		ft_strncmp(char const *s1, char const *s2, size_t n);
 int		is_space(char c);
 int		ft_strcmp(char *s1, char *s2);
+char	*is_space_veta(char s);
 
 
 char	*ft_itoa(int n);

@@ -17,3 +17,20 @@ int is_space(char c)
 {
 	return (((c >= 9 && c <= 13) || c == 32));
 }
+
+char *is_space_veta(char s)
+{
+	if(s == ' ')
+		return (" ");
+	// else if(s == '\t')
+	// 	return ("\t");
+	// else if(s == '\a')
+	// 	return ("\a");
+	// else if(s == '\f')
+	// 	return("\f");
+	// else if(s == '\r')
+	// 	return ("\r");
+	// else if(s == '\n')
+	// 	return ("\n");
+	return NULL;
+}

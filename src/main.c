@@ -12,6 +12,14 @@
 
 #include "../includes/minishell.h"
 
+void assing_null(void *ref, ...)
+{
+	va_list refs;
+	va_start(refs ,ref);
+	ref = va_arg(refs , void *);
+	va_end(refs);
+}
+
 int main (int ac, char **av, char **envp)
 {
 	(void)envp;
@@ -21,7 +29,6 @@ int main (int ac, char **av, char **envp)
 	char **splitted_array;
 	t_token  **final;
 	t_env **env;
-	int *flag;
 
 	line = NULL;
 	env = NULL;
@@ -32,7 +39,7 @@ int main (int ac, char **av, char **envp)
 		line = retline();
 		if(!line)
 			continue;
-		splitted_array = split_to_lex(line , flag);
+		splitted_array = split_to_lex(line);
 		tokenization(splitted_array , final);
 		//prompt(check_syntax_extanded(final));
 		//expander(final); 

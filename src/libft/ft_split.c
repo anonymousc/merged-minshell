@@ -42,7 +42,7 @@ char **fri_ol(char **str)
 	int	i;
 
 	i = 0;
-	while (str[i])
+	while (str && str[i])
 		free(str[i++]);
 	free(str);
 	return (NULL);
