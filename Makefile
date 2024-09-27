@@ -1,38 +1,24 @@
 NAME = minishell
 
-CC = cc
+CFLAGS = -fsanitize=address -g3 # -Wall -Wextra -Werror 
 
-CFLAGS = -Werror -Wall -Wextra #-fsanitize=address -g3 
 
-SRC = src/main.c src/minishell.c builtins/ft_env.c src/parsing/check_syntax.c src/parsing/Lexer_Tokens.c src/parsing/signals.c src/parsing/ft_split_v2.c src/parsing/debug.c
+SRCS =  my_cd.c my_export.c my_echo.c my_env.c my_pwd.c utils.c main.c
 
-LIBFTSRC =  $(wildcard src/libft/*.c src/libft/ft_printf/*.c)
-
-OBJ = $(SRC:%.c=%.o) 
-
-LIBFTOBJ = $(LIBFTSRC:%.c=%.o)
-
-ARFILE = src/libft/libft.a
+OBJ = $(SRCS:.c=.o)
+%.o:%.c
+	$(CC) $(CFLAGS) -c $^ -o $@
 
 all : $(NAME)
 
-$(NAME) : $(OBJ) $(LIBFTOBJ) $(ARFILE)
-	$(CC) $(CFLAGS) $(OBJ) $(ARFILE) -lreadline -o $(NAME)
-
-$(ARFILE) : $(LIBFTOBJ) 
-	ar -rcs $(ARFILE) $(LIBFTOBJ)
+$(NAME) : $(OBJ)
+	$(CC)  $(CFLAGS) $(OBJ) -lreadline -o $(NAME)
 
 clean :
-	@rm -rf $(OBJ) $(LIBFTOBJ)
-	@echo "\033[0;31mremoving obj files\033[0m"
+	rm -f $(OBJ)
 
 fclean : clean
-	@rm -rf $(NAME)
-	@rm -rf $(ARFILE)
-	@echo "\033[0;31mremoving archives and executables\033[0m"
+	rm -f $(NAME)
 
 re : fclean all
-
-.PHONY : re all clean fclean
-
-.SECONDARY : $(OBJ) $(LIBFTOBJ) $(ARFILE)
+	
