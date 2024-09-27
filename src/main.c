@@ -21,6 +21,7 @@ int main (int ac, char **av, char **envp)
 	char **splitted_array;
 	t_token  **final;
 	t_env **env;
+	int *flag;
 
 	line = NULL;
 	env = NULL;
@@ -31,7 +32,7 @@ int main (int ac, char **av, char **envp)
 		line = retline();
 		if(!line)
 			continue;
-		splitted_array = split_to_lex(line);
+		splitted_array = split_to_lex(line , flag);
 		tokenization(splitted_array , final);
 		//prompt(check_syntax_extanded(final));
 		//expander(final); 

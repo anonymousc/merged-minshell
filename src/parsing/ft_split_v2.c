@@ -60,7 +60,7 @@ int quotes_cout_word(char *s,char q)
 	return i;
 }
 
-static char	**str_all_fill_v2(char **str, char const *s)
+static char	**str_all_fill_v2(char **str, char const *s , int *flag)
 {
 	const char	*start;
 	int			i;
@@ -105,6 +105,10 @@ static char	**str_all_fill_v2(char **str, char const *s)
 				str[i] = ft_strdup(">");
 				s++;
 			}
+			else if(t == WHITESPACE)
+			{
+				*flag  = 1;
+			}
 			if (!str[i])
 				return (fri_ol_v2(str));
 			i++;
@@ -138,6 +142,6 @@ char	**split_to_lex(char const *s)
 	str = malloc((word_count_v2(s) + 1) * sizeof(char *));
 	if (!str)
 		return (NULL);
-	return (str_all_fill_v2(str, s));
+	return (str_all_fill_v2(str, s , flag));
 }
 

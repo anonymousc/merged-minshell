@@ -66,6 +66,8 @@ Token get_token (char *str)
 		return (REDIRECTION_OUT);
 	else if(ft_strnstr(str, "<" , 1))
 		return(REDIRECTION_IN);
+	else if(ft_strnstr(str , " " , 1) || ft_strnstr(str , "\n" , 1) || ft_strnstr(str , "\v" , 1) || ft_strnstr(str , "\t" , 1) || ft_strnstr(str , "\r" , 1))
+		return (WHITESPACE);
 	return WORD;
 }
 void	tokenization(char **line , t_token **fill_line)
