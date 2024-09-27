@@ -41,6 +41,7 @@ int main (int ac, char **av, char **envp)
 			continue;
 		splitted_array = split_to_lex(line);
 		tokenization(splitted_array , final);
+		sanitizer(final);
 		//prompt(check_syntax_extanded(final));
 		//expander(final); 
 		//final_list_to_execute(final);

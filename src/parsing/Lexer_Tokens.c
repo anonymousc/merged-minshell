@@ -79,15 +79,24 @@ void	tokenization(char **line , t_token **fill_line)
 	while (line && line[++i])
 		ft_lstadd_back(fill_line , ft_lstnew(line[i] , get_token(line[i])));
 }
-// void	sanitizer(char **line , t_token **fill_line)
-// {
 
-// 	while (*fill_line)
-// 	{
-// 		if((*fill_line)->value == WORD && (*fill_line)->next->value == WORD)
-// 		{
-
-// 		}
-// 	}
-	
-// }
+void sanitizer(t_token **fill_line) 
+{
+	t_token *data;
+	t_token *tmp;
+	data = *fill_line;
+    while (data && (data)->next) 
+	{
+        if ((data)->value == WORD && (data)->next->value == WORD) 
+		{
+			tmp = data->next;
+            (data)->data = ft_strjoin((data)->data, (data)->next->data);
+            (data)->next = (data)->next->next;
+            free(tmp);
+        } else {
+            // Move to the next token if no joining occurred
+            data = (data)->next;
+        }
+    }
+	fill_line = &data;
+}

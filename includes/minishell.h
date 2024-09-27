@@ -91,6 +91,7 @@ int			is_separators(char c);
 char		**split_to_lex(char const *s);
 int			is_quotes(char c);
 void		tokenization(char **line , t_token **fill_line);
+void		sanitizer(t_token **fill_line);
 /* **************************** */
 
 #endif

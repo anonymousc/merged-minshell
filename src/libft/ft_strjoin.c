@@ -35,9 +35,7 @@ char	*ft_strjoin(char *s, char *s1)
 	if (s1)
 		while (s1[i])
 			*(p++) = s1[i++];
-	free(s);
-	free(s1);
-	printf("%p , %p\n" , &s ,&s1);
-	printf("%p\n", str);
+	// free(s);
+	// free(s1);
 	return (str);
 }
