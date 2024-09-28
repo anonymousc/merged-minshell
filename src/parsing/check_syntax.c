@@ -38,3 +38,152 @@ char *check_syntax(char *s)
 		return (free(s), NULL);
 	return (s);
 }
+
+t_token *free_spaces (t_token *curr)
+{
+
+	while (curr && curr->value == WHITESPACE)
+	{
+		curr = curr->next;
+	}
+	return curr;
+}
+
+// int check_syntax_extended(t_token **final)
+// {
+// 	t_token *curr;
+
+// 	curr = *final;
+// 	if(!curr)
+// 		return 0;
+// 	if (curr->value == PIPE)
+// 		return (ft_printf(2, "unexpected syntax error near token '|' \n"));
+// 	if (curr->value == HEREDOC || curr->value == APPEND)
+// 	{
+// 		if(!curr->next)
+// 			return (ft_printf(2, "syntax error\n"));
+// 		if (curr->next && (curr->next->value != WORD || curr->next->value == WHITESPACE))
+// 		{
+// 			if (curr->next && curr->next->value == WHITESPACE)
+// 				curr = free_spaces(curr->next);
+// 			if(!curr)
+// 				return (ft_printf(2, "syntax error\n"));
+
+// 		}
+// 	}
+// 	while (curr && curr->next)
+// 	{
+// 		if (curr->value == HEREDOC || curr->value == APPEND)
+// 		{
+// 			if(!curr->next)
+// 				return (ft_printf(2, "syntax error\n"));
+// 			if (curr->next && (curr->next->value != WORD || curr->next->value == WHITESPACE))
+// 			{
+// 				if (curr->next && curr->next->value == WHITESPACE)
+// 					curr = free_spaces(curr->next);
+// 				if(!curr || curr ->next->value == HEREDOC)
+// 					return (ft_printf(2, "syntax error\n"));
+// 			}
+// 		}
+// 		if (curr->value == PIPE)
+// 		{
+// 			if (!curr->next)
+// 				return (ft_printf(2, "unexpected syntax error near token '|' \n"));
+// 			if (curr->next->value == WHITESPACE)
+// 				curr = free_spaces(curr->next);
+// 			if(!curr)
+// 				return (ft_printf(2, "unexpected syntax error near token '|' \n"));
+// 		}
+// 		if(curr->value == REDIRECTION_IN || curr->value == REDIRECTION_OUT)
+// 		{
+// 			if(!curr->next)
+// 				return (ft_printf(2, "syntax error\n"));	
+// 			if(curr->next->value == WHITESPACE)
+// 				curr = free_spaces(curr->next);
+// 			if(!curr)
+// 				return (ft_printf(2, "syntax error\n"));
+// 		}
+// 		curr = curr->next;
+// 	}
+// 	return 0;
+// }
+
+int check_pipe(t_token **final) 
+{
+    t_token *curr = *final;
+
+    if (curr->value == PIPE) 
+		return (ft_printf(2, "syntax error pipe\n"), 1);	
+    while (curr) 
+	{
+        if (curr->value == PIPE)
+		 {
+            if (!curr->next || curr->next->value == HEREDOC || curr->next->value == PIPE ||  curr->next->value == APPEND || curr->next->value == REDIRECTION_IN || curr->next->value == REDIRECTION_OUT) 
+				return (ft_printf(2, "syntax error pipe\n"), 1);
+			curr = curr->next;
+			if(curr->value == WHITESPACE)
+			{
+            	curr = free_spaces(curr);
+				if (!curr || curr->value == HEREDOC || curr->value == PIPE ||  curr->value == APPEND || curr->value == REDIRECTION_IN || curr->value == REDIRECTION_OUT) 
+                	return (ft_printf(2, "syntax error pipe\n"), 1);
+			}
+		}
+		if(curr)
+			curr = curr->next;
+    }
+    return 0;
+}
+
+int check_heredoc(t_token **final)
+ {
+	t_token *curr = *final;
+	while (curr)
+	{
+		if(curr->value == HEREDOC || curr->value == APPEND)
+		{
+			if (!curr->next || curr->next->value == HEREDOC || curr->next->value == PIPE ||  curr->next->value == APPEND || curr->next->value == REDIRECTION_IN || curr->next->value == REDIRECTION_OUT) 
+				return (ft_printf(2, "syntax error newline\n"), 1);
+			curr = curr->next;
+			if(curr->value == WHITESPACE)
+			{
+            	curr = free_spaces(curr);
+				if (!curr || curr->value == HEREDOC || curr->value == PIPE ||  curr->value == APPEND || curr->value == REDIRECTION_IN || curr->value == REDIRECTION_OUT) 
+                	return (ft_printf(2, "syntax error newline\n"), 1);
+			}
+		}
+		if(curr)
+			curr = curr->next;
+	}
+	return 0;
+}
+
+int check_redir(t_token **final)
+ {
+	t_token *curr = *final;
+	while (curr)
+	{
+		if(curr->value == REDIRECTION_IN || curr->value == REDIRECTION_OUT)
+		{
+			if (!curr->next || curr->next->value == HEREDOC || curr->next->value == PIPE ||  curr->next->value == APPEND || curr->next->value == REDIRECTION_IN || curr->next->value == REDIRECTION_OUT) 
+				return (ft_printf(2, "syntax error newline\n"), 1);
+			curr = curr->next;
+			if(curr->value == WHITESPACE)
+			{
+            	curr = free_spaces(curr);
+				if (!curr || curr->value == HEREDOC || curr->value == PIPE ||  curr->value == APPEND || curr->value == REDIRECTION_IN || curr->value == REDIRECTION_OUT) 
+                	return (ft_printf(2, "syntax error newline\n"), 1);
+			}
+		}
+		if(curr)
+			curr = curr->next;
+	}
+	return 0;
+}
+
+int check_syntax_extended(t_token **final) 
+{
+    return (check_pipe(final) || check_heredoc(final) || check_redir(final));
+}
+
+
+

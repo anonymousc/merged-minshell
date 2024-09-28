@@ -55,7 +55,13 @@ typedef	struct	s_Tokenization
 	struct s_Tokenization	*next;
 
 }		t_token;
-
+typedef struct s_execution
+{
+	char 				**cmd;
+	int					fd[2];
+	int					pid;
+	struct s_execution	*next;
+}					t_execution;
 
 ///////////////////////
 
