@@ -24,6 +24,9 @@ char *find_path(char *cmd, char **env)
     char *path_var = NULL;
     
     int j = 0;
+    
+    if (strchr(cmd , '/') && access (cmd, F_OK | X_OK))
+        return NULL;
     while (env[j])
     {
         if (strncmp(env[j], "PATH=", 5) == 0)
@@ -44,17 +47,24 @@ char *find_path(char *cmd, char **env)
     int i = 0;
     while (paths[i])
     {
+        if (strstr(cmd, paths[i]))
+        {
+            if (!access(cmd, F_OK | X_OK))
+                return cmd;
+            return NULL;
+        }
         full_path = ft_strjoin(paths[i], "/");
         full_command = ft_strjoin(full_path, cmd);
         
         free(full_path);
 
-        if (access(full_command, F_OK) == 0)
+        if (access(full_command, F_OK | X_OK) == 0)
         {
             return full_command;
         }
         free(full_command);
-        i++;    }
+        i++;    
+    }
     return NULL;
 }
 
@@ -81,7 +91,7 @@ void pipe_and_execute(char **cmd1, char **cmd2, char **env)
         char *fullcmd1 = find_path(cmd1[0], env);
 
         execve(fullcmd1, cmd1, env);
-        perror ("cant execute cmd2");
+        perror ("cant execute cmd1");
         exit(EXIT_FAILURE);
     }
 
