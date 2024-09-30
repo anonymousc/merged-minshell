@@ -29,13 +29,16 @@ int main (int ac, char **av, char **envp)
 	char **splitted_array;
 	t_token  **final;
 	t_env **env;
+	t_execution **data;
 
 	line = NULL;
 	env = NULL;
 	env = fill_env(envp, env);
 	while(1)
 	{
+		// data = (t_execution  **)malloc(sizeof(t_execution  *));
 		final = (t_token  **)malloc(sizeof(t_token  *));
+		data = (t_execution  **)malloc(sizeof(t_execution  *));
 		line = retline();
 		if(!line)
 			continue;
@@ -46,7 +49,14 @@ int main (int ac, char **av, char **envp)
 		if (check_syntax_extended(final))
 			continue;
 		//expander(final); 
-		//final_list_to_execute(final);
+		// final_list_to_execute(final);
+		int i = 0;
+		data = for_execute(final , data);//temprary function
+		while ((*data)->cmd[i])
+		{
+			printf("data == %s \n" , (*data)->cmd[i]);
+			i++;
+		}
 		print_tokens(*final);
 		free_stack(final);
 		free(final);

@@ -78,6 +78,7 @@ int		ft_strncmp(char const *s1, char const *s2, size_t n);
 int		is_space(char c);
 int		ft_strcmp(char *s1, char *s2);
 char	*is_space_veta(char s);
+t_execution		**for_execute(t_token **final , t_execution **data);
 
 
 char	*ft_itoa(int n);

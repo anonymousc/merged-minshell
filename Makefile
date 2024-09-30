@@ -6,7 +6,7 @@ CFLAGS = -Werror -Wall -Wextra -fsanitize=address -g3
 
 SRC = src/main.c src/minishell.c builtins/ft_env.c src/parsing/check_syntax.c src/parsing/Lexer_Tokens.c src/parsing/signals.c src/parsing/ft_split_v2.c src/parsing/debug.c
 
-LIBFTSRC =  $(wildcard src/libft/*.c src/libft/ft_printf/*.c)
+LIBFTSRC =  $(wildcard src/libft/*.c src/libft/ft_printf/*.c src/libft/*.c)
 
 OBJ = $(SRC:%.c=%.o) 
 
