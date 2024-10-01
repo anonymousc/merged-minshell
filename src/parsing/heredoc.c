@@ -125,43 +125,46 @@ void print_inode(int fd) {
  if (fstat(fd, &info) != 0)
    fprintf(stderr,"fstat() error for fd %d: %s\n",fd,strerror(errno));
  else
-   printf("The inode of fd %d is %d\n", fd, (int) info.st_ino);
+   printf("The inode of fd %d is %d \n", fd, (int) info.st_ino);
 }
 
 void here_doc_child (t_token **final)
 {
 	t_token *curr = *final;
+	int exit_status;
 
 	int fd[2];
 	int id = fork ();
 	pipe(fd);
+
 	if (id == 0)
 	{
-		dup2(0 , fd[0]);
-		close(fd[1]);
-
+		dup2(fd[1] , 1);
+		printf("fd[0] == %d\n" , STDIN_FILENO);
 		if (curr && curr->value == HEREDOC)
 		{
 			curr = free_spaces(curr->next);
-			print_inode(3);
+			print_inode(1);
+			print_inode(fd[1]);
 			char *delim = curr->data;
 			while (1)
 			{
-				char *line = get_next_line(fd[0]);
+				char *line = get_next_line(0);
 				if(line)
 				{
+					write(fd[1] , line , strlen(line));
 					if (!ft_strncmp(line , delim, ft_strlen(delim)))
 					{
-						close(fd[0]);
-						break;
+						close(fd[1]);
+						free(line);
+						exit(42);
 					}
 				}
 			}
 		}
 	}
 	close(fd[1]);
-	close(fd[0]);
-	wait (NULL);
+	waitpid (id, &exit_status, 0);
 }
 
 void here_doc(t_token **final)
@@ -172,8 +175,9 @@ void here_doc(t_token **final)
 	t_token *herecount = curr;
 	while (herecount)
 	{
-		hc++;
-		if(hc == 17)
+		if (herecount->value == HEREDOC)
+			hc++;
+		else if(hc == 17)
 			return (printf("minishell : maximum here-document count exceeded\n"), exit(1));
 		herecount = herecount->next;
 	}

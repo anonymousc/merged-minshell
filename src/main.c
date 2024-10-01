@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aessadik <aessadik@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 12:03:40 by aessadik          #+#    #+#             */
-/*   Updated: 2024/09/24 18:45:01 by aessadik         ###   ########.fr       */
+/*   Updated: 2024/10/01 19:59:15 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int main (int ac, char **av, char **envp)
 	char **splitted_array;
 	t_token  **final;
 	t_env **env;
-	t_execution **data;
+	// t_execution **data;
 
 	line = NULL;
 	env = NULL;
@@ -38,7 +38,7 @@ int main (int ac, char **av, char **envp)
 	{
 		// data = (t_execution  **)malloc(sizeof(t_execution  *));
 		final = (t_token  **)malloc(sizeof(t_token  *));
-		data = (t_execution  **)malloc(sizeof(t_execution  *));
+		// data = (t_execution  **)malloc(sizeof(t_execution  *));
 		line = retline();
 		if(!line)
 			continue;
@@ -51,8 +51,9 @@ int main (int ac, char **av, char **envp)
 		here_doc(final);
 		//expander(final); 
 		// final_list_to_execute(final);
-		data = for_execute(final , data);//temprary function
-		// print_tokens(*final);
+		// data = for_execute(final , data);//temprary function
+		
+		print_tokens(*final);
 		free_stack(final);
 		free(final);
 		fri_ol(splitted_array);
