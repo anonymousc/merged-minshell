@@ -127,8 +127,7 @@ void here_doc_child (t_token **final)
 
 	// int fd[2];
 	int id = fork ();
-	// pipe(fd);
-	// dup2(fd[0] , 0);
+	pipe(fd);
 	// close(fd[1]);
 	if (id == 0)
 	{
@@ -146,6 +145,7 @@ void here_doc_child (t_token **final)
 						// close(fd[0]);
 						break;
 					}
+	dup2(fd[0] , 0);
 				}
 			}
 		}
