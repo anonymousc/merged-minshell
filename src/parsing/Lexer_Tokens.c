@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Lexer_Tokens.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aessadik <aessadik@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:11:54 by aessadik          #+#    #+#             */
-/*   Updated: 2024/09/24 18:22:46 by aessadik         ###   ########.fr       */
+/*   Updated: 2024/10/01 04:52:55 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,8 +142,13 @@ t_execution **for_execute(t_token **final , t_execution **data)
 
 	while (tmp)
 	{
-		if(tmp->value == WORD || !((tmp->value == REDIRECTION_IN || tmp->value == REDIRECTION_IN) && tmp->next->value == WORD))
-			wc++;
+		if(tmp->value == WORD)
+		{
+			if(curr->next && (curr->next->value == REDIRECTION_IN || curr->next->value == REDIRECTION_IN))
+				curr = curr->next->next->next;
+			else
+				wc++;
+		}
 		tmp = tmp->next;
 	}
 	cmd = (char **)malloc(sizeof(char *) * (wc + 1));
@@ -153,10 +158,16 @@ t_execution **for_execute(t_token **final , t_execution **data)
 	{
 		if(curr->value == WORD)
 		{
-			cmd[i] = curr->data;
-			i++;
+			if(curr->next && (curr->next->value == REDIRECTION_IN || curr->next->value == REDIRECTION_IN))
+				curr = curr->next->next->next;
+			else
+			{
+				cmd[i] = curr->data;
+				i++;
+			}
 		}
-		curr = curr->next;	
+		if(curr)
+			curr = curr->next;	
 	}
 	cmd[wc] = NULL;
 	*data = ft_lstnew_exec(cmd);

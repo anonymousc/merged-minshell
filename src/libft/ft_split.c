@@ -6,7 +6,7 @@
 /*   By: aessadik <aessadik@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 03:44:27 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/09/24 10:51:28 by aessadik         ###   ########.fr       */
+/*   Updated: 2024/08/21 16:26:32 by aessadik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,12 +37,13 @@ size_t	word_count(char const *s)
 	return (counter);
 }
 
+
 char **fri_ol(char **str)
 {
 	int	i;
 
 	i = 0;
-	while (str && str[i])
+	while (str[i])
 		free(str[i++]);
 	free(str);
 	return (NULL);

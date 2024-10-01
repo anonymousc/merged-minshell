@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   is_space.c                                         :+:      :+:    :+:   */
+/*   ft_isspace.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aessadik <aessadik@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 16:17:25 by aessadik          #+#    #+#             */
-/*   Updated: 2024/08/21 16:18:40 by aessadik         ###   ########.fr       */
+/*   Updated: 2024/10/01 20:05:22 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,13 @@ char *is_space_veta(char s)
 {
 	if(s == ' ')
 		return (" ");
-	else if(s == '\t')
+	if(s == '\t')
 		return ("\t");
-	else if(s == '\a')
-		return ("\a");
-	else if(s == '\f')
-		return("\f");
-	else if(s == '\r')
-		return ("\r");
-	else if(s == '\n')
+	if(s == '\n')
 		return ("\n");
+	if(s == '\f')
+		return ("\f");
+	if(s == '\r')
+		return ("\r");
 	return NULL;
 }
