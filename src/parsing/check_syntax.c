@@ -19,7 +19,7 @@ char *check_quotes(char *s)
 	syntax.iter = 0;
 	int sq = 0;
 	int dq = 0;
-	while(s[syntax.iter])
+	while(s && s[syntax.iter])
 	{
 		if(s[syntax.iter] == '\'' && !dq)
 			sq = !sq;
@@ -53,7 +53,7 @@ int check_pipe(t_token **final)
 {
     t_token *curr = *final;
 
-    if (curr->value == PIPE) 
+    if (curr && curr->value == PIPE) 
 		return (free_stack(&curr) ,ft_printf(2, "syntax error\n"), 1);	
     while (curr) 
 	{
@@ -123,7 +123,7 @@ int check_redir(t_token **final)
 
 int check_syntax_extended(t_token **final) 
 {
-    return (check_heredoc(final) || check_pipe(final) || check_redir(final));
+    	return (check_heredoc(final) || check_pipe(final) || check_redir(final));
 }
 
 

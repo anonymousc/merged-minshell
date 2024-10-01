@@ -93,6 +93,10 @@ int			is_quotes(char c);
 void		tokenization(char **line , t_token **fill_line);
 void		sanitizer(t_token **fill_line);
 int			check_syntax_extended (t_token **final);
+t_token *free_spaces (t_token *curr);
 /* **************************** */
+// to remove
+// int here_doc(t_token **final, int *fd);
+void here_doc(t_token **final);
 
 #endif

@@ -114,6 +114,22 @@ size_t	ft_strlcpy(char *dest, char const *src, size_t size);
 size_t	word_count(char const *s);
 char **fri_ol(char **str);
 
+// GET_NEXT_LINE
+
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 3
+
+# endif
+
+char	*ft_strdup(const char *s1);
+char	*get_new_line(char *s);
+char	*ft_strjoin(char *s, char *s1);
+int		find_newline(char *str);
+char	*get_next_line(int fd);
+char	*set_buffer(char *buffer, char *line);
+char	*read_line(char *ret, int fd);
+char	*ft_free(char *s);
+
 //    LINKED LISTS
 
 t_token  *ft_lstnew(char *content , Token t);

@@ -48,16 +48,11 @@ int main (int ac, char **av, char **envp)
 		sanitizer(final);
 		if (check_syntax_extended(final))
 			continue;
+		here_doc(final);
 		//expander(final); 
 		// final_list_to_execute(final);
-		int i = 0;
 		data = for_execute(final , data);//temprary function
-		while ((*data)->cmd[i])
-		{
-			printf("data == %s \n" , (*data)->cmd[i]);
-			i++;
-		}
-		print_tokens(*final);
+		// print_tokens(*final);
 		free_stack(final);
 		free(final);
 		fri_ol(splitted_array);
