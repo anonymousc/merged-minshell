@@ -1,0 +1,4 @@
+{
+	"makefile.configurationCachePath": "cache",
+	"C_Cpp.intelliSenseCachePath": "%LocalAppData%/Microsoft/vscode-cpptools"
+}

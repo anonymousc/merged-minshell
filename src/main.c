@@ -29,22 +29,30 @@ int main (int ac, char **av, char **envp)
 	char **splitted_array;
 	t_token  **final;
 	t_env **env;
+	t_execution **data;
 
 	line = NULL;
 	env = NULL;
 	env = fill_env(envp, env);
 	while(1)
 	{
+		// data = (t_execution  **)malloc(sizeof(t_execution  *));
 		final = (t_token  **)malloc(sizeof(t_token  *));
+		data = (t_execution  **)malloc(sizeof(t_execution  *));
 		line = retline();
 		if(!line)
 			continue;
 		splitted_array = split_to_lex(line);
 		tokenization(splitted_array , final);
-		//prompt(check_syntax_extanded(final));
+		
+		sanitizer(final);
+		if (check_syntax_extended(final))
+			continue;
+		here_doc(final);
 		//expander(final); 
-		//final_list_to_execute(final);
-		print_tokens(*final);
+		// final_list_to_execute(final);
+		data = for_execute(final , data);//temprary function
+		// print_tokens(*final);
 		free_stack(final);
 		free(final);
 		fri_ol(splitted_array);
