@@ -125,38 +125,39 @@ void here_doc_child (t_token **final)
 {
 	t_token *curr = *final;
 
-	// int fd[2];
+	int fd[2];
 	int id = fork ();
 	pipe(fd);
-	// close(fd[1]);
 	if (id == 0)
 	{
+		dup2(0 , fd[0]);
+		close(fd[1]);
 		if (curr && curr->value == HEREDOC)
 		{
 			curr = free_spaces(curr->next);
 			char *delim = curr->data;
 			while (1)
 			{
-				char *line = get_next_line(0);
+				char *line = get_next_line(fd[0]);
 				if(line)
 				{
 					if (!ft_strncmp(line , delim, ft_strlen(delim)))
 					{
-						// close(fd[0]);
+						close(fd[0]);
 						break;
 					}
-	dup2(fd[0] , 0);
 				}
 			}
 		}
 	}
-	// close(fd[1]);
-	// close(fd[0]);
+	close(fd[1]);
+	close(fd[0]);
 	wait (NULL);
 }
 
 void here_doc(t_token **final)
 {
+
 	int hc = 0;
 	t_token *curr = *final;
 	t_token *herecount = curr;
