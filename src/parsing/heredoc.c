@@ -120,6 +120,13 @@
     
 //     return 0;
 // }
+void print_inode(int fd) {
+ struct stat info;
+ if (fstat(fd, &info) != 0)
+   fprintf(stderr,"fstat() error for fd %d: %s\n",fd,strerror(errno));
+ else
+   printf("The inode of fd %d is %d\n", fd, (int) info.st_ino);
+}
 
 void here_doc_child (t_token **final)
 {
@@ -132,9 +139,11 @@ void here_doc_child (t_token **final)
 	{
 		dup2(0 , fd[0]);
 		close(fd[1]);
+
 		if (curr && curr->value == HEREDOC)
 		{
 			curr = free_spaces(curr->next);
+			print_inode(3);
 			char *delim = curr->data;
 			while (1)
 			{
