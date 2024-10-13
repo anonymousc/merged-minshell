@@ -55,7 +55,7 @@ char **fri_ol_v2(char **str)
 int quotes_cout_word(char *s,char q)
 {
 	int i = 0 ;
-	while (s && s[i] && s[i]!=q)
+	while (s && s[i] && s[i] != q)
 		i++;
 	return i;
 }
@@ -143,6 +143,6 @@ char	**split_to_lex(char const *s)
 	str = malloc((word_count_v2(s) + 1) * sizeof(char *));
 	if (!str)
 		return (NULL);
-	return (str_all_fill_v2(str, s));
+	return (str_all_fill_v2(str,  s));
 }
 

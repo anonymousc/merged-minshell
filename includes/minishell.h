@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/06 13:21:40 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/10/01 03:13:26 by kali             ###   ########.fr       */
+/*   Updated: 2024/10/10 15:43:15 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,9 @@
 
 typedef struct	s_syntax
 {
+	int s_q;
+	int d_q;
 	int iter;
-	int flag;
-	char c;
-	int start;
-	int end;
-	
 }				t_syntax;
 
 typedef	struct	s_AST
@@ -93,10 +90,12 @@ int			is_quotes(char c);
 void		tokenization(char **line , t_token **fill_line);
 void		sanitizer(t_token **fill_line);
 int			check_syntax_extended (t_token **final);
-t_token *free_spaces (t_token *curr);
+t_token		*free_spaces (t_token *curr);
+void free_spaces2(t_token **head);
 /* **************************** */
 // to remove
 // int here_doc(t_token **final, int *fd);
-void here_doc(t_token **final);
+int here_doc(t_token **final);
+char *expander(char *expansion, t_env *envp);
 
 #endif

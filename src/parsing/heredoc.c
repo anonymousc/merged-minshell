@@ -1,192 +1,180 @@
 #include "../../includes/minishell.h"
 
-// int **create_pipes(int *num_pipes) 
+// char *randgen(char *s)
 // {
-//     int i;
-//     int **pipes = malloc((*num_pipes) * sizeof(int *));
-//     if (!pipes)
-//         exit(1);
-    
-//     for (i = 0; i < *num_pipes; i++) 
-// 	{
-//         pipes[i] = malloc(2 * sizeof(int));
-//         if (pipe(pipes[i]) == -1) {
-//             perror("pipe");
-//             exit(1);
-//         }
-//     }
-//     return pipes;
+// 	char *pathname = "/tmp/.";
+// 	static char *add;
+// 	add = ft_strdup(" ");
+// 	s = ft_strjoin(pathname , add);
+// 	(*add)++;
+// 	free(add);
+// 	return (s);
 // }
 
-// void wait_children(int *num_pipes) 
+// int file_to_write_on(char *filename)
 // {
-//     for (int i = 0; i < *num_pipes; i++) 
-//         wait(NULL);
+// 	int fd = open (randgen(filename) , O_RDWR  | O_CREAT);
+// 	return (fd);
 // }
 
-// void heredoc_child(t_token **final, int *num_pipes, int **pipes) 
+// void delete_file(char *filename)
 // {
-//     t_token *curr = *final;
-//     char *line = NULL;
+// 	unlink(filename);
+// }
 
-//     // Close unused write ends in the child
-//     for (int i = 0; i < *num_pipes; i++) 
-// 	{
-//         close(pipes[i][1]);
-//     }
+// void here_doc_child(t_token **final)
+// {
+// 	t_token *curr = *final;
+// 	int fd;
+// 	char *line;
+// 	char *filename;
 
-//     while (curr) 
+// 	fd = 0;
+// 	filename = NULL;
+// 	if (curr && curr->value == HEREDOC)
 // 	{
-//         if (curr && curr->value == HEREDOC) 
+// 		fd = file_to_write_on(filename);
+// 		dup2(fd , STDOUT_FILENO);
+// 		close (STDOUT_FILENO);
+// 		curr = free_spaces(curr->next);
+// 		char *delim = curr->data;
+// 		while (1)
 // 		{
-// 			curr = free_spaces(curr->next);
-//             // curr = curr->next;
-//             char *delim = curr->data;
-// 			printf ("delim %s \n", delim);
-//             while (1) 
+// 			line = readline(">");
+// 			if (write(fd, "test\n", 5) == -1)
 // 			{
-//                 line = get_next_line(0);
-//                 if (!line)
-//                     return; // Exit on EOF or error
-//                 if (strncmp(line, delim, strlen(delim)) == 0) 
-// 				{
-//                     free(line);
-//                     return;
-//                 }
-//                 free(line);
-//             }
-//         }
-//         curr = curr->next;
-//     }
-
-//     // Close read ends after use
-//     for (int i = 0; i < *num_pipes; i++) 
-// 	{
-//         close(pipes[i][0]);
-//     }
+// 				ft_printf(2, "fd is %d\n", fd);
+// 				ft_printf(2, "warning here_doc delimited\n");
+// 			}
+// 			if(!line)
+// 				ft_printf(2, "warning here_doc delimited\n");
+// 			if (!ft_strncmp(delim , line, ft_strlen(delim) + 1))
+// 			{
+// 					delete_file(filename);
+// 					close(fd);
+// 					free(line);
+// 					break;
+// 			}
+// 		}
+// 	}
 // }
 
-// void here_doc(t_token **final, int *num_pipes, int **pipes) 
+// void here_doc(t_token **final)
 // {
-//     int id;
-    
-//     for (int i = 0; i < *num_pipes; i++) {
-//         id = fork();
-//         if (id == 0) 
-// 		{
-//             heredoc_child(final, num_pipes, pipes);
-//             exit(0); // Ensure child exits
-//         } 
-// 		else if (id < 0) 
-// 		{
-//             perror("fork");
-//             exit(1);
-//         }
-
-//         // Close both ends of the pipe in the parent after forking
-//         close(pipes[i][1]); // Close write end
-//     }
-    
-//     // Close all read ends in parent
-//     for (int i = 0; i < *num_pipes; i++) 
+// 	int hc = 0;
+// 	t_token *curr = *final;
+// 	t_token *herecount = curr;
+// 	while (herecount)
 // 	{
-//         close(pipes[i][0]);
-//     }
+// 		if (herecount->value == HEREDOC)
+// 			hc++;
+// 		if(hc == 17)
+// 			return(printf("minishell : maximum here-document count exceeded\n"), exit(2));
+// 		herecount = herecount->next;
+// 	}
+// 	while (curr)
+// 	{
+// 		if(curr->value == HEREDOC)
+// 			here_doc_child(&curr);
+// 		curr = curr->next;
+// 	}
 // }
 
-// int here_doc_final(t_token **final) 
-// {
-//     int pc = 0;
-//     int **pipes;
 
-//     // Count HEREDOC tokens
-//     t_token *curr = *final;
-//     while (curr) 
-// 	{
-//         if (curr->value == HEREDOC)
-//             pc++;
-//         curr = curr->next;
-//     }
-    
-//     pipes = create_pipes(&pc);
-//     here_doc(final, &pc, pipes);
-//     wait_children(&pc);
+char *randgen(char *s)
+{
+    char *pathname = "/dev/shm/";
+    char *suffix = "\v";
 
-//     for (int i = 0; i < pc; i++) 
-// 	{
-//         free(pipes[i]);
-//     }
-//     free(pipes);
+    s = ft_strjoin(pathname, suffix);
     
-//     return 0;
-// }
-void print_inode(int fd) {
- struct stat info;
- if (fstat(fd, &info) != 0)
-   fprintf(stderr,"fstat() error for fd %d: %s\n",fd,strerror(errno));
- else
-   printf("The inode of fd %d is %d \n", fd, (int) info.st_ino);
+    return s;
 }
 
-void here_doc_child (t_token **final)
+int file_to_write_on(char *filename)
 {
-	t_token *curr = *final;
-	int exit_status;
+    char *path = randgen(filename);
+    int fd = open(path, O_RDWR | O_CREAT | O_TRUNC, 0777);
+    free(path);
+    return fd;
+}
 
-	int fd[2];
-	int id = fork ();
-	pipe(fd);
+void delete_file(char *filename)
+{
+    unlink(filename);
+}
 
-	if (id == 0)
-	{
-		dup2(fd[1] , 1);
-		printf("fd[0] == %d\n" , STDIN_FILENO);
-		if (curr && curr->value == HEREDOC)
-		{
-			curr = free_spaces(curr->next);
-			print_inode(1);
-			print_inode(fd[1]);
-			char *delim = curr->data;
-			while (1)
-			{
-				char *line = get_next_line(0);
-				if(line)
-				{
-					write(fd[1] , line , strlen(line));
-					if (!ft_strncmp(line , delim, ft_strlen(delim)))
-					{
-						close(fd[1]);
-						free(line);
-						exit(42);
-					}
-				}
-			}
+void here_doc_child(t_token **final , int *fd1)
+{
+    t_token *curr = *final;
+    int fd;
+    char *line;
+    char *filename = NULL;
+
+    if (curr && curr->value == HEREDOC)
+    {
+        fd = file_to_write_on(filename);
+        if (fd == -1)
+        {
+			delete_file(filename);
+			fd = file_to_write_on(filename);
+        }
+        curr = free_spaces(curr->next);
+        char *delim = curr->data;
+        while (1)
+        {
+			delete_file(filename);
+            line = readline(">");
+            if (!line)
+            {
+                ft_printf(2, "warning: here-doc delimited by end-of-file\n");
+                break;
+            }
+            if (!ft_strncmp(delim, line, ft_strlen(delim) + 1))
+            {
+				delete_file(filename);
+				close(fd);
+                free(line);
+                break;
+            }
+            if (write(fd, line, ft_strlen(line)) == -1 || write(fd, "\n", 1) == -1)
+                ft_printf(2, "Error: Unable to write to heredoc file\n");
+            free(line);
+        }
+        close(fd);
+        fd = open(filename, O_RDONLY);
+        if (fd != -1)
+        {
+            dup2(fd, STDIN_FILENO);
+            close(fd);
 		}
-	}
-	close(fd[1]);
-	waitpid (id, &exit_status, 0);
+        delete_file(filename);
+    }
+	*fd1 = fd;
 }
 
-void here_doc(t_token **final)
+int here_doc(t_token **final)
 {
-
-	int hc = 0;
-	t_token *curr = *final;
-	t_token *herecount = curr;
-	while (herecount)
-	{
-		if (herecount->value == HEREDOC)
-			hc++;
-		else if(hc == 17)
-			return (printf("minishell : maximum here-document count exceeded\n"), exit(1));
-		herecount = herecount->next;
-	}
-	while (curr)
-	{
-		if(curr->value == HEREDOC)
-			here_doc_child(&curr);
-		curr  = curr->next;
-	}
-
-	
+    int hc = 0;
+    t_token *curr = *final;
+    t_token *herecount = curr;
+	int fd;
+    while (herecount)
+    {
+        if (herecount->value == HEREDOC)
+            hc++;
+        if (hc == 17)
+        {
+            ft_printf(2, "minishell: maximum here-document count exceeded\n");
+            exit(2);
+        }
+        herecount = herecount->next;
+    }
+    while (curr)
+    {
+        if (curr->value == HEREDOC)
+            here_doc_child(&curr , &fd);
+        curr = curr->next;
+    }
+	return (fd);
 }

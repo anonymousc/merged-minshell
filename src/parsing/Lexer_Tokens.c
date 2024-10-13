@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:11:54 by aessadik          #+#    #+#             */
-/*   Updated: 2024/10/01 04:52:55 by kali             ###   ########.fr       */
+/*   Updated: 2024/10/12 19:42:26 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,36 @@ void	tokenization(char **line , t_token **fill_line)
 	}
 }
 
+void free_spaces2(t_token **head)
+{
+    t_token* current = *head;
+    t_token* tmp;
+
+    while (current) 
+	{
+        if (current->value == WHITESPACE) 
+		{
+            tmp = current;
+            current = current->next;
+
+            if (tmp == *head) 
+                *head = current;
+			else 
+			{
+                t_token* prev = *head;
+                while (prev && prev->next != tmp) 
+                    prev = prev->next;
+                if (prev) 
+                    prev->next = current;
+            }
+
+            free(tmp);
+        } 
+		else 
+            current = current->next;
+    }
+}
+
 void sanitizer(t_token **fill_line) 
 {
 	t_token *data;
@@ -121,7 +151,7 @@ void	ft_lstadd_back_exec(t_execution  **stacks, t_execution  *new)
 	new->next = NULL;
 }
 
-t_execution  *ft_lstnew_exec(char **cmd)
+t_execution  *ft_lstnew_exec(char **cmd ,char * file_in , char *file_out)
 {
 	t_execution   *list;
 
@@ -129,48 +159,90 @@ t_execution  *ft_lstnew_exec(char **cmd)
 	if (!list)
 		return (NULL);
 	list->cmd = cmd;
+	list->file_in = file_in;
+	list->file_out = file_out;
 	list->next = NULL;
 	return (list);
 }
-
+int count_filename_in(t_token **data)
+{
+	int wc = 0;
+	t_token *curr = *data;
+	while (curr)
+	{
+		if(curr->value == REDIRECTION_IN)
+			wc++;
+		curr = curr->next;
+	}
+	return wc;
+}
+int count_filename_out(t_token **data)
+{
+	int wc = 0;
+	t_token *curr = *data;
+	while (curr)
+	{
+		if(REDIRECTION_IN == curr->value)
+			wc++;
+		curr = curr->next;
+	}
+	return wc;
+}
+int count_cmds(t_token **data)
+{
+	int wc = 0;
+	t_token *curr = *data;
+	while (curr)
+	{
+		if(curr && (curr->value == REDIRECTION_IN || curr->value == REDIRECTION_OUT))
+			curr = curr->next->next;
+		if(curr && curr->value == WORD)	
+			wc++;
+		if(curr)
+			curr = curr->next;
+	}
+	return wc;
+}
 t_execution **for_execute(t_token **final , t_execution **data)
 {
 	t_token *curr = *final;
-	t_token *tmp = curr;
 	char **cmd;
-	int wc = 0;
-
-	while (tmp)
-	{
-		if(tmp->value == WORD)
-		{
-			if(curr->next && (curr->next->value == REDIRECTION_IN || curr->next->value == REDIRECTION_IN))
-				curr = curr->next->next->next;
-			else
-				wc++;
-		}
-		tmp = tmp->next;
-	}
+	int wc = count_cmds(final);
 	cmd = (char **)malloc(sizeof(char *) * (wc + 1));
 	*cmd = NULL;
-	int i = 0;
+	char *file_out = NULL;
+	char *file_in = NULL;
 	while (curr)
 	{
-		if(curr->value == WORD)
+		int i = 0;
+		if(curr && curr->value == REDIRECTION_IN)
 		{
-			if(curr->next && (curr->next->value == REDIRECTION_IN || curr->next->value == REDIRECTION_IN))
-				curr = curr->next->next->next;
-			else
-			{
-				cmd[i] = curr->data;
-				i++;
-			}
+			file_in = ft_strdup(curr->next->data);
+			// *data = ft_lstnew_exec(cmd , file_in , file_out);
+			curr = curr->next->next;
+		}
+		if(curr && curr->value == REDIRECTION_OUT)
+		{
+			file_out = ft_strdup(curr->next->data);
+			// *data = ft_lstnew_exec(cmd , file_in , file_out);
+			curr = curr->next->next;
+		}
+		if(curr && curr->value == WORD)
+		{
+			cmd[i] = curr->data;
+			i++;
+		}
+		// *data = ft_lstnew_exec(cmd , file_in , file_out);
+		cmd[wc] = NULL;
+		*data = ft_lstnew_exec(cmd , file_in , file_out);
+		if(curr && curr->value == PIPE)
+		{
+			ft_lstadd_back_exec(data, *data);
+			*data = (*data)->next;
 		}
 		if(curr)
-			curr = curr->next;	
+			curr = curr->next;
 	}
-	cmd[wc] = NULL;
-	*data = ft_lstnew_exec(cmd);
 	return data;
 }
 

@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 18:16:47 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/10/01 04:34:27 by kali             ###   ########.fr       */
+/*   Updated: 2024/10/11 23:56:02 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,12 +52,15 @@ typedef	struct	s_Tokenization
 {
 	char					*data;
 	Token					value;
+	// t_syntax				checker;
 	struct s_Tokenization	*next;
 
 }		t_token;
 typedef struct s_execution
 {
 	char 				**cmd;
+	char				*file_in;
+	char				*file_out;
 	int					fd[2];
 	int					pid;
 	struct s_execution	*next;
@@ -82,7 +85,7 @@ t_execution		**for_execute(t_token **final , t_execution **data);
 
 
 char	*ft_itoa(int n);
-char	*ft_strdup(char const *src);
+char	*ft_strdup(char *src);
 char	*ft_strchr(char const *s, int c);
 char	*ft_strrchr(char const *s, int c);
 char	*ft_strjoin(char *s1, char *s2);
@@ -121,7 +124,6 @@ char **fri_ol(char **str);
 
 # endif
 
-char	*ft_strdup(const char *s1);
 char	*get_new_line(char *s);
 char	*ft_strjoin(char *s, char *s1);
 int		find_newline(char *str);
