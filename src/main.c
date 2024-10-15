@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 12:03:40 by aessadik          #+#    #+#             */
-/*   Updated: 2024/10/12 18:19:15 by kali             ###   ########.fr       */
+/*   Updated: 2024/10/13 18:31:24 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,16 +184,16 @@ int main (int ac, char **av, char **envp)
 		
 		// printf("env == %s\n" , expander((*final)->data , *env));
 		// final_list_to_execute(final);
-		data = for_execute(final , data);//temprary function
+		for_execute(final , data);//temprary function
 		while (*data)
 		{
 			int i = 0; 
 			while((*data)->cmd && (*data)->cmd[i])
 			{
 				printf("data->cmd = %s\n" , (*data)->cmd[i]);
-				printf("fil_in = %s || file_out = %s\n" , (*data)->file_in , (*data)->file_out);
 				i++;
 			}
+			printf("fil_in = %d || file_out = %d\n" , (*data)->fd_in , (*data)->fd_out);
 			if(data)
 				(*data) = (*data)->next;
 		}

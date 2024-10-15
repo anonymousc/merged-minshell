@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:11:54 by aessadik          #+#    #+#             */
-/*   Updated: 2024/10/12 19:42:26 by kali             ###   ########.fr       */
+/*   Updated: 2024/10/13 18:59:05 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,7 @@ void	ft_lstadd_back_exec(t_execution  **stacks, t_execution  *new)
 	new->next = NULL;
 }
 
-t_execution  *ft_lstnew_exec(char **cmd ,char * file_in , char *file_out)
+t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int fd_out)
 {
 	t_execution   *list;
 
@@ -159,34 +159,10 @@ t_execution  *ft_lstnew_exec(char **cmd ,char * file_in , char *file_out)
 	if (!list)
 		return (NULL);
 	list->cmd = cmd;
-	list->file_in = file_in;
-	list->file_out = file_out;
+	list->fd_in = fd_in;
+	list->fd_out = fd_out;
 	list->next = NULL;
 	return (list);
-}
-int count_filename_in(t_token **data)
-{
-	int wc = 0;
-	t_token *curr = *data;
-	while (curr)
-	{
-		if(curr->value == REDIRECTION_IN)
-			wc++;
-		curr = curr->next;
-	}
-	return wc;
-}
-int count_filename_out(t_token **data)
-{
-	int wc = 0;
-	t_token *curr = *data;
-	while (curr)
-	{
-		if(REDIRECTION_IN == curr->value)
-			wc++;
-		curr = curr->next;
-	}
-	return wc;
 }
 int count_cmds(t_token **data)
 {
@@ -203,226 +179,50 @@ int count_cmds(t_token **data)
 	}
 	return wc;
 }
-t_execution **for_execute(t_token **final , t_execution **data)
+
+void for_execute(t_token **final , t_execution **data)
 {
 	t_token *curr = *final;
 	char **cmd;
+	int  fd_in;
+	int  fd_out;
+	// exec = malloc (sizeof (t_execution));
 	int wc = count_cmds(final);
 	cmd = (char **)malloc(sizeof(char *) * (wc + 1));
 	*cmd = NULL;
-	char *file_out = NULL;
-	char *file_in = NULL;
+	int i = 0;
 	while (curr)
 	{
-		int i = 0;
-		if(curr && curr->value == REDIRECTION_IN)
-		{
-			file_in = ft_strdup(curr->next->data);
-			// *data = ft_lstnew_exec(cmd , file_in , file_out);
-			curr = curr->next->next;
-		}
+		sleep(2);
 		if(curr && curr->value == REDIRECTION_OUT)
 		{
-			file_out = ft_strdup(curr->next->data);
-			// *data = ft_lstnew_exec(cmd , file_in , file_out);
+			printf("curr->value_redir_in == %s\n", curr->data);
+			fd_in = open(curr->next->data , O_CREAT | O_RDWR);
 			curr = curr->next->next;
 		}
-		if(curr && curr->value == WORD)
+		else if(curr && curr->value == REDIRECTION_IN)
 		{
-			cmd[i] = curr->data;
-			i++;
+			printf("curr->value_redir_out == %s\n", curr->data);
+			fd_out = open(curr->next->data , O_CREAT | O_RDWR);
+			curr = curr->next->next;
 		}
-		// *data = ft_lstnew_exec(cmd , file_in , file_out);
+		else if(curr && curr->value == WORD)
+		{
+			printf("curr->value_word == %s\n", curr->data);
+			if(curr->data)
+			{
+				cmd[i] = curr->data;
+				i++;
+			}
+		}
 		cmd[wc] = NULL;
-		*data = ft_lstnew_exec(cmd , file_in , file_out);
+		*data = ft_lstnew_exec(cmd , fd_in, fd_out);
 		if(curr && curr->value == PIPE)
-		{
-			ft_lstadd_back_exec(data, *data);
-			*data = (*data)->next;
-		}
+			ft_lstadd_back_exec(data , *data);
 		if(curr)
+		{
+			printf("curr->curr_data == %s\n", curr->data);
 			curr = curr->next;
+		}
 	}
-	return data;
 }
-
-// void heredoc_child(t_token **final, int *num_pipes, int **pipes)
-// {
-// 	t_token *curr = *final;
-//     char *line = NULL;
-// 	int i = 0;
-
-// 	while (i < *num_pipes)
-// 	{
-// 		close (pipes[i][1]);
-// 		i++;
-// 	}
-// 	while (curr && curr->value == HEREDOC)
-// 	{
-// 		curr = free_spaces (curr->next);
-// 		char *delim = curr->data;
-// 		while (1)
-// 		{		
-// 			line = get_next_line(0);
-// 			if (line == NULL) 
-// 				return ;
-// 			if (strncmp(line, delim, strlen(delim)) == 0)
-// 			{
-// 				free(line);
-// 				return ;
-// 			}
-// 			free(line);
-// 		}
-// 		curr = curr->next;
-// 	}
-// 	while (i < *num_pipes)
-// 	{
-// 		close (pipes[i][0]);
-// 		i++;
-// 	}
-// }
-
-// int **creat_pipes (int *num_pipes)
-// {
-// 	int i = 0;
-// 	int **pipes = (int **)malloc ((*num_pipes + 2) * sizeof (int *));
-// 	if(!pipes)
-// 		exit(1);
-// 	while (i < *num_pipes)
-// 	{
-// 		pipes[i] = malloc (2 * sizeof(int));
-// 		i++;
-// 	}
-// 	// pipes[(*num_pipes + 1)] = NULL;
-// 	return pipes;
-// }
-
-// void wait_children (int *num_pipes)
-// {
-// 	int i = 0;
-
-// 	while (i < *num_pipes)
-// 	{
-// 		wait (NULL);
-// 		i++;
-// 	}
-
-// }
-
-// void here_doc (t_token **final, int *num_pipes, int **pipes)
-// {
-// 	int id;
-// 	int i = 0;
-
-// 	while (i < *num_pipes)
-// 	{
-// 		id = fork();
-// 		if (id == 0)
-// 			heredoc_child(final, num_pipes, pipes);
-// 		i++;
-// 	}
-// 	dup2(pipes[*num_pipes - 2][0], STDIN_FILENO);
-// }
-
-// int here_doc_final(t_token **final)
-// {
-// 	int pc = 0;
-// 	int **pipes;
-
-// 	t_token *curr = *final;
-// 	while (curr)
-// 	{
-// 		if (curr && curr->value == HEREDOC)
-// 			pc++;
-// 		curr = curr->next;
-// 	}
-// 	pipes = creat_pipes(&pc);
-// 	here_doc(final, &pc, pipes);
-// 	wait_children(&pc);
-// 	return 0;
-// }
-
-// void heredoc_child(t_token **final, int *num_pipes, int **pipes) {
-//     t_token *curr = *final;
-//     char *line = NULL;
-
-//     for (int i = 0; i < *num_pipes; i++)
-//     	close(pipes[i][1]);
-//     while (curr) 
-// 	{
-// 		if(curr->value == HEREDOC)
-// 		{
-// 			curr = free_spaces(curr->next);
-// 			char *delim = curr->data;
-// 			printf ("curr  == |%s|\n", curr->data);
-// 			while (1) 
-// 			{
-// 				line = get_next_line(0);
-// 				if (line == NULL) 
-// 					return;
-// 				if (strncmp(line, delim, strlen(delim)) == 0) 
-// 				{
-// 					free(line);
-// 					return;
-// 				}
-// 				free(line);
-// 			}
-// 		}
-// 		curr = curr->next;
-//     }
-
-//     // Close read ends after use
-//     for (int i = 0; i < *num_pipes; i++) 
-//         close(pipes[i][0]);
-// }
-
-// void here_doc(t_token **final, int *num_pipes, int **pipes) 
-// {
-//     int id;
-//     int i = 0;
-// 	while(i < *num_pipes)
-// 	{
-//         id = fork();
-//         if (id == 0) 
-// 		{
-//             heredoc_child(final, num_pipes, pipes);
-//             return (void)0; // Ensure the child exits after completion
-//         }
-//         // Close both ends of the pipe in the parent after forking
-//         close(pipes[i][1]);
-//         close(pipes[i][0]);
-// 		i++;
-//     }
-// 	// int test = (i != 0);
-// 	// printf("|%d|\n" , i - (i != 0));
-//     // Redirect the input for the last pipe
-//     // if(pipes[i - test][0])
-// 		// dup2(pipes[i  - 1][0], STDIN_FILENO);
-//     for (int i = 0; i < *num_pipes; i++) 
-//         close(pipes[i][0]); // Close read ends in parent after dup
-// }
-
-// int here_doc_final(t_token **final) {
-//     int pc = 0;
-//     int **pipes;
-
-//     t_token *curr = *final;
-//     while (curr) 
-// 	{
-//         if (curr->value == HEREDOC)
-//             pc++;
-//         curr = curr->next;
-//     }
-//     pipes = creat_pipes(&pc);
-//     here_doc(final, &pc, pipes);
-//     wait_children(&pc);
-
-//     // Free the pipes memory
-//     for (int i = 0; i < pc; i++) 
-// 	{
-//         free(pipes[i]);
-//     }
-//     free(pipes);
-    
-//     return 0;
-// }

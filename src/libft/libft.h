@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 18:16:47 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/10/11 23:56:02 by kali             ###   ########.fr       */
+/*   Updated: 2024/10/13 18:09:30 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,8 @@ typedef	struct	s_Tokenization
 typedef struct s_execution
 {
 	char 				**cmd;
-	char				*file_in;
-	char				*file_out;
+	int					fd_in;
+	int					fd_out;
 	int					fd[2];
 	int					pid;
 	struct s_execution	*next;
@@ -81,7 +81,7 @@ int		ft_strncmp(char const *s1, char const *s2, size_t n);
 int		is_space(char c);
 int		ft_strcmp(char *s1, char *s2);
 char	*is_space_veta(char s);
-t_execution		**for_execute(t_token **final , t_execution **data);
+void for_execute(t_token **final , t_execution **data);
 
 
 char	*ft_itoa(int n);
