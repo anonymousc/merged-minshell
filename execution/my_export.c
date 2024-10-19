@@ -18,6 +18,46 @@ void swap(char **s1, char **s2)
     *s2 = tmp;
 }
 
+
+int env_size(t_env *env)
+{
+    int count = 0;
+    while (env)
+    {
+        count++;
+        env = env->next
+    }
+    return count;
+}
+
+char **env_to_arr(t_env *env)
+{
+    char **envir = malloc (sizeof (char*) * env_size(env));
+    int i = 0;
+    while (env)
+    {
+        int len = ft_strlen(env->variable) + ft_strlen (env->value) + 2;
+
+        envir[i] = malloc (len);
+        int j = 0;
+        int k = 0;
+        while (envir[i][j])
+        {
+            envir[i][j] = env->variable[k];
+            envir[i][j] = '=';
+            k = 0;
+            envir[i][j] = env->value[k];
+            j++;
+            k++;
+        }
+        envir[i][j] = 0;
+        env = env->next;
+        i++;
+    }
+    envir[i] = NULL;
+    return envir;
+}
+
 char **sort_strings(char **str, int len) 
 {
     int i = 0;
@@ -155,8 +195,6 @@ int export_with_value(t_execution *exec, char *arg, char *equal, char *plus)
         free(var_name);
         return 0;
     }
-
-    // free(var_name);
     return 1;
 }
 

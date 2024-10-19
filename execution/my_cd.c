@@ -169,7 +169,6 @@ int check_path (char *path)
         printf("Error:\n");
         return -1;
     }
-    // Check if it's a regular file
     else if (S_ISREG(path_stat.st_mode))
     {
         printf("not a directory: %s\n", path);

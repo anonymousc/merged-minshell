@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:11:54 by aessadik          #+#    #+#             */
-/*   Updated: 2024/10/13 18:59:05 by kali             ###   ########.fr       */
+/*   Updated: 2024/10/18 01:31:38 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,7 +139,7 @@ void	ft_lstadd_back_exec(t_execution  **stacks, t_execution  *new)
 {
 	t_execution 	*head;
 
-	if (!stacks || !*stacks)
+	if (!*stacks)
 	{
 		*stacks = new;
 		return ;
@@ -151,7 +151,7 @@ void	ft_lstadd_back_exec(t_execution  **stacks, t_execution  *new)
 	new->next = NULL;
 }
 
-t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int fd_out)
+t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int fd_out ,int fd_append , int fd_heredoc)
 {
 	t_execution   *list;
 
@@ -161,6 +161,8 @@ t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int fd_out)
 	list->cmd = cmd;
 	list->fd_in = fd_in;
 	list->fd_out = fd_out;
+	list->fd_append = fd_append;
+	list->fd_heredoc = fd_heredoc;
 	list->next = NULL;
 	return (list);
 }
@@ -180,49 +182,137 @@ int count_cmds(t_token **data)
 	return wc;
 }
 
-void for_execute(t_token **final , t_execution **data)
+// void for_execute(t_token **final , t_execution **data)
+// {
+// 	t_token *curr = *final;
+// 	char **cmd;
+// 	int  fd_in;
+// 	int  fd_out;
+// 	// exec = malloc (sizeof (t_execution));
+// 	int wc = count_cmds(final);
+// 	cmd = (char **)malloc(sizeof(char *) * (wc + 1));
+// 	*cmd = NULL;
+// 	int i = 0;
+// 	while (curr)
+// 	{
+// 		// sleep(2);
+// 		if(curr && curr->value == REDIRECTION_OUT)
+// 		{
+// 			// printf("curr->value_redir_in == %s\n", curr->data);
+// 			fd_in = open(curr->next->data , O_CREAT | O_RDWR);
+// 			curr = curr->next->next;
+// 		}
+// 		else if(curr && curr->value == REDIRECTION_IN)
+// 		{
+// 			printf("curr->value_redir_out == %s\n", curr->data);
+// 			fd_out = open(curr->next->data , O_CREAT | O_RDWR);
+// 			curr = curr->next->next;
+// 		}
+// 		else if(curr && curr->value == WORD)
+// 		{
+// 			printf("curr->value_word == %s\n", curr->data);
+// 			if(curr->data)
+// 			{
+// 				cmd[i] = curr->data;
+// 				i++;
+// 			}
+// 		}
+// 		cmd[wc] = NULL;
+// 		*data = ft_lstnew_exec(cmd , fd_in, fd_out);
+// 		if(curr && curr->value == PIPE)
+// 			ft_lstadd_back_exec(data , *data);
+// 		if(curr)
+// 		{
+// 			printf("curr->curr_data == %s\n", curr->data);
+// 			curr = curr->next;
+// 		}
+// 	}
+// }
+
+void for_execute(t_token **final, t_execution **data)
 {
-	t_token *curr = *final;
-	char **cmd;
-	int  fd_in;
-	int  fd_out;
-	// exec = malloc (sizeof (t_execution));
-	int wc = count_cmds(final);
-	cmd = (char **)malloc(sizeof(char *) * (wc + 1));
-	*cmd = NULL;
-	int i = 0;
-	while (curr)
-	{
-		sleep(2);
-		if(curr && curr->value == REDIRECTION_OUT)
-		{
-			printf("curr->value_redir_in == %s\n", curr->data);
-			fd_in = open(curr->next->data , O_CREAT | O_RDWR);
-			curr = curr->next->next;
-		}
-		else if(curr && curr->value == REDIRECTION_IN)
-		{
-			printf("curr->value_redir_out == %s\n", curr->data);
-			fd_out = open(curr->next->data , O_CREAT | O_RDWR);
-			curr = curr->next->next;
-		}
-		else if(curr && curr->value == WORD)
-		{
-			printf("curr->value_word == %s\n", curr->data);
-			if(curr->data)
+    t_token *curr = *final;
+    *data = NULL;
+    while (curr)
+    {
+        int word_count = 0;
+        t_token *temp = curr;
+        while (temp && temp->value != PIPE)
+        {
+            if (temp->value == WORD)
+                word_count++;
+            temp = temp->next;
+        }
+        if (word_count == 0)
+        {
+            curr = curr->next;
+            continue;
+        }
+        char **cmd = (char **)malloc(sizeof(char *) * (word_count + 1));
+        for (int i = 0; i <= word_count; i++)
+            cmd[i] = NULL;
+
+        int i = 0;
+        int fd_in = 0;
+		int fd_append = 0;
+        int fd_out = 1;
+		int fd_heredoc = 0;
+        while (curr && curr->value != PIPE)
+        {
+            if (!curr->data)
+            {
+                curr = curr->next;
+                continue;
+            }
+            if (curr->value == REDIRECTION_OUT)
+            {
+                if (curr->next && curr->next->data)
+                {
+                    fd_out = open(curr->next->data, O_CREAT | O_RDWR | O_TRUNC, 0644);
+                    curr = curr->next;
+                }
+            }
+			else if(curr->value == HEREDOC)
 			{
-				cmd[i] = curr->data;
-				i++;
+				if(curr->next && curr->next->data)
+				{
+					fd_heredoc = here_doc(&curr);
+					curr = curr->next;
+				}
 			}
-		}
-		cmd[wc] = NULL;
-		*data = ft_lstnew_exec(cmd , fd_in, fd_out);
-		if(curr && curr->value == PIPE)
-			ft_lstadd_back_exec(data , *data);
-		if(curr)
-		{
-			printf("curr->curr_data == %s\n", curr->data);
-			curr = curr->next;
-		}
-	}
+			else if(curr->value == APPEND)
+			{
+				 if (curr->next && curr->next->data)
+                {
+					fd_append = open(curr->next->data, O_CREAT | O_RDWR | O_APPEND, 0644);
+					curr = curr->next;
+				}
+			}
+            else if (curr->value == REDIRECTION_IN)
+            {
+                if (curr->next && curr->next->data)
+                {  
+                    fd_in = open(curr->next->data, O_RDONLY);
+                    curr = curr->next;
+                }
+            }
+            else if (curr->value == WORD && i < word_count)
+            {
+               
+                cmd[i] = strdup(curr->data);
+                i++;
+            }
+
+            curr = curr->next;
+        }
+        t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc);
+		if (!*data)
+            *data = new_cmd;
+        else
+            ft_lstadd_back_exec(data, new_cmd);
+        if (curr && curr->value == PIPE)
+        {
+            curr = curr->next;
+        }
+    }
 }

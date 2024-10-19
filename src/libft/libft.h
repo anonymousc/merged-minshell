@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 18:16:47 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/10/13 18:09:30 by kali             ###   ########.fr       */
+/*   Updated: 2024/10/18 00:23:53 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,8 @@ typedef struct s_execution
 	char 				**cmd;
 	int					fd_in;
 	int					fd_out;
+	int					fd_append;
+	int					fd_heredoc;
 	int					fd[2];
 	int					pid;
 	struct s_execution	*next;
@@ -93,7 +95,7 @@ char	*ft_strtrim(char const *s1, char const *set);
 char	*ft_strmapi(char const *s, char (*f)(unsigned int, char));
 char	*ft_substr(char const *s, unsigned int start, size_t len);
 char	*ft_strnstr(char const *haystack, char const *needle, size_t n);
-char	**ft_split(char const *s);
+char	**ft_split(char const *s, char c);
 
 
 void	ft_bzero(void *s, size_t n);
@@ -114,7 +116,7 @@ void	split_to_fill(char *s , t_token  **fill);
 size_t	ft_strlen(char const *str);
 size_t	ft_strlcat(char *dest, char const *src, size_t size);
 size_t	ft_strlcpy(char *dest, char const *src, size_t size);
-size_t	word_count(char const *s);
+size_t	word_count(char const *s, char c);
 char **fri_ol(char **str);
 
 // GET_NEXT_LINE

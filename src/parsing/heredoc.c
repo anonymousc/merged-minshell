@@ -143,11 +143,11 @@ void here_doc_child(t_token **final , int *fd1)
         }
         close(fd);
         fd = open(filename, O_RDONLY);
-        if (fd != -1)
-        {
-            dup2(fd, STDIN_FILENO);
-            close(fd);
-		}
+        // if (fd != -1)
+        // {
+        //     dup2(fd, STDIN_FILENO);
+        //     close(fd);
+		// }
         delete_file(filename);
     }
 	*fd1 = fd;

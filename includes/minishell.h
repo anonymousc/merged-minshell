@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/06 13:21:40 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/10/10 15:43:15 by kali             ###   ########.fr       */
+/*   Updated: 2024/10/16 23:05:19 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,4 +98,6 @@ void free_spaces2(t_token **head);
 int here_doc(t_token **final);
 char *expander(char *expansion, t_env *envp);
 
+//execution
+void execute_bins (t_execution **exec, char **env);
 #endif

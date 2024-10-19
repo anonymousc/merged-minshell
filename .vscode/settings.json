@@ -2,6 +2,7 @@
 	"makefile.configurationCachePath": "cache",
 	"C_Cpp.intelliSenseCachePath": "%LocalAppData%/Microsoft/vscode-cpptools",
 	"files.associations": {
-		"libft.h": "c"
+		"libft.h": "c",
+		"builtins.h": "c"
 	}
 }

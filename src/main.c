@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 12:03:40 by aessadik          #+#    #+#             */
-/*   Updated: 2024/10/13 18:31:24 by kali             ###   ########.fr       */
+/*   Updated: 2024/10/17 22:28:04 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,20 +185,22 @@ int main (int ac, char **av, char **envp)
 		// printf("env == %s\n" , expander((*final)->data , *env));
 		// final_list_to_execute(final);
 		for_execute(final , data);//temprary function
-		while (*data)
-		{
-			int i = 0; 
-			while((*data)->cmd && (*data)->cmd[i])
-			{
-				printf("data->cmd = %s\n" , (*data)->cmd[i]);
-				i++;
-			}
-			printf("fil_in = %d || file_out = %d\n" , (*data)->fd_in , (*data)->fd_out);
-			if(data)
-				(*data) = (*data)->next;
-		}
+		// while (*data)
+		// {
+		// 	int i = 0; 
+		// 	while((*data)->cmd && (*data)->cmd[i])
+		// 	{
+		// 		printf("data->cmd = %s\n" , (*data)->cmd[i]);
+		// 		i++;
+		// 	}
+		// 	printf("fil_in = %d || file_out = %d\n" , (*data)->fd_in , (*data)->fd_out);
+		// 	if(data)
+		// 		(*data) = (*data)->next;
+		// }
 		
-		print_tokens(*final);
+		// print_tokens(*final);
+		execute_bins (data, envp);
+
 		free_stack(final);
 		free(final);
 		fri_ol(splitted_array);
