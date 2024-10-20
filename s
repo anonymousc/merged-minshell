@@ -1,0 +1,15 @@
+builtins
+execution
+file2
+file3
+hhh
+includes
+Makefile
+minishell
+s
+src
+ta
+tesst
+test
+test1
+test12

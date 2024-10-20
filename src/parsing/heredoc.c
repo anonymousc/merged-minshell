@@ -110,7 +110,7 @@ void here_doc_child(t_token **final , int *fd1)
     int fd;
     char *line;
     char *filename = NULL;
-
+    fd = 0;
     if (curr && curr->value == HEREDOC)
     {
         fd = file_to_write_on(filename);
@@ -159,6 +159,8 @@ int here_doc(t_token **final)
     t_token *curr = *final;
     t_token *herecount = curr;
 	int fd;
+
+    fd = 0;
     while (herecount)
     {
         if (herecount->value == HEREDOC)

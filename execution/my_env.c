@@ -1,6 +1,6 @@
 #include "builtins.h"
 
-t_env *make_env(t_execution *exec) 
+t_env *make_env(t_exec *exec) 
 {
     int i = 0;
     t_env *envir = NULL;

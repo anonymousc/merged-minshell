@@ -16,14 +16,14 @@ typedef struct s_env
     struct s_env *next;
 } t_env;
 
-typedef struct s_execution
+typedef struct s_exec
 {
     int ac;
     char **env_orginal;
     char **av;
     char *input;
     t_env  *env;
-} t_execution;
+} t_exec;
 
 
 
@@ -34,7 +34,7 @@ size_t	count_words(char const *str, char sep);
 char	**ft_split(char const *s, char sep);
 size_t	ft_strlen(char *str);
 void print_env(t_env *env);
-t_env * make_env(t_execution *exec);
+t_env * make_env(t_exec *exec);
 char *ft_strchr(char *str, int c);
 char *ft_strndup (char *str, size_t n);
 char *ft_strdup (char *str);
@@ -46,11 +46,11 @@ void free_env(t_env *env);
 //pwd
 int my_pwd();
 //export
-int my_export(t_execution *exec);
+int my_export(t_exec *exec);
 //cd
-int my_cd(t_execution *exec);
+int my_cd(t_exec *exec);
 //echo
 int my_echo (int ac, char **av);
 //execute builtins
-int execute_builtins(t_execution *exec);
+int execute_builtins(t_exec *exec);
 #endif

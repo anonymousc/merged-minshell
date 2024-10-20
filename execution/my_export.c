@@ -25,36 +25,54 @@ int env_size(t_env *env)
     while (env)
     {
         count++;
-        env = env->next
+        env = env->next;
     }
     return count;
 }
 
 char **env_to_arr(t_env *env)
 {
-    char **envir = malloc (sizeof (char*) * env_size(env));
+    int size = env_size(env);
+    char **envir = malloc(sizeof(char *) * (size + 1));
+    if (!envir)
+        return NULL;
+
     int i = 0;
     while (env)
     {
-        int len = ft_strlen(env->variable) + ft_strlen (env->value) + 2;
+        int var_len = ft_strlen(env->variable);
+        int val_len = ft_strlen(env->value);
+        int len = var_len + val_len + 4;
 
-        envir[i] = malloc (len);
+        envir[i] = malloc(len);
         int j = 0;
-        int k = 0;
-        while (envir[i][j])
+        if (!envir[i])
         {
-            envir[i][j] = env->variable[k];
-            envir[i][j] = '=';
-            k = 0;
-            envir[i][j] = env->value[k];
-            j++;
-            k++;
+            while (j < i)
+            {
+                free(envir[j]);
+                j++;
+            }
+            free(envir);
+            return NULL;
         }
-        envir[i][j] = 0;
+        j = 0;
+        int k = 0;
+        while (k < var_len)
+            envir[i][j++] = env->variable[k++];
+        envir[i][j++] = '=';
+        envir[i][j++] = '"';
+        k = 0;
+        while (k < val_len)
+            envir[i][j++] = env->value[k++];
+        envir[i][j++] = '"';
+        envir[i][j] = '\0';
+
         env = env->next;
         i++;
     }
     envir[i] = NULL;
+
     return envir;
 }
 
@@ -146,7 +164,7 @@ int update_existing_var(t_env *existing, char *value, int is_append)
 }
 
 
-int handle_existing_var(t_execution *exec, char *var_name, char *value, int is_append)
+int handle_existing_var(t_exec *exec, char *var_name, char *value, int is_append)
 {
     t_env *existing = find_env_variable(exec->env, var_name);
     t_env *new_var;
@@ -171,7 +189,7 @@ int handle_existing_var(t_execution *exec, char *var_name, char *value, int is_a
     return 1;
 }
 
-int export_with_value(t_execution *exec, char *arg, char *equal, char *plus)
+int export_with_value(t_exec *exec, char *arg, char *equal, char *plus)
 {
     int is_append = (plus && plus + 1 == equal);
     int name_len;
@@ -198,7 +216,7 @@ int export_with_value(t_execution *exec, char *arg, char *equal, char *plus)
     return 1;
 }
 
-int export_without_value(t_execution *exec, char *arg)
+int export_without_value(t_exec *exec, char *arg)
 {
     t_env *existing = find_env_variable(exec->env, arg);
     t_env *new_var;
@@ -218,7 +236,7 @@ int export_without_value(t_execution *exec, char *arg)
     return 1;
 }
 
-int process_export_arg(t_execution *exec, char *arg)
+int process_export_arg(t_exec *exec, char *arg)
 {
     char *equal = strchr(arg, '=');
     char *plus = strchr(arg, '+');
@@ -233,7 +251,7 @@ int process_export_arg(t_execution *exec, char *arg)
     }
 }
 
-int my_export(t_execution *exec)
+int my_export(t_exec *exec)
 {
     int i = 1;
     while (exec->av[i])
@@ -252,21 +270,24 @@ int my_export(t_execution *exec)
     return 0;
 }
 
-// int main(int ac, char **av, char **env)
-// {
-//     t_execution *exec = malloc(sizeof(t_execution));
-//     exec->ac = ac;
-//     exec->av = av;
-//     exec->env_orginal = env;
-//     t_env * envir = make_env(exec);
-//     exec->env = envir;
+int main (int ac , char **av, char **env)
+{
+    t_exec *exec = malloc(sizeof(t_exec));
+    exec->ac = ac;
+    exec->av = av;
+    exec->env_orginal = env;
+    t_env *envir = make_env(exec);
 
-//     int result = my_export(exec);
-//     if (result != 0)
-//     {
-//         printf("Export failed\n");
-//         return 1;
-//     }
-//     my_env(exec->env);
-//     return 0;
-// }
+    char **test = env_to_arr(envir);
+    sort_strings(test, env_size(envir));
+    int i = 0;
+    while (test[i])
+    {
+        printf ("declare -x %s\n", test[i]);
+        free(test[i]);
+        i++;
+    }
+    i = 0;
+   
+    free(test);
+}

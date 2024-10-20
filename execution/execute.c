@@ -1,7 +1,7 @@
 // #include "builtins.h"
 #include "../includes/minishell.h"
 
-// int execute_builtins(t_execution *exec)
+// int execute_builtins(t_exec *exec)
 // {
 // 	int ret;
 // 	if (strncmp(exec->av[0], "echo", 5) == 0)
@@ -172,17 +172,30 @@ void redirect_io(t_execution **exec)
 //     while (wait(&status) > 0);
 // }
 
+void	free_stack1(t_execution **stack)
+{
+	t_execution	*tmp;
+
+	tmp = *stack;
+	while (tmp)
+	{
+		*stack = (*stack)->next;
+		free(tmp);
+		tmp = *stack;
+	}
+	stack = NULL;
+}
+
 void execute_bins(t_execution **exec, char **env)
 {
     t_execution *curr = *exec;
     int status;
-    pid_t *pids;  // Array to store all process IDs
+    pid_t *pids;
     int cmd_count = 0;
     int i = 0;
     int prev_pipe[2] = {0, 1};
     int curr_pipe[2];
 
-    // Count commands and allocate pid array
     t_execution *temp = curr;
     while (temp)
     {
@@ -215,7 +228,6 @@ void execute_bins(t_execution **exec, char **env)
 
         if (pids[i] == 0)
         {
-            // Set up input from previous pipe if not first command
             if (i > 0)
             {
                 dup2(prev_pipe[0], STDIN_FILENO);
@@ -223,7 +235,6 @@ void execute_bins(t_execution **exec, char **env)
                 close(prev_pipe[1]);
             }
 
-            // Set up output to next pipe if not last command
             if (i < cmd_count - 1)
             {
                 close(curr_pipe[0]);
@@ -231,19 +242,20 @@ void execute_bins(t_execution **exec, char **env)
                 close(curr_pipe[1]);
             }
 
-            // Handle redirections after pipe setup
             redirect_io(&curr);
 
             char *fullcmd = find_path(curr->cmd[0], env);
             if (!fullcmd)
             {
                 fprintf(stderr, "Command not found: %s\n", curr->cmd[0]);
+                free_stack1(&curr);
                 free(pids);
                 exit(1);
             }
 
             if (execve(fullcmd, curr->cmd, env) == -1)
             {
+                free_stack1(&curr);
                 perror("execve");
                 free(fullcmd);
                 free(pids);
@@ -252,7 +264,6 @@ void execute_bins(t_execution **exec, char **env)
         }
         else
         {
-            // Parent process
             if (i > 0)
             {
                 close(prev_pipe[0]);
@@ -270,18 +281,9 @@ void execute_bins(t_execution **exec, char **env)
         i++;
     }
 
-    // Wait for first process (cat) to finish first
-    waitpid(pids[0], &status, 0);
-
-    // If first process exited normally, terminate other processes
-    if (WIFEXITED(status))
-    {
-        for (i = 1; i < cmd_count; i++)
+        for (i = 0; i < cmd_count; i++)
         {
-            kill(pids[i], SIGTERM);
-            waitpid(pids[i], NULL, 0);
+            waitpid(pids[i], &status, 0);
         }
-    }
-
-    free(pids);
+        free(pids);
 }
