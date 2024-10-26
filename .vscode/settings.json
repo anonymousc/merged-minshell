@@ -3,6 +3,7 @@
 	"C_Cpp.intelliSenseCachePath": "%LocalAppData%/Microsoft/vscode-cpptools",
 	"files.associations": {
 		"libft.h": "c",
-		"builtins.h": "c"
+		"builtins.h": "c",
+		"minishell.h": "c"
 	}
 }

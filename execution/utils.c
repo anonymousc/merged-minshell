@@ -172,7 +172,7 @@ static char	*allocate(char const **s, char sep)
 	return (word);
 }
 
-static void	free_split(char **s, int n)
+void	free_split(char **s, int n)
 {
 	if (!s)
 		return ;

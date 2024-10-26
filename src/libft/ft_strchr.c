@@ -21,7 +21,7 @@ char	*ft_strchr(const char *s, int c)
 	chr = c;
 	i = 0;
 	len = ft_strlen(s);
-	while (i <= len)
+	while (s && i <= len)
 	{
 		if (s[i] == chr)
 			return ((char *)(s + i));

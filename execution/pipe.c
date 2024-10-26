@@ -23,6 +23,8 @@ char *find_path(char *cmd, char **env)
     char *full_command;
     char *path_var = NULL;
     
+     if (strchr(cmd , '/') && access (cmd, F_OK | X_OK))
+        return NULL;
     int j = 0;
     while (env[j])
     {
@@ -49,12 +51,13 @@ char *find_path(char *cmd, char **env)
         
         free(full_path);
 
-        if (access(full_command, F_OK) == 0)
+        if (access(full_command, F_OK | X_OK) == 0)
         {
             return full_command;
         }
         free(full_command);
-        i++;    }
+        i++;    
+    }
     return NULL;
 }
 
@@ -108,13 +111,22 @@ void pipe_and_execute(char **cmd1, char **cmd2, char **env)
 
 int main(int ac, char *av[], char **env)
 {
-    int pipe_index = find_pipe_index(ac, av);
+    // int pipe_index = find_pipe_index(ac, av);
     
-    av[pipe_index] = NULL;
-    char **cmd1 = &av[1];
-    char **cmd2 = &av[pipe_index + 1];
+    // av[pipe_index] = NULL;
+    // char **cmd1 = &av[1];
+    // char **cmd2 = &av[pipe_index + 1];
 
-    pipe_and_execute(cmd1, cmd2, env);
+    // pipe_and_execute(cmd1, cmd2, env);
 
-    return 0;
+    // return 0;
+    int pid = fork ();
+
+    if (pid == 0)
+    {
+        char *s = "/root/";
+        char *s1[] = {"", NULL};
+        if(execv(s , s1))
+            perror("execv");
+    }
 }

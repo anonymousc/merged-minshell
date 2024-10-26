@@ -91,12 +91,13 @@ void		tokenization(char **line , t_token **fill_line);
 void		sanitizer(t_token **fill_line);
 int			check_syntax_extended (t_token **final);
 t_token		*free_spaces (t_token *curr);
-void free_spaces2(t_token **head);
+void		free_spaces2(t_token **head);
 /* **************************** */
 // to remove
 // int here_doc(t_token **final, int *fd);
-int here_doc(t_token **final);
-char *expander(char *expansion, t_env *envp);
+int		here_doc(t_token **final);
+char	*expander(char *expansion, t_env *envp);
+int		file_size(t_token **data);
 
 //execution
 void execute_bins (t_execution **exec, char **env);

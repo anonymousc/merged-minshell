@@ -27,7 +27,8 @@ void sig_handler1(int test)
 	(void)test;
 	// rl_replace_line ("", 0);
 	// rl_on_new_line ();
-	signal(SIGQUIT, SIG_IGN);
+	// signal(SIGQUIT, SIG_IGN);
+	return ;
 	// rl_redisplay();
 	// return ;
 }

@@ -60,7 +60,7 @@ typedef struct s_execution
 {
 	char 				**cmd;
 	int					fd_in;
-	int					fd_out;
+	int					*fd_out;
 	int					fd_append;
 	int					fd_heredoc;
 	int					fd[2];

@@ -32,6 +32,7 @@ int list_len(t_env *env);
 char	*ft_strjoin(char *s1, char *s2);
 size_t	count_words(char const *str, char sep);
 char	**ft_split(char const *s, char sep);
+void	free_split(char **s, int n);
 size_t	ft_strlen(char *str);
 void print_env(t_env *env);
 t_env * make_env(t_exec *exec);

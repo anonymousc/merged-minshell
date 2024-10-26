@@ -151,6 +151,19 @@ void process_quotes(t_token **final)
         curr = curr->next;
     }
 }
+void	free_stackhhh(t_execution **stack)
+{
+	t_execution	*tmp;
+
+	tmp = *stack;
+	while (tmp)
+	{
+		*stack = (*stack)->next;
+		free(tmp);
+		tmp = *stack;
+	}
+	stack = NULL;
+}
 
 int main (int ac, char **av, char **envp)
 {
@@ -167,10 +180,9 @@ int main (int ac, char **av, char **envp)
 	env = fill_env(envp, env);
 	while(1)
 	{
-		// data = (t_execution  **)malloc(sizeof(t_execution  *));
+		line = retline();
 		final = (t_token  **)malloc(sizeof(t_token  *));
 		data = (t_execution  **)malloc(sizeof(t_execution  *));
-		line = retline();
 		if(!line)
 			continue;
 		splitted_array = split_to_lex(line);
@@ -178,11 +190,10 @@ int main (int ac, char **av, char **envp)
 		
 		sanitizer(final);
 		process_quotes(final);
-		if (check_syntax_extended(final) || here_doc(final) == -1)
+		if (check_syntax_extended(final))
 			continue;
 		free_spaces2(final);
-		
-		// printf("env == %s\n" , expander((*final)->data , *env));
+		printf("env == %s\n" , expander((*final)->data , *env));
 		// final_list_to_execute(final);
 		for_execute(final , data);//temprary function
 		// while (*data)
@@ -193,16 +204,18 @@ int main (int ac, char **av, char **envp)
 		// 		printf("data->cmd = %s\n" , (*data)->cmd[i]);
 		// 		i++;
 		// 	}
-		// 	printf("fil_in = %d || file_out = %d\n" , (*data)->fd_in , (*data)->fd_out);
+		// 	for(int i = 0 ; i <  ; i++)
+		// 		printf("file_out = %d\n", (*data)->fd_out[i]);
 		// 	if(data)
 		// 		(*data) = (*data)->next;
 		// }
 		
 		// print_tokens(*final);
-		execute_bins (data, envp);
-
+		execute_bins(data, envp);
+		// free_stackhhh(data);
 		free_stack(final);
 		free(final);
+		free(data);
 		fri_ol(splitted_array);
 		free(line);
 	}

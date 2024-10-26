@@ -19,6 +19,7 @@ char  *retline(void)
 		signal(SIGINT , sig_handler);
 		signal(SIGQUIT, SIG_IGN);
 		line = readline("\e[34mminishell$ \e[0m");
+		signal(SIGINT , sig_handler);
 		add_history(line);
 		if(!line)
 			return (free(line) ,printf("exit\n"), exit(1) , NULL);

@@ -69,7 +69,7 @@ void expander_final(t_token **final ,t_env *env)
 	curr = *final;
 	while (curr)
 	{
-		if(curr->data == '$' && (curr->data + 1 != ' ' || curr->data + 1 != '\''))
+		if(!strncmp("$",curr->data , ft_strlen("$") - 1) && (!ft_strncmp(curr->data + 1, "\"" , ft_strlen("\"") - 1) || !ft_strncmp(curr->data + 1, "\"" , ft_strlen("\'") - 1)))
 			curr->data = expander(curr->data , env);
 		curr = curr->next;
 	}
