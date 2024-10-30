@@ -6,8 +6,7 @@ t_env *make_env(t_exec *exec)
     t_env *envir = NULL;
     t_env *new;
     char *delimiter;
-
-    while (exec->env_orginal[i])
+    while (exec->env_orginal && exec->env_orginal[i])
     {
         new = malloc(sizeof(t_env));
         if (!new)

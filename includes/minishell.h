@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/06 13:21:40 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/10/16 23:05:19 by kali             ###   ########.fr       */
+/*   Updated: 2024/10/28 17:01:10 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,7 @@ void		sanitizer(t_token **fill_line);
 int			check_syntax_extended (t_token **final);
 t_token		*free_spaces (t_token *curr);
 void		free_spaces2(t_token **head);
+void		expander_final(t_token **final ,t_env *env);
 /* **************************** */
 // to remove
 // int here_doc(t_token **final, int *fd);

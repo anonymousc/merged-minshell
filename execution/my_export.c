@@ -254,6 +254,21 @@ int process_export_arg(t_exec *exec, char *arg)
 int my_export(t_exec *exec)
 {
     int i = 1;
+    if (exec->ac == 1)
+    {
+        char **env_array = env_to_arr(exec->env);
+        sort_strings(env_array, env_size(exec->env));
+        
+        i = 0;
+        while (env_array[i])
+        {
+            printf("declare -x %s\n", env_array[i]);
+            free(env_array[i]);
+            i++;
+        }
+        free(env_array);
+        return 0;
+    }
     while (exec->av[i])
     {
         char *arg = exec->av[i];
@@ -270,24 +285,13 @@ int my_export(t_exec *exec)
     return 0;
 }
 
-int main (int ac , char **av, char **env)
-{
-    t_exec *exec = malloc(sizeof(t_exec));
-    exec->ac = ac;
-    exec->av = av;
-    exec->env_orginal = env;
-    t_env *envir = make_env(exec);
-
-    char **test = env_to_arr(envir);
-    sort_strings(test, env_size(envir));
-    int i = 0;
-    while (test[i])
-    {
-        printf ("declare -x %s\n", test[i]);
-        free(test[i]);
-        i++;
-    }
-    i = 0;
-   
-    free(test);
-}
+// int main (int ac , char **av, char **env)
+// {
+//     t_exec *exec = malloc(sizeof(t_exec));
+//     exec->ac = ac;
+//     exec->av = av;
+//     exec->env_orginal = env;
+//     t_env *envir = make_env(exec);
+//     exec->env = envir;
+//     my_export(exec);
+// }

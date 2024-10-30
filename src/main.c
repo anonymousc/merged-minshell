@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 12:03:40 by aessadik          #+#    #+#             */
-/*   Updated: 2024/10/17 22:28:04 by kali             ###   ########.fr       */
+/*   Updated: 2024/10/28 17:05:20 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,11 +189,11 @@ int main (int ac, char **av, char **envp)
 		tokenization(splitted_array , final);
 		
 		sanitizer(final);
+		expander_final(final ,*env);
 		process_quotes(final);
 		if (check_syntax_extended(final))
 			continue;
 		free_spaces2(final);
-		printf("env == %s\n" , expander((*final)->data , *env));
 		// final_list_to_execute(final);
 		for_execute(final , data);//temprary function
 		// while (*data)

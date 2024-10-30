@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 20:48:19 by kali              #+#    #+#             */
-/*   Updated: 2024/10/05 14:59:02 by kali             ###   ########.fr       */
+/*   Updated: 2024/10/28 18:58:25 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ char *expander(char *expansion, t_env *envp)
 	char *expanded;
 	char *to_compare;
 	expansion = expansion + 1;
+	if(*expansion  == '\'' || *expansion  == '\"')
+		return (expansion);
 	while (envp)
 	{
 		int j = 0;
@@ -24,7 +26,7 @@ char *expander(char *expansion, t_env *envp)
 			j++;
 		to_compare = (char *)malloc(sizeof(char) * j + 1);
 		if(!to_compare)
-			return NULL;
+			return (NULL);
 		int k = 0;
 		j = 0;
 		while (envp->env[j] && envp->env[j] != '=')
@@ -46,7 +48,7 @@ char *expander(char *expansion, t_env *envp)
 			i -= 1;
 			expanded = malloc(sizeof(char) * i + 1);
 			if(!expanded)
-				return NULL;
+				return (NULL);
 			i = 0;
 			while (envp->env[j])
 			{
@@ -69,9 +71,30 @@ void expander_final(t_token **final ,t_env *env)
 	curr = *final;
 	while (curr)
 	{
-		if(!strncmp("$",curr->data , ft_strlen("$") - 1) && (!ft_strncmp(curr->data + 1, "\"" , ft_strlen("\"") - 1) || !ft_strncmp(curr->data + 1, "\"" , ft_strlen("\'") - 1)))
-			curr->data = expander(curr->data , env);
+		if(curr->value == WORD)
+		{
+			int i = 0;
+			i = 0;
+			while (curr->data[i])
+			{
+				if(curr->data[i] == '$')
+				{
+					char *tmp = expander(curr->data + i , env);
+					*(curr->data + i) = '\0';
+					printf("curr->data %s\n" , curr->data);
+					if(tmp)
+					{
+						tmp[ft_strlen(ft_strdup(tmp))] = '\0';
+						curr->data = ft_strjoin(curr->data ,tmp);
+						printf("data == %s\n", curr->data);
+					}
+					else
+						*(curr->data + i) = '\0';
+				}
+				i++;
+			}
+		}
 		curr = curr->next;
 	}
-	*final  = curr;
+	final  = &curr;
 }

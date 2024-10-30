@@ -87,18 +87,12 @@ void	free_stack1(t_execution **stack)
 
 int redirect_io(t_execution **exec, int *flag)
 {
-    int i = 0;
-    if((*exec)->fd_out)
+    if((*exec)->fd_out != 1)
     {
-        while ((*exec)->fd_out[i] && (*exec)->fd_out[i] != 1)
-        {
             *flag = 1;
-            // Just perform redirections in order, last one wins
-            dup2((*exec)->fd_out[i], STDOUT_FILENO);
-            if ((*exec)->fd_out[i] != STDOUT_FILENO)  // Don't close STDOUT_FILENO
-                close((*exec)->fd_out[i]);
-            i++;
-        }
+            dup2((*exec)->fd_out, STDOUT_FILENO);
+            if ((*exec)->fd_out != STDOUT_FILENO) 
+                close((*exec)->fd_out);
     }
     if ((*exec)->fd_append != 1)
     {
@@ -108,7 +102,7 @@ int redirect_io(t_execution **exec, int *flag)
 
     if ((*exec)->fd_in != 0)
     {
-        if((*exec)->fd_in == -1)
+        if((*exec)->fd_in == -1 || (*exec)->fflag == 1)
         {
             printf("no such a file or directory\n");
             return -1;
@@ -167,8 +161,11 @@ void execute_bins(t_execution **exec, char **env)
         if (pids[i] == 0)
         {
         
-            if(redirect_io(&curr, &flag) == -1)
-                 break;
+            if (redirect_io(&curr, &flag) == -1)
+            {
+                free(pids);
+                exit(1);
+            }
             if (i > 0)
             {
                 dup2(prev_pipe[0], STDIN_FILENO);

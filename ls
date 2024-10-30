@@ -1,17 +1,14 @@
 a
 b
 builtins
-c
-d
-dsds
-e
 execution
-fdsfds
-hhh
+hh
 includes
-lit
+-l
+ls
 Makefile
 minishell
-out
+mm
+New Document.tldr
+s
 src
-test

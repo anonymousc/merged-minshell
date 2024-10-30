@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_syntax.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aessadik <aessadik@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/27 14:14:18 by aessadik          #+#    #+#             */
-/*   Updated: 2024/09/04 11:14:35 by aessadik         ###   ########.fr       */
+/*   Updated: 2024/10/27 19:20:05 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,8 @@ char *check_syntax(char *s)
 
 t_token *free_spaces (t_token *curr)
 {
-
 	while (curr && curr->value == WHITESPACE)
-	{
 		curr = curr->next;
-	}
 	return curr;
 }
 
@@ -105,7 +102,7 @@ int check_redir(t_token **final)
 	{
 		if(curr->value == REDIRECTION_IN || curr->value == REDIRECTION_OUT)
 		{
-			if (!curr->next || curr->next->value == HEREDOC || curr->next->value == PIPE ||  curr->next->value == APPEND || curr->next->value == REDIRECTION_IN || curr->next->value == REDIRECTION_OUT) 
+			if (!curr->next || curr->next->value == HEREDOC || curr->next->value == PIPE ||  curr->next->value == APPEND || curr->next->value == REDIRECTION_IN) 
 				return (free_stack(&curr) ,ft_printf(2, "syntax error\n"), 1);
 			curr = curr->next;
 			if(curr->value == WHITESPACE)

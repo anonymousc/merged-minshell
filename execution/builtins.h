@@ -48,10 +48,13 @@ void free_env(t_env *env);
 int my_pwd();
 //export
 int my_export(t_exec *exec);
+//unset
+void my_unset (t_exec **exec, char *s);
 //cd
 int my_cd(t_exec *exec);
 //echo
 int my_echo (int ac, char **av);
 //execute builtins
 int execute_builtins(t_exec *exec);
+
 #endif

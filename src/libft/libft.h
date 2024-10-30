@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 18:16:47 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/10/18 00:23:53 by kali             ###   ########.fr       */
+/*   Updated: 2024/10/27 18:44:33 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,12 +59,13 @@ typedef	struct	s_Tokenization
 typedef struct s_execution
 {
 	char 				**cmd;
+	int 				fflag;
 	int					fd_in;
-	int					*fd_out;
+	int					fd_out;
 	int					fd_append;
 	int					fd_heredoc;
-	int					fd[2];
-	int					pid;
+	// int					fd[2];
+	// int					pid;
 	struct s_execution	*next;
 }					t_execution;
 

@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:11:54 by aessadik          #+#    #+#             */
-/*   Updated: 2024/10/18 01:31:38 by kali             ###   ########.fr       */
+/*   Updated: 2024/10/27 23:21:16 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,6 @@ void sanitizer(t_token **fill_line)
 
 // to remove or enhance
 
-
 int file_size(t_token **data)
 {
 	t_token *curr = *data;
@@ -165,7 +164,7 @@ void	ft_lstadd_back_exec(t_execution  **stacks, t_execution  *new)
 	new->next = NULL;
 }
 
-t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int *fd_out ,int fd_append , int fd_heredoc)
+t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int fd_out ,int fd_append , int fd_heredoc, int flag)
 {
 	t_execution   *list;
 
@@ -177,6 +176,7 @@ t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int *fd_out ,int fd_append 
 	list->fd_out = fd_out;
 	list->fd_append = fd_append;
 	list->fd_heredoc = fd_heredoc;
+	list->fflag = flag;
 	list->next = NULL;
 	return (list);
 }
@@ -217,23 +217,15 @@ void for_execute(t_token **final, t_execution **data)
             continue;
         }
         char **cmd = (char **)malloc(sizeof(char *) * (word_count + 1));
-        int *fd_out = NULL; 
-		if(file_size(final) != 0)
-		{
-			fd_out = (int *)malloc(sizeof(int) * (file_size(final) + 1));
-			fd_out[file_size(final)] = 0;
-		}
        	int k = -1;
 	   	while(++k <= word_count)
 	   		cmd[k] = NULL;
-		k = -1;
-		while (++k < file_size(final))
-			fd_out[k] = 1;
         int i = 0;
         int fd_in = 0;
 		int fd_append = 1;
 		int fd_heredoc = 0;
-		int fd_count = 0;
+		int fd_out = 1;
+		int flag = 0;
         while (curr && curr->value != PIPE)
         {
             if (!curr->data)
@@ -241,18 +233,35 @@ void for_execute(t_token **final, t_execution **data)
                 curr = curr->next;
                 continue;
             }
-            if (curr->value == REDIRECTION_OUT)
+            if (curr->value == REDIRECTION_IN)
+            {
+				if (curr->next->value == REDIRECTION_OUT)
+				{
+					open(curr->next->next->data , O_CREAT | O_RDWR | O_TRUNC, 0666);
+					curr = curr->next->next;
+				}
+                if (curr->next && curr->next->data)
+                {
+                    fd_in = open(curr->next->data, O_RDONLY, 0444);
+					if (fd_in == -1)
+					{
+						flag = 1;
+					}
+					else if (!ft_strncmp(curr->next->data, "/dev/stdin" , ft_strlen("/dev/stdin")))
+						fd_in--;
+					curr = curr->next;
+                }
+            }
+            else if (curr->value == REDIRECTION_OUT)
             {
                 if (curr->next && curr->next->data)
                 {
-                    fd_out[fd_count] = open(curr->next->data, O_CREAT | O_RDWR | O_TRUNC, 0666);
-					if (!ft_strncmp(curr->next->data, "/dev/stdout" , ft_strlen("/dev/stdout") - 1) && !curr->next->next)
-						fd_out[fd_count] = fd_out[fd_count - 1];
-				 	fd_count++;
+                    fd_out = open(curr->next->data, O_CREAT | O_RDWR | O_TRUNC, 0666);
+					if (!ft_strncmp(curr->next->data, "/dev/stdout" , ft_strlen("/dev/stdout")) && !curr->next->next)
+						fd_out--;
                     curr = curr->next;
                 }
             }
-			// cat << e << f
 			else if(curr->value == HEREDOC)
 			{
 				if(curr->next && curr->next->data)
@@ -269,14 +278,6 @@ void for_execute(t_token **final, t_execution **data)
 					curr = curr->next;
 				}
 			}
-            else if (curr->value == REDIRECTION_IN)
-            {
-                if (curr->next && curr->next->data)
-                {  
-                    fd_in = open(curr->next->data, O_RDONLY, 0444);
-					curr = curr->next;
-                }
-            }
             else if (curr->value == WORD && i < word_count)
             {
                 cmd[i] = strdup(curr->data);
@@ -284,7 +285,7 @@ void for_execute(t_token **final, t_execution **data)
             }
             curr = curr->next;
         }
-        t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc);
+        t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc, flag);
 		if (!*data)
             *data = new_cmd;
         else
