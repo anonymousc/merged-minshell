@@ -164,7 +164,7 @@ void	ft_lstadd_back_exec(t_execution  **stacks, t_execution  *new)
 	new->next = NULL;
 }
 
-t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int fd_out ,int fd_append , int fd_heredoc, int flag)
+t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int fd_out ,int fd_append , int fd_heredoc, int flag, int dflag)
 {
 	t_execution   *list;
 
@@ -177,6 +177,7 @@ t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int fd_out ,int fd_append ,
 	list->fd_append = fd_append;
 	list->fd_heredoc = fd_heredoc;
 	list->fflag = flag;
+	list->dflag = dflag;
 	list->next = NULL;
 	return (list);
 }
@@ -226,6 +227,7 @@ void for_execute(t_token **final, t_execution **data)
 		int fd_heredoc = 0;
 		int fd_out = 1;
 		int flag = 0;
+		int dflag = 0;
         while (curr && curr->value != PIPE)
         {
             if (!curr->data)
@@ -252,10 +254,18 @@ void for_execute(t_token **final, t_execution **data)
 					curr = curr->next;
                 }
             }
-            else if (curr->value == REDIRECTION_OUT)
+            else if (curr->value == REDIRECTION_OUT && !dflag)
             {
                 if (curr->next && curr->next->data)
                 {
+					struct stat dstat;
+					if (stat(curr->next->data , &dstat) > -1)
+					{
+						if (S_ISDIR(dstat.st_mode))
+						{
+							dflag = 1;
+						}
+					}
                     fd_out = open(curr->next->data, O_CREAT | O_RDWR | O_TRUNC, 0666);
 					if (!ft_strncmp(curr->next->data, "/dev/stdout" , ft_strlen("/dev/stdout")) && !curr->next->next)
 						fd_out--;
@@ -285,7 +295,7 @@ void for_execute(t_token **final, t_execution **data)
             }
             curr = curr->next;
         }
-        t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc, flag);
+        t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc, flag, dflag);
 		if (!*data)
             *data = new_cmd;
         else

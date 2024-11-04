@@ -28,24 +28,25 @@ void my_unset(t_exec **exec, char *s)
     }
 }
 
-int main(int ac ,char **av , char **envp)
-{
-	t_exec *exec = malloc(sizeof(t_exec));
-	exec->env_orginal = envp;
-	t_env *env = make_env(exec);
-	exec->env = env;
-	exec->av = av;
-	exec->ac = ac;
-	int i = 0;
-	while(ac > ++i)
-	{
-		my_unset(&exec , av[i]);
-		i++;
-	}
-	t_env *current = exec->env;
-	while (current)
-	{
-		printf ("%s=%s\n", current->variable, current->value);
-		current = current->next;
-	}
-}
+
+// int main(int ac ,char **av , char **envp)
+// {
+// 	t_exec *exec = malloc(sizeof(t_exec));
+// 	exec->env_orginal = envp;
+// 	t_env *env = make_env(exec);
+// 	exec->env = env;
+// 	exec->av = av;
+// 	exec->ac = ac;
+// 	int i = 0;
+// 	while(ac > ++i)
+// 	{
+// 		my_unset(&exec , av[i]);
+// 		i++;
+// 	}
+// 	t_env *current = exec->env;
+// 	while (current)
+// 	{
+// 		printf ("%s=%s\n", current->variable, current->value);
+// 		current = current->next;
+// 	}
+// }

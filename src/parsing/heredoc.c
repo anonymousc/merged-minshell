@@ -1,11 +1,32 @@
 #include "../../includes/minishell.h"
 
+char *namegen()
+{
+    int fd = open("/dev/random" , O_RDONLY);
+    int i = 0;
+    char *file = malloc(11);
+    char *buf = malloc (1);
+    int j = 0;
+    while (i < 10)
+    {
+        read(fd, buf, 1);
+        if (__isascii(*buf))
+        {
+            file[j] = *buf;
+            j++;
+        }
+        i++;
+    }
+    file[j] = '\0';
+    free(buf);
+    return file;
+}
+
 char *randgen(char *s)
 {
     char *pathname = "/tmp/";
-    char *suffix = "\v";
 
-    s = ft_strjoin(pathname, suffix);
+    s = ft_strjoin(pathname, namegen());
     
     return s;
 }

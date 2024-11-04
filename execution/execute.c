@@ -87,7 +87,12 @@ void	free_stack1(t_execution **stack)
 
 int redirect_io(t_execution **exec, int *flag)
 {
-    if((*exec)->fd_out != 1)
+    if ((*exec)->dflag == 1)
+    {
+        printf ("this is a directory\n");
+        return -1;
+    }
+    else if((*exec)->fd_out != 1)
     {
             *flag = 1;
             dup2((*exec)->fd_out, STDOUT_FILENO);
@@ -224,10 +229,11 @@ void execute_bins(t_execution **exec, char **env)
         // int pid = 0;
         i = -1;
     
-        //     waitpid(pids[cmd_count - (cmd_count != 0)], &status, 0);
-        // while (pid != -1)
-        //     pid = wait(NULL);
         while (++i < cmd_count)
             waitpid(pids[i] , &status , 0);
+        if (WIFEXITED(status))
+        {
+            // int state = WEXITSTATUS(status);
+        }
         free(pids);
 }
