@@ -105,4 +105,7 @@ int		file_size(t_token **data);
 void execute_bins (t_execution **exec, char **env);
 
 int execute_builtins(t_execution *exec);
+
+char *remove_quotes(char *s);
+
 #endif

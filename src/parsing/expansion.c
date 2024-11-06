@@ -12,56 +12,51 @@
 
 #include "../../includes/minishell.h"
 
+
+int check_in_db_or_sq(char *s)
+{
+	int dq = 0;
+	int sq = 0;
+
+	int i = 0;
+	while (s[i])
+	{
+		if (s[i] == '"' && !sq)
+			dq = 1;
+		if (s[i] == '\'' && !dq)
+			sq = 1;
+		i++;
+	}
+	if (dq)
+		return 2;
+	if (sq)
+		return 1;
+	return 0;
+}
+
+char *find_env_variable2 (t_env *env, char *varname)
+{
+    while (env)
+    {
+        if (ft_strcmp(env->variable, varname) == 0)
+        {
+            return env->value;
+        }
+        env = env->next;
+    }
+    return NULL;
+}
+
 char *expander(char *expansion, t_env *envp)
 {
-	char *expanded;
-	char *to_compare;
+	//$jhsd$USER jhjhk
 	expansion = expansion + 1;
-	if(*expansion  == '\'' || *expansion  == '\"')
-		return (expansion);
-	while (envp)
+	
+	if(!(find_env_variable2(envp , expansion)))
 	{
-		int j = 0;
-		while (envp->env[j] && envp->env[j] != '=')
-			j++;
-		to_compare = (char *)malloc(sizeof(char) * j + 1);
-		if(!to_compare)
-			return (NULL);
-		int k = 0;
-		j = 0;
-		while (envp->env[j] && envp->env[j] != '=')
-		{
-			to_compare[k] = envp->env[j];
-			k++;
-			j++;
-		}
-		to_compare[k] = 0;
-		if(!strncmp(expansion , to_compare, strlen(to_compare)))
-		{
-			int i = 0;
-			int tmp = j;
-			while (envp->env[tmp])
-			{
-				tmp++;
-				i++;
-			}
-			i -= 1;
-			expanded = malloc(sizeof(char) * i + 1);
-			if(!expanded)
-				return (NULL);
-			i = 0;
-			while (envp->env[j])
-			{
-				expanded[i] = envp->env[j + 1];
-				j++;
-				i++;
-			}
-			return (expanded);
-		}
-		free(to_compare);
-		envp = envp->next;
+		return (ft_strdup("\v"));
 	}
-	return (NULL);
+	return (find_env_variable2(envp , expansion));
 }
 
 void expander_final(t_token **final ,t_env *env)
@@ -71,30 +66,31 @@ void expander_final(t_token **final ,t_env *env)
 	curr = *final;
 	while (curr)
 	{
-		if(curr->value == WORD)
-		{
-			int i = 0;
-			i = 0;
-			while (curr->data[i])
+			if(curr->value == WORD)
 			{
-				if(curr->data[i] == '$')
+				if (check_in_db_or_sq(curr->data) == 2 || !check_in_db_or_sq(curr->data))
 				{
-					char *tmp = expander(curr->data + i , env);
-					*(curr->data + i) = '\0';
-					printf("curr->data %s\n" , curr->data);
-					if(tmp)
+					curr->data = ft_strdup(remove_quotes(curr->data));
+					int i = 0;
+					while (curr->data[i])
 					{
-						tmp[ft_strlen(ft_strdup(tmp))] = '\0';
-						curr->data = ft_strjoin(curr->data ,tmp);
-						printf("data == %s\n", curr->data);
+						if(curr->data[i] == '$')
+						{
+							char *tmp = expander(curr->data + i , env);
+							*(curr->data + i) = '\0';
+							if(*tmp)
+							{
+								tmp[ft_strlen(ft_strdup(tmp))] = '\0';
+								curr->data = ft_strjoin(curr->data ,tmp);
+							}
+							else
+								*(curr->data + i) = '\0';
+						}
+						i++;
 					}
-					else
-						*(curr->data + i) = '\0';
 				}
-				i++;
 			}
-		}
-		curr = curr->next;
+			curr = curr->next;
 	}
 	final  = &curr;
 }

@@ -52,7 +52,6 @@ typedef	struct	s_Tokenization
 {
 	char					*data;
 	Token					value;
-	// t_syntax				checker;
 	struct s_Tokenization	*next;
 
 }		t_token;

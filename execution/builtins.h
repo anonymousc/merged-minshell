@@ -52,6 +52,7 @@ int my_pwd();
 int my_export(t_exec *exec);
 char **env_to_arr2(t_env *env);
 char **env_to_arr(t_env *env);
+t_env *find_env_variable (t_env *env, char *varname);
 //unset
 void my_unset (t_exec **exec, char *s);
 //cd

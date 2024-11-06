@@ -144,7 +144,7 @@ t_env *find_env_variable (t_env *env, char *varname)
 {
     while (env)
     {
-        if (strcmp(env->variable, varname) == 0)
+        if (ft_strcmp(env->variable, varname) == 0)
         {
             return env;
         }

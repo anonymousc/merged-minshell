@@ -148,6 +148,7 @@ void sanitizer(t_token **fill_line)
 // 	}
 // 	return wc;
 // }
+
 void	ft_lstadd_back_exec(t_execution  **stacks, t_execution  *new)
 {
 	t_execution 	*head;
@@ -266,11 +267,16 @@ void for_execute(t_token **final, t_execution **data)
 							dflag = 1;
 						}
 					}
-                    fd_out = open(curr->next->data, O_CREAT | O_RDWR | O_TRUNC, 0666);
-					if(access(curr->next->data , R_OK | W_OK) == -1)
-						fflag = 1;
-					if (!ft_strncmp(curr->next->data, "/dev/stdout" , ft_strlen("/dev/stdout")) && !curr->next->next)
-						fd_out--;
+					if(*(curr->next->data) && *(curr->next->data) != '\v')
+					{
+						fd_out = open(curr->next->data, O_CREAT | O_RDWR | O_TRUNC, 0666);
+						if(access(curr->next->data , R_OK | W_OK) == -1)
+							fflag = 1;
+						if (!ft_strncmp(curr->next->data, "/dev/stdout" , ft_strlen("/dev/stdout")) && !curr->next->next)
+							fd_out--;
+					}
+					else
+						fflag = 2 + (*(curr->next->data) == '\v');
                     curr = curr->next;
                 }
             }

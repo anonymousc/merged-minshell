@@ -92,17 +92,11 @@ int count_chars_after_removal(char *s)
 	{
         char q = is_quote(*s);
         if (q == '"' && !in_squote) 
-		{
             in_dquote = !in_dquote;
-        } 
 		else if (q == '\'' && !in_dquote) 
-		{
             in_squote = !in_squote;
-        } 
 		else 
-		{
             count++;
-        }
         s++;
     }
     return count;
@@ -121,17 +115,11 @@ char *remove_quotes(char *s)
 	{
         char q = is_quote(s[i]);
         if (q == '"' && !in_squote) 
-		{
             in_dquote = !in_dquote;
-        } 
 		else if (q == '\'' && !in_dquote) 
-		{
             in_squote = !in_squote;
-        } 
 		else 
-		{
             result[j++] = s[i];
-        }
 		i++;
     }
     result[j] = '\0';
@@ -193,7 +181,7 @@ int main (int ac, char **av, char **envp)
 		tokenization(splitted_array , final);
 		
 		sanitizer(final);
-		// expander_final(final ,*env);
+		expander_final(final ,env);
 		process_quotes(final);
 		if (check_syntax_extended(final))
 			continue;

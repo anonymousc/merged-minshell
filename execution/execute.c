@@ -113,14 +113,15 @@ void	free_stack1(t_execution **stack)
 int redirect_io(t_execution **exec, int *flag)
 {
     if ((*exec)->dflag == 1)
-    {
-        printf ("this is a directory\n");
-        return -1;
-    }
+        return (printf("this is a directory\n"),-1);
+    if((*exec)->fflag == 3)
+        return (printf("ambigous redirection\n") , -1);
+    if((*exec)->fflag == 2)
+        return(printf("no such a file or directory\n"), -1);
     else if((*exec)->fd_out != 1)
     {
         if ((*exec)->fflag == 1)
-            return (printf ("permission denied\n"), -1);
+            return (printf ("permission denied1\n"), -1);
         *flag = 1;
         dup2((*exec)->fd_out, STDOUT_FILENO);
         if ((*exec)->fd_out != STDOUT_FILENO) 
