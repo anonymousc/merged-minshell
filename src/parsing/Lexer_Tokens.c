@@ -136,18 +136,18 @@ void sanitizer(t_token **fill_line)
 
 // to remove or enhance
 
-int file_size(t_token **data)
-{
-	t_token *curr = *data;
-	int wc = 0;
-	while (curr)
-	{
-		if(curr && curr->value == REDIRECTION_OUT)
-			wc++;
-		curr = curr->next;
-	}
-	return wc;
-}
+// int file_size(t_token **data)
+// {
+// 	t_token *curr = *data;
+// 	int wc = 0;
+// 	while (curr)
+// 	{
+// 		if(curr && curr->value == REDIRECTION_OUT)
+// 			wc++;
+// 		curr = curr->next;
+// 	}
+// 	return wc;
+// }
 void	ft_lstadd_back_exec(t_execution  **stacks, t_execution  *new)
 {
 	t_execution 	*head;
@@ -200,6 +200,7 @@ int count_cmds(t_token **data)
 
 void for_execute(t_token **final, t_execution **data)
 {
+	struct stat dstat;
     t_token *curr = *final;
     *data = NULL;
     while (curr)
@@ -226,7 +227,7 @@ void for_execute(t_token **final, t_execution **data)
 		int fd_append = 1;
 		int fd_heredoc = 0;
 		int fd_out = 1;
-		int flag = 0;
+		int fflag = 0;
 		int dflag = 0;
         while (curr && curr->value != PIPE)
         {
@@ -237,7 +238,7 @@ void for_execute(t_token **final, t_execution **data)
             }
             if (curr->value == REDIRECTION_IN)
             {
-				if (curr->next->value == REDIRECTION_OUT)
+				if (curr->next->value == REDIRECTION_OUT && !fflag)
 				{
 					open(curr->next->next->data , O_CREAT | O_RDWR | O_TRUNC, 0666);
 					curr = curr->next->next;
@@ -247,7 +248,7 @@ void for_execute(t_token **final, t_execution **data)
                     fd_in = open(curr->next->data, O_RDONLY, 0444);
 					if (fd_in == -1)
 					{
-						flag = 1;
+						fflag = 1;
 					}
 					else if (!ft_strncmp(curr->next->data, "/dev/stdin" , ft_strlen("/dev/stdin")))
 						fd_in--;
@@ -258,7 +259,6 @@ void for_execute(t_token **final, t_execution **data)
             {
                 if (curr->next && curr->next->data)
                 {
-					struct stat dstat;
 					if (stat(curr->next->data , &dstat) > -1)
 					{
 						if (S_ISDIR(dstat.st_mode))
@@ -267,6 +267,8 @@ void for_execute(t_token **final, t_execution **data)
 						}
 					}
                     fd_out = open(curr->next->data, O_CREAT | O_RDWR | O_TRUNC, 0666);
+					if(access(curr->next->data , R_OK | W_OK) == -1)
+						fflag = 1;
 					if (!ft_strncmp(curr->next->data, "/dev/stdout" , ft_strlen("/dev/stdout")) && !curr->next->next)
 						fd_out--;
                     curr = curr->next;
@@ -282,9 +284,11 @@ void for_execute(t_token **final, t_execution **data)
 			}
 			else if(curr->value == APPEND)
 			{
-				 if (curr->next && curr->next->data)
+				if (curr->next && curr->next->data)
                 {
 					fd_append = open(curr->next->data, O_CREAT | O_RDWR | O_APPEND, 0666);
+					if(access(curr->next->data , R_OK | W_OK) == -1)
+						fflag = 1;
 					curr = curr->next;
 				}
 			}
@@ -295,7 +299,7 @@ void for_execute(t_token **final, t_execution **data)
             }
             curr = curr->next;
         }
-        t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc, flag, dflag);
+        t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc, fflag, dflag);
 		if (!*data)
             *data = new_cmd;
         else

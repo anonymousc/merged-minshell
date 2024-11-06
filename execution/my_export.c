@@ -30,7 +30,7 @@ int env_size(t_env *env)
     return count;
 }
 
-char **env_to_arr(t_env *env)
+char **env_to_arr2(t_env *env)
 {
     int size = env_size(env);
     char **envir = malloc(sizeof(char *) * (size + 1));
@@ -66,6 +66,50 @@ char **env_to_arr(t_env *env)
         while (k < val_len)
             envir[i][j++] = env->value[k++];
         envir[i][j++] = '"';
+        envir[i][j] = '\0';
+
+        env = env->next;
+        i++;
+    }
+    envir[i] = NULL;
+
+    return envir;
+}
+
+char **env_to_arr(t_env *env)
+{
+    int size = env_size(env);
+    char **envir = malloc(sizeof(char *) * (size + 1));
+    if (!envir)
+        return NULL;
+
+    int i = 0;
+    while (env)
+    {
+        int var_len = ft_strlen(env->variable);
+        int val_len = ft_strlen(env->value);
+        int len = var_len + val_len + 2;
+
+        envir[i] = malloc(len);
+        int j = 0;
+        if (!envir[i])
+        {
+            while (j < i)
+            {
+                free(envir[j]);
+                j++;
+            }
+            free(envir);
+            return NULL;
+        }
+        j = 0;
+        int k = 0;
+        while (k < var_len)
+            envir[i][j++] = env->variable[k++];
+        envir[i][j++] = '=';
+        k = 0;
+        while (k < val_len)
+            envir[i][j++] = env->value[k++];
         envir[i][j] = '\0';
 
         env = env->next;
@@ -256,7 +300,7 @@ int my_export(t_exec *exec)
     int i = 1;
     if (exec->ac == 1)
     {
-        char **env_array = env_to_arr(exec->env);
+        char **env_array = env_to_arr2(exec->env);
         sort_strings(env_array, env_size(exec->env));
         
         i = 0;
@@ -293,5 +337,7 @@ int my_export(t_exec *exec)
 //     exec->env_orginal = env;
 //     t_env *envir = make_env(exec);
 //     exec->env = envir;
-//     my_export(exec);
+//     char **arr = env_to_arr(envir);
+//     print(arr);
+//     // my_export(exec);
 // }

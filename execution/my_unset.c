@@ -39,17 +39,17 @@ int my_unset(t_exec **exec)
 	return 0;
 }
 
-int main(int ac ,char **av , char **envp)
-{
-	t_exec *exec = malloc(sizeof(t_exec));
-	exec->env_orginal = envp;
-	t_env *env = make_env(exec);
-	exec->env = env;
-	exec->av = av;
-	exec->ac = ac;
-	int i = 0;
-	my_unset(&exec);
-	t_env *current = exec->env;
-	my_env(&current);
-	free_env(&current);
-}
+// int main(int ac ,char **av , char **envp)
+// {
+// 	t_exec *exec = malloc(sizeof(t_exec));
+// 	exec->env_orginal = envp;
+// 	t_env *env = make_env(exec);
+// 	exec->env = env;
+// 	exec->av = av;
+// 	exec->ac = ac;
+// 	int i = 0;
+// 	my_unset(&exec);
+// 	t_env *current = exec->env;
+// 	my_env(&current);
+// 	free_env(&current);
+// }

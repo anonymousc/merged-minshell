@@ -29,6 +29,7 @@
 # include <errno.h>
 # include <sys/wait.h>
 # include <sys/stat.h>
+# include "../execution/builtins.h"
 
 /* ******** DEFINITIONS ********* */
 
@@ -77,7 +78,7 @@ char		*check_syntax(char *s);
 t_token 	**ft_fill(char *line);
 // void		init_token s(char *str);
 void		print_tokens(t_token *list);
-void		free_env(t_env **stack);
+// void		free_env(t_env **stack);
 char 		*retline(void);
 void		sig_handler(int test);
 void		sig_handler1(int test);
@@ -102,4 +103,6 @@ int		file_size(t_token **data);
 
 //execution
 void execute_bins (t_execution **exec, char **env);
+
+int execute_builtins(t_execution *exec);
 #endif

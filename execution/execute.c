@@ -1,21 +1,46 @@
 #include "../includes/minishell.h"
 
-// int execute_builtins(t_exec *exec)
-// {
-// 	int ret;
-// 	if (strncmp(exec->av[0], "echo", 5) == 0)
-// 		ret = my_echo(exec->ac, exec->av);
-// 	else if (strncmp (exec->av[0], "cd", 3) == 0)
-// 		ret = my_cd(exec);
-// 	else if (strncmp (exec->av[0], "pwd", 4) == 0)
-// 		ret = my_pwd();
-// 	else if (strncmp (exec->av[0] , "env", 4) == 0)
-// 		ret = my_env(exec->env);
-// 	else if (strncmp(exec->av[0] , "export", 7) == 0)
-// 		ret = my_export(exec);
-// 	else 
-// 		return 1;
-// }
+int execute_builtins(t_execution *exec)
+{
+	int ret = 1;
+	// if (strncmp(exec->cmd[0], "echo", 5) == 0)
+    // {
+	// 	ret = my_echo(exec->cmd);
+    // }
+	// if (strncmp (exec->cmd[0], "cd", 3) == 0)
+	// 	ret = my_cd(exec);
+	if (strncmp(exec->cmd[0], "pwd", 4) == 0)
+    {
+        printf("test\n");
+		ret = my_pwd();
+    }
+	// else if (strncmp (exec->av[0] , "env", 4) == 0)
+	// 	ret = my_env(exec->env);
+	// else if (strncmp(exec->av[0] , "export", 7) == 0)
+	// 	ret = my_export(exec);
+    return ret;
+}
+
+int check_builtins(t_execution *exec)
+{
+	int ret = 0;
+	// if (strncmp(exec->cmd[0], "echo", 5) == 0)
+    // {
+	// 	ret = my_echo(exec->cmd);
+    // }
+	// if (strncmp (exec->cmd[0], "cd", 3) == 0)
+	// 	ret = my_cd(exec);
+	if (strncmp(exec->cmd[0], "pwd", 4) == 0)
+    {
+		ret = 1;
+    }
+	// else if (strncmp (exec->av[0] , "env", 4) == 0)
+	// 	ret = my_env(exec->env);
+	// else if (strncmp(exec->av[0] , "export", 7) == 0)
+	// 	ret = my_export(exec);
+    return ret;
+}
+
 void ft_free11(char **s)
 {
     int i = 0;
@@ -94,13 +119,17 @@ int redirect_io(t_execution **exec, int *flag)
     }
     else if((*exec)->fd_out != 1)
     {
-            *flag = 1;
-            dup2((*exec)->fd_out, STDOUT_FILENO);
-            if ((*exec)->fd_out != STDOUT_FILENO) 
-                close((*exec)->fd_out);
+        if ((*exec)->fflag == 1)
+            return (printf ("permission denied\n"), -1);
+        *flag = 1;
+        dup2((*exec)->fd_out, STDOUT_FILENO);
+        if ((*exec)->fd_out != STDOUT_FILENO) 
+            close((*exec)->fd_out);
     }
     if ((*exec)->fd_append != 1)
     {
+        if ((*exec)->fflag == 1)
+            return (printf ("permission denied\n"), -1);
         dup2((*exec)->fd_append, STDOUT_FILENO);
         close((*exec)->fd_append);
     }
@@ -237,3 +266,9 @@ void execute_bins(t_execution **exec, char **env)
         }
         free(pids);
 }
+
+// void execute_all (t_execution **exec, char **env)
+// {
+//     t_execution *curr = *exec;
+    
+// }

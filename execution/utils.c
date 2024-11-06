@@ -11,30 +11,30 @@ int list_len(t_env *env)
     return len;
 }
 
-size_t	ft_strlen(char *str)
-{
-	size_t	i;
+// size_t	ft_strlen(char *str)
+// {
+// 	size_t	i;
 
-	i = 0;
-	while (str[i])
-	{
-		i++;
-	}
-	return (i);
-}
+// 	i = 0;
+// 	while (str[i])
+// 	{
+// 		i++;
+// 	}
+// 	return (i);
+// }
 
-char *ft_strchr(char *str, int c)
-{
-    while (*str != '\0')
-    {
-        if (*str == (char)c)
-            return str;
-        str++;
-    }
-    if (c == '\0')
-        return str;
-    return NULL;
-}
+// char *ft_strchr(char *str, int c)
+// {
+//     while (*str != '\0')
+//     {
+//         if (*str == (char)c)
+//             return str;
+//         str++;
+//     }
+//     if (c == '\0')
+//         return str;
+//     return NULL;
+// }
 
 char	*ft_strjoin(char *s1, char *s2)
 {
@@ -75,7 +75,7 @@ char *ft_strndup (char *str, size_t n)
 	res = malloc(len + 1);
 	if (!res)
 		return NULL;
-	int i = 0;
+	size_t i = 0;
 	while (i < len)
 	{
 		res[i] = str[i];
@@ -85,23 +85,23 @@ char *ft_strndup (char *str, size_t n)
 	return res;
 }
 
-char *ft_strdup (char *str)
-{
-	char *res;
-	size_t len = ft_strlen(str);
+// char *ft_strdup (char *str)
+// {
+// 	char *res;
+// 	size_t len = ft_strlen(str);
 
-	res = malloc(len + 1);
-	if (!res)
-		return NULL;
-	int i = 0;
-	while (i < len)
-	{
-		res[i] = str[i];
-		i++;
-	}
-	res[i] = '\0';
-	return res;
-}
+// 	res = malloc(len + 1);
+// 	if (!res)
+// 		return NULL;
+// 	int i = 0;
+// 	while (i < len)
+// 	{
+// 		res[i] = str[i];
+// 		i++;
+// 	}
+// 	res[i] = '\0';
+// 	return res;
+// }
 
 void add_back(t_env **envir, t_env *var)
 {
@@ -181,7 +181,7 @@ void	free_split(char **s, int n)
 	free(s);
 }
 
-char	**ft_split(char const *s, char sep)
+char	**ft_splita(char const *s, char sep)
 {
 	char	**splitted;
 	size_t	words;

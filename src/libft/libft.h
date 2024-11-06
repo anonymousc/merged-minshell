@@ -41,12 +41,12 @@ typedef enum
 
 } Token;
 
-typedef	struct		s_env
-{
-	char			*env;
-	struct s_env	*next;
+// typedef	struct		s_env
+// {
+// 	char			*env;
+// 	struct s_env	*next;
 
-}					t_env;
+// }					t_env;
 
 typedef	struct	s_Tokenization
 {

@@ -102,7 +102,7 @@ int check_redir(t_token **final)
 	{
 		if(curr->value == REDIRECTION_IN || curr->value == REDIRECTION_OUT)
 		{
-			if (!curr->next || curr->next->value == HEREDOC || curr->next->value == PIPE ||  curr->next->value == APPEND || curr->next->value == REDIRECTION_IN) 
+			if (!curr->next || curr->next->value == HEREDOC || curr->next->value == PIPE ||  curr->next->value == APPEND || curr->next->value == REDIRECTION_OUT || curr->next->value == REDIRECTION_IN) 
 				return (free_stack(&curr) ,ft_printf(2, "syntax error\n"), 1);
 			curr = curr->next;
 			if(curr->value == WHITESPACE)

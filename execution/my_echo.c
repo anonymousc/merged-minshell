@@ -19,7 +19,6 @@ bool check_newline(int ac, char **av, int *start_i)
         }
         (*start_i)++;
     }
-
     return new_line;
 }
 

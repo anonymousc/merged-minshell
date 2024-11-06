@@ -172,12 +172,16 @@ int main (int ac, char **av, char **envp)
 	char *line;
 	char **splitted_array;
 	t_token  **final;
-	t_env **env;
 	t_execution **data;
-
+	t_exec *exec = malloc (sizeof(t_exec));
+	exec->env_orginal = envp;
+	t_env *env = make_env(exec);
+	exec->env = env;
+	exec->ac = ac;
+	exec->av = av;
+	exec->env = env;
 	line = NULL;
-	env = NULL;
-	env = fill_env(envp, env);
+	char **env2 = env_to_arr(exec->env);
 	while(1)
 	{
 		line = retline();
@@ -189,7 +193,7 @@ int main (int ac, char **av, char **envp)
 		tokenization(splitted_array , final);
 		
 		sanitizer(final);
-		expander_final(final ,*env);
+		// expander_final(final ,*env);
 		process_quotes(final);
 		if (check_syntax_extended(final))
 			continue;
@@ -211,7 +215,8 @@ int main (int ac, char **av, char **envp)
 		// }
 		
 		// print_tokens(*final);
-		execute_bins(data, envp);
+		execute_bins(data, env2);
+
 		// free_stackhhh(data);
 		free_stack(final);
 		free(final);
