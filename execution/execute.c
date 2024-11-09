@@ -1,5 +1,16 @@
 #include "../includes/minishell.h"
 
+
+void printenv(char **s)
+{
+	int i = 0;
+	while (s[i])
+	{
+		printf ("env == %s\n", s[i]);
+		i++;
+	}
+}
+
 int execute_builtins(t_execution *exec)
 {
 	int ret = 1;
@@ -184,7 +195,7 @@ void execute_bins(t_execution **exec, char **env)
                 return;
             }
         }
-
+        
         pids[i] = fork();
         if (pids[i] == -1)
         {
@@ -195,7 +206,6 @@ void execute_bins(t_execution **exec, char **env)
 
         if (pids[i] == 0)
         {
-        
             if (redirect_io(&curr, &flag) == -1)
             {
                 free(pids);

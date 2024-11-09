@@ -111,7 +111,7 @@ char *remove_quotes(char *s)
     int in_dquote = 0;
     int in_squote = 0;
     
-    while (s[i]) 
+    while (s && s[i]) 
 	{
         char q = is_quote(s[i]);
         if (q == '"' && !in_squote) 
@@ -130,7 +130,8 @@ void process_quotes(t_token **final)
 {
     t_token *curr = *final;
     
-    while (curr) {
+    while (curr) 
+	{
         if (curr->value == WORD) 
 		{
             char *processed = remove_quotes(curr->data);
@@ -139,6 +140,7 @@ void process_quotes(t_token **final)
         curr = curr->next;
     }
 }
+
 void	free_stackhhh(t_execution **stack)
 {
 	t_execution	*tmp;

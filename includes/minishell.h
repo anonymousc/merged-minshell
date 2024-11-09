@@ -108,4 +108,8 @@ int execute_builtins(t_execution *exec);
 
 char *remove_quotes(char *s);
 
+char *find_env_variable2 (t_env *env, char *varname);
+
+
+void ft_free11(char **s);
 #endif

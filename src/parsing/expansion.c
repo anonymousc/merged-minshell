@@ -47,16 +47,58 @@ char *find_env_variable2 (t_env *env, char *varname)
     return NULL;
 }
 
+// char *expander(char *expansion, t_env *envp)
+// {
+// 	//asdas$USER jhjhk
+// 	expansion = expansion + 1;
+// 	char *tmp = expansion;
+// 	while (*tmp && *tmp != '%')
+// 		tmp++;
+// 	int l = tmp - expansion;
+// 	char *to_expand = malloc (l + 1);
+// 	strncpy(to_expand, expansion, l);
+// 	to_expand[l] = '\0';
+// 	if (!tmp)
+// 	{
+// 		if(!(find_env_variable2(envp , expansion)))
+// 		{
+// 			return (ft_strdup("\v"));
+// 		}
+// 		else
+// 			return (find_env_variable2(envp , expansion));
+// 	}
+// 	if(!(find_env_variable2(envp , to_expand)))
+// 	{
+// 		return (ft_strdup("\v"));
+// 	}
+// 	if (!tmp)
+// 		return (find_env_variable2(envp , to_expand));
+// 	else
+// 		return (ft_strjoin(find_env_variable2(envp , to_expand), tmp));
+// }
+
 char *expander(char *expansion, t_env *envp)
 {
-	//$jhsd$USER jhjhk
 	expansion = expansion + 1;
-	
-	if(!(find_env_variable2(envp , expansion)))
+	char *tmp = expansion;
+	while (*tmp && (*tmp != '%' && *tmp != ' ' && *tmp != '@' && *tmp != '-' && *tmp != '+' && *tmp != '$'))
+		tmp++;
+	int l = tmp - expansion;
+	char *to_expand = malloc (l + 1);
+	strncpy(to_expand, expansion, l);
+	to_expand[l] = '\0';
+	if (!tmp)
+	{
+		return expander (tmp, envp);
+	}
+	if(!(find_env_variable2(envp , to_expand)))
 	{
 		return (ft_strdup("\v"));
 	}
-	return (find_env_variable2(envp , expansion));
+	if (!tmp)
+		return (find_env_variable2(envp , to_expand));
+	else
+		return (ft_strjoin(find_env_variable2(envp , to_expand), tmp));
 }
 
 void expander_final(t_token **final ,t_env *env)
@@ -94,3 +136,67 @@ void expander_final(t_token **final ,t_env *env)
 	}
 	final  = &curr;
 }
+
+// void expander_final(t_token **final, t_env *env)
+// {
+//     t_token *curr;
+//     char *expand_res = NULL;
+    
+//     curr = *final;
+    
+//     while (curr)
+//     {
+//         if (curr->value == WORD)
+//         {
+//             if (check_in_db_or_sq(curr->data) == 2 || !check_in_db_or_sq(curr->data))
+//             {
+//                 expand_res = NULL;
+//                 curr->data = ft_strdup(remove_quotes(curr->data));
+//                 char **segments = ft_split(curr->data, '%');
+//                 int i = 0;
+//                 while (segments[i])
+//                 {
+//                     int j = 0;
+//                     int dollar_found = 0;
+                    
+//                     while (segments[i][j])
+//                     {
+//                         if (segments[i][j] == '$')
+//                         {
+//                             dollar_found = 1;
+//                             char *tmp = expander(segments[i] + j, env);
+//                             if (ft_strcmp(tmp, "\v"))
+//                             {
+//                                 expand_res = ft_strjoin2(expand_res, tmp);
+//                             }
+//                         }
+//                         j++;
+//                     }
+                    
+//                     if (!dollar_found)
+//                     {
+//                         expand_res = ft_strjoin2(expand_res, segments[i]);
+//                     }
+//                     i++;
+//                 }
+                
+//                 if (!ft_strchr(expand_res, '\v'))
+//                 {
+//                     free(curr->data);
+//                     curr->data = ft_strdup(expand_res);
+//                     free(expand_res);
+//                 }
+                
+//                 i = 0;
+//                 while (segments[i])
+//                 {
+//                     free(segments[i]);
+//                     i++;
+//                 }
+//                 free(segments);
+//             }
+//         }
+//         curr = curr->next;
+//     }
+
+// }

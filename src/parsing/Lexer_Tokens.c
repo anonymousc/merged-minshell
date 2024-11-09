@@ -306,6 +306,7 @@ void for_execute(t_token **final, t_execution **data)
             curr = curr->next;
         }
         t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc, fflag, dflag);
+		// ft_free11(cmd);
 		if (!*data)
             *data = new_cmd;
         else
