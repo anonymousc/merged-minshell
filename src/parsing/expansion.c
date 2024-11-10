@@ -47,58 +47,26 @@ char *find_env_variable2 (t_env *env, char *varname)
     return NULL;
 }
 
-// char *expander(char *expansion, t_env *envp)
-// {
-// 	//asdas$USER jhjhk
-// 	expansion = expansion + 1;
-// 	char *tmp = expansion;
-// 	while (*tmp && *tmp != '%')
-// 		tmp++;
-// 	int l = tmp - expansion;
-// 	char *to_expand = malloc (l + 1);
-// 	strncpy(to_expand, expansion, l);
-// 	to_expand[l] = '\0';
-// 	if (!tmp)
-// 	{
-// 		if(!(find_env_variable2(envp , expansion)))
-// 		{
-// 			return (ft_strdup("\v"));
-// 		}
-// 		else
-// 			return (find_env_variable2(envp , expansion));
-// 	}
-// 	if(!(find_env_variable2(envp , to_expand)))
-// 	{
-// 		return (ft_strdup("\v"));
-// 	}
-// 	if (!tmp)
-// 		return (find_env_variable2(envp , to_expand));
-// 	else
-// 		return (ft_strjoin(find_env_variable2(envp , to_expand), tmp));
-// }
-
 char *expander(char *expansion, t_env *envp)
 {
 	expansion = expansion + 1;
 	char *tmp = expansion;
-	while (*tmp && (*tmp != '%' && *tmp != ' ' && *tmp != '@' && *tmp != '-' && *tmp != '+' && *tmp != '$'))
+	while (tmp && *tmp && (*tmp != '%' && *tmp != ' ' && *tmp != '@' && *tmp != '-' && *tmp != '+' && *tmp != '$'))
 		tmp++;
 	int l = tmp - expansion;
 	char *to_expand = malloc (l + 1);
 	strncpy(to_expand, expansion, l);
 	to_expand[l] = '\0';
 	if (!tmp)
-	{
-		return expander (tmp, envp);
-	}
-	if(!(find_env_variable2(envp , to_expand)))
-	{
-		return (ft_strdup("\v"));
-	}
+		return (free(to_expand), expander(tmp, envp));
+	if(!(find_env_variable2(envp , to_expand)) && tmp)
+		return (free(to_expand) , ft_strdup("\v"));
 	if (!tmp)
 		return (find_env_variable2(envp , to_expand));
-	else
+	else if (ft_strncmp(to_expand, "\v", 1))
 		return (ft_strjoin(find_env_variable2(envp , to_expand), tmp));
+	else
+		return NULL;
 }
 
 void expander_final(t_token **final ,t_env *env)
@@ -118,12 +86,22 @@ void expander_final(t_token **final ,t_env *env)
 					{
 						if(curr->data[i] == '$')
 						{
+							if(!curr->data[i + 1] || curr->data[i + 1] == '$')
+								break;
+							if(curr->data[i + 1] && curr->data[i + 1] == '?')
+									printf("exitstatus");
 							char *tmp = expander(curr->data + i , env);
 							*(curr->data + i) = '\0';
+							if(*tmp == '\v')
+							{
+								i++;
+								continue;	
+							}
 							if(*tmp)
 							{
 								tmp[ft_strlen(ft_strdup(tmp))] = '\0';
 								curr->data = ft_strjoin(curr->data ,tmp);
+								free(tmp);
 							}
 							else
 								*(curr->data + i) = '\0';
@@ -136,7 +114,6 @@ void expander_final(t_token **final ,t_env *env)
 	}
 	final  = &curr;
 }
-
 // void expander_final(t_token **final, t_env *env)
 // {
 //     t_token *curr;

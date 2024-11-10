@@ -276,7 +276,7 @@ void for_execute(t_token **final, t_execution **data)
 							fd_out--;
 					}
 					else
-						fflag = 2 + (*(curr->next->data) == '\v');
+						fflag = 2 + (ft_strchr(curr->next->data,'\v') == NULL);
                     curr = curr->next;
                 }
             }
