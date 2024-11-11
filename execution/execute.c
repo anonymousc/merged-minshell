@@ -163,7 +163,11 @@ int redirect_io(t_execution **exec, int *flag)
     }
     return 0;
 }
-
+void sighhh(int data)
+{
+    (void)data;
+    printf("\n");
+}
 void execute_bins(t_execution **exec, char **env)
 {
     t_execution *curr = *exec;
@@ -203,9 +207,9 @@ void execute_bins(t_execution **exec, char **env)
             free(pids);
             return;
         }
-
         if (pids[i] == 0)
         {
+            signal(SIGINT , sighhh);
             if (redirect_io(&curr, &flag) == -1)
             {
                 free(pids);
@@ -250,6 +254,7 @@ void execute_bins(t_execution **exec, char **env)
         }
         else
         {
+            signal(SIGINT , SIG_IGN);
             if (i > 0)
             {
                 close(prev_pipe[0]);
@@ -262,7 +267,6 @@ void execute_bins(t_execution **exec, char **env)
                 prev_pipe[1] = curr_pipe[1];
             }
         }
-
         curr = curr->next;
         i++;
     }
