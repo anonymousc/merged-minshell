@@ -51,16 +51,19 @@ char *expander(char *expansion, t_env *envp)
 {
 	expansion = expansion + 1;
 	char *tmp = expansion;
-	while (tmp && *tmp && (*tmp != '%' && *tmp != ' ' && *tmp != '@' && *tmp != '-' && *tmp != '+' && *tmp != '$'))
+	while(tmp && *tmp && ft_isalnum(*tmp))
 		tmp++;
 	int l = tmp - expansion;
 	char *to_expand = malloc (l + 1);
 	strncpy(to_expand, expansion, l);
 	to_expand[l] = '\0';
+	printf("to_expand == %s\n", to_expand);
 	if (!tmp)
 		return (free(to_expand), expander(tmp, envp));
 	if(!(find_env_variable2(envp , to_expand)) && tmp)
+	{
 		return (free(to_expand) , ft_strdup("\v"));
+	}
 	if (!tmp)
 		return (find_env_variable2(envp , to_expand));
 	else if (ft_strncmp(to_expand, "\v", 1))
@@ -89,7 +92,7 @@ void expander_final(t_token **final ,t_env *env)
 							if(!curr->data[i + 1] || curr->data[i + 1] == '$')
 								break;
 							if(curr->data[i + 1] && curr->data[i + 1] == '?')
-									printf("exitstatus");
+									printf("exitstatus\n");
 							char *tmp = expander(curr->data + i , env);
 							*(curr->data + i) = '\0';
 							if(*tmp == '\v')
