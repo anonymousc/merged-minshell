@@ -13,7 +13,7 @@ void printenv(char **s)
 
 int execute_builtins(t_execution *exec)
 {
-	int ret = 1;
+	int ret = 0;
 	// if (strncmp(exec->cmd[0], "echo", 5) == 0)
     // {
 	// 	ret = my_echo(exec->cmd);
@@ -23,7 +23,8 @@ int execute_builtins(t_execution *exec)
 	if (strncmp(exec->cmd[0], "pwd", 4) == 0)
     {
         printf("test\n");
-		ret = my_pwd();
+		my_pwd();
+        ret = 1;
     }
 	// else if (strncmp (exec->av[0] , "env", 4) == 0)
 	// 	ret = my_env(exec->env);
@@ -179,6 +180,7 @@ void execute_bins(t_execution **exec, char **env)
     int prev_pipe[2] = {0, 1};
     int curr_pipe[2];
     int flag = 0;
+    int flag_s = 0;
     t_execution *temp = curr;
     while (temp)
     {
@@ -190,6 +192,12 @@ void execute_bins(t_execution **exec, char **env)
         return;
     while (curr && i < cmd_count)
     {
+        // flag_s = 0;
+        // if(execute_builtins(curr))
+        // {
+        //     curr = curr->next;
+        //     flag_s = 1;
+        // }
         if (i < cmd_count - 1)
         {
             if (pipe(curr_pipe) == -1)
@@ -243,13 +251,16 @@ void execute_bins(t_execution **exec, char **env)
                 free(pids);
                 exit(1);
             }
-            if (execve(fullcmd, curr->cmd, env) == -1)
+            if(!flag_s)
             {
-                free_stack1(&curr);
-                perror("minishell");
-                free(fullcmd);
-                free(pids);
-                exit(1);
+                if (execve(fullcmd, curr->cmd, env) == -1)
+                {
+                    free_stack1(&curr);
+                    perror("minishell");
+                    free(fullcmd);
+                    free(pids);
+                    exit(1);
+                }
             }
         }
         else
@@ -267,7 +278,8 @@ void execute_bins(t_execution **exec, char **env)
                 prev_pipe[1] = curr_pipe[1];
             }
         }
-        curr = curr->next;
+        if(curr)
+            curr = curr->next;
         i++;
     }
         // int pid = 0;

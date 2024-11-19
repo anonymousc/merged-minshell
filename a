@@ -1,12 +1,14 @@
-asd
-asdasdasd
+*
+a
+b
 builtins
+Dockerfile
 execution
-       hhah        
 includes
-ls
 Makefile
 minishell
 New Document.tldr
+out
 readline.supp
 src
+test
