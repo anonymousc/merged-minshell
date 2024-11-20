@@ -32,7 +32,6 @@ void print_tokens(t_token *list)
 			printf("token type : WORD its_data == %s\n" , list->data);
 		if(list->value == WHITESPACE)
 			printf("token type : WHITESPACE its_data == %d\n" ,  (*list->data));
-		printf("list address is %p\n", list);
 		list = list->next;
 	}
 }

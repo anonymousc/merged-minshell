@@ -105,6 +105,7 @@ char *expander(char *expansion, t_env *envp)
 	expansion = expansion + 1; // skips $
 	char *tmp = expansion;
 	while(tmp && *tmp && ft_isalnum(*tmp))
+	while(tmp && *tmp && ft_isalnum(*tmp))
 		tmp++;
 	// in case it wasnt stooped by $
 	//$HOMEffff%%%%%%%$HOME
@@ -148,6 +149,7 @@ void expander_final(t_token **final ,t_env *env)
 							if(!curr->data[i + 1] || curr->data[i + 1] == '$')
 								break;
 							if(curr->data[i + 1] && curr->data[i + 1] == '?')
+									printf("exitstatus\n");
 									printf("exitstatus\n");
 							char *tmp = expander(curr->data + i , env);
 							if (tmp)
