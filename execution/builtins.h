@@ -47,7 +47,7 @@ void free_env(t_env *env);
 int my_env(t_env *env);
 void free_env(t_env *env);
 //pwd
-int my_pwd();
+int my_pwd(int fd);
 //export
 int my_export(t_exec *exec);
 char **env_to_arr2(t_env *env);

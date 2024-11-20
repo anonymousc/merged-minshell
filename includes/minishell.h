@@ -55,6 +55,11 @@ typedef	struct	s_AST
 
 }				t_AST;
 
+typedef struct s_alloc
+{
+	void			*addr;
+	struct s_alloc	*next;
+}					t_alloc;
 /* ****************************** */
 
 /*  ********* BULTINS *********  */

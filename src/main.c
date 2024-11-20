@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
+t_alloc	*g_allocs;
 
 // char is_data_quotes(char c)
 // {
@@ -188,7 +189,7 @@ int main (int ac, char **av, char **envp)
 			continue;
 		free_spaces2(final);
 		for_execute(final , data);
-		execute_bins(data, env2);
+		(execute_bins(data, env2));
 		// print_tokens(*final);
 		free_stackhhh(data);
 		free_stack(final);
