@@ -107,9 +107,9 @@ char	*expander(char *expansion, t_env *envp);
 int		file_size(t_token **data);
 
 //execution
-void execute_bins (t_execution **exec, char **env);
+void execute_bins (t_execution **exec, char **env , t_env *env1);
 
-int execute_builtins(t_execution *exec);
+int execute_builtins(t_execution *exec, t_env *env1);
 
 char *remove_quotes(char *s);
 
@@ -117,4 +117,5 @@ char *find_env_variable2 (t_env *env, char *varname);
 
 
 void ft_free11(char **s);
+
 #endif

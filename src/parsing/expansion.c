@@ -150,7 +150,6 @@ void expander_final(t_token **final ,t_env *env)
 								break;
 							if(curr->data[i + 1] && curr->data[i + 1] == '?')
 									printf("exitstatus\n");
-									printf("exitstatus\n");
 							char *tmp = expander(curr->data + i , env);
 							if (tmp)
 								printf("final expanded value is %s\n", tmp);

@@ -11,15 +11,18 @@ void printenv(char **s)
 	}
 }
 
-int execute_builtins(t_execution *exec)
+int execute_builtins(t_execution *exec  ,t_env *env)
 {
 	int ret = 0;
 	// if (strncmp(exec->cmd[0], "echo", 5) == 0)
     // {
 	// 	ret = my_echo(exec->cmd);
     // }
-	// if (strncmp (exec->cmd[0], "cd", 3) == 0)
-	// 	ret = my_cd(exec);
+	if (strncmp (exec->cmd[0], "cd", 3) == 0)
+    {
+		my_cd(exec , env);
+        ret = 1;
+    }
 	if (strncmp(exec->cmd[0], "pwd", 4) == 0)
     {
 		my_pwd(exec->fd_out);
@@ -27,26 +30,31 @@ int execute_builtins(t_execution *exec)
     }
 	// else if (strncmp (exec->av[0] , "env", 4) == 0)
 	// 	ret = my_env(exec->env);
-	// else if (strncmp(exec->av[0] , "export", 7) == 0)
-	// 	ret = my_export(exec);
+	else if (strncmp(exec->cmd[0] , "export", 7) == 0)
+	{
+        ret = 1; 
+        my_export(exec , env);
+    }
     return ret;
 }
 
 int check_builtins(t_execution *exec)
 {
-	int ret = 0;
 	// if (strncmp(exec->cmd[0], "echo", 5) == 0)
     // {
 	// 	ret = my_echo(exec->cmd);
     // }
-	// if (strncmp (exec->cmd[0], "cd", 3) == 0)
-	// 	ret = my_cd(exec);
+	int ret = 0;
+        if(!exec->cmd)
+            ret = 0;
+	if (strncmp(exec->cmd[0], "cd", 3) == 0)
+		ret = 1;
 	if (ft_strcmp(exec->cmd[0], "pwd") == 0)
 		ret = 1;
+	if (strncmp(exec->cmd[0] , "export", 7) == 0)
+        ret = 1;
 	// else if (strncmp (exec->av[0] , "env", 4) == 0)
 	// 	ret = my_env(exec->env);
-	// else if (strncmp(exec->av[0] , "export", 7) == 0)
-	// 	ret = my_export(exec);
     return ret;
 }
 
@@ -119,48 +127,6 @@ void	free_stack1(t_execution **stack)
 	stack = NULL;
 }
 
-// int redirect_io(t_execution **exec, int *flag)
-// {
-//     if ((*exec)->dflag == 1)
-//         return (printf("this is a directory\n"),-1);
-//     if((*exec)->fflag == 3)
-//         return (printf("ambigous redirection\n") , -1);
-//     if((*exec)->fflag == 2)
-//         return(printf("no such a file or directory\n"), -1);
-//     else if((*exec)->fd_out != 1)
-//     {
-//         if ((*exec)->fflag == 1)
-//             return (printf ("permission denied1\n"), -1);
-//         *flag = 1;
-//         dup2((*exec)->fd_out, STDOUT_FILENO);
-//         if ((*exec)->fd_out != STDOUT_FILENO) 
-//             close((*exec)->fd_out);
-//     }
-//     if ((*exec)->fd_append != 1)
-//     {
-//         if ((*exec)->fflag == 1)
-//             return (printf ("permission denied\n"), -1);
-//         dup2((*exec)->fd_append, STDOUT_FILENO);
-//         close((*exec)->fd_append);
-//     }
-
-//     if ((*exec)->fd_in != 0)
-//     {
-//         if((*exec)->fd_in == -1 || (*exec)->fflag == 1)
-//         {
-//             printf("no such a file or directory\n");
-//             return -1;
-//         }
-//         dup2((*exec)->fd_in, STDIN_FILENO);
-//         close((*exec)->fd_in);
-//     }
-//     else if ((*exec)->fd_heredoc != 0)
-//     {
-//         dup2((*exec)->fd_heredoc, STDIN_FILENO);
-//         close((*exec)->fd_heredoc);
-//     }
-//     return 0;
-// }
 
 int handle_output_redirection(t_execution **exec, int *flag)
 {
@@ -239,7 +205,7 @@ void sighhh(int data)
     printf("\n");
 }
 
-void execute_bins(t_execution **exec, char **env)
+void execute_bins(t_execution **exec, char **env , t_env *env1)
 {
     t_execution *curr = *exec;
     char *fullcmd;
@@ -276,7 +242,7 @@ void execute_bins(t_execution **exec, char **env)
             if (!curr->next && check_builtins(curr))
             {
                 flag_s = 1;
-                execute_builtins(curr);
+                execute_builtins(curr ,env1);
                 return;
             }
             pids[i] = fork();
@@ -301,7 +267,7 @@ void execute_bins(t_execution **exec, char **env)
                     {
                         flag_s = 1;
                         // curr->fd_out = dup(curr_pipe[1]);
-                        execute_builtins(curr);
+                        execute_builtins(curr , env1);
                     }
                     dup2(prev_pipe[0], STDIN_FILENO);
                     close(prev_pipe[0]);
@@ -317,7 +283,7 @@ void execute_bins(t_execution **exec, char **env)
                         {
                             curr->fd_out = dup(curr_pipe[1]);
                         }
-                        execute_builtins(curr);
+                        execute_builtins(curr, env1);
                     }
                     close(curr_pipe[0]);
                     if (flag == 0)
@@ -331,7 +297,7 @@ void execute_bins(t_execution **exec, char **env)
                     exit(1);
                 }
                 if(!flag_s)  
-                {  
+                {
                     fullcmd = find_path(curr->cmd[0], env);
                     if (!fullcmd)
                     {
@@ -340,6 +306,9 @@ void execute_bins(t_execution **exec, char **env)
                         free(pids);
                         exit(1);
                     }
+                    // struct stat data;
+                    // if(stat(fullcmd, &data) && data.st_mode == S_ISDIR)
+                    //     printf("is directory\n");
                     if (execve(fullcmd, curr->cmd, env) == -1)
                     {
                         free_stack1(&curr);
@@ -381,3 +350,45 @@ void execute_bins(t_execution **exec, char **env)
             free(pids);
     }
 }
+// int redirect_io(t_execution **exec, int *flag)
+// {
+//     if ((*exec)->dflag == 1)
+//         return (printf("this is a directory\n"),-1);
+//     if((*exec)->fflag == 3)
+//         return (printf("ambigous redirection\n") , -1);
+//     if((*exec)->fflag == 2)
+//         return(printf("no such a file or directory\n"), -1);
+//     else if((*exec)->fd_out != 1)
+//     {
+//         if ((*exec)->fflag == 1)
+//             return (printf ("permission denied1\n"), -1);
+//         *flag = 1;
+//         dup2((*exec)->fd_out, STDOUT_FILENO);
+//         if ((*exec)->fd_out != STDOUT_FILENO) 
+//             close((*exec)->fd_out);
+//     }
+//     if ((*exec)->fd_append != 1)
+//     {
+//         if ((*exec)->fflag == 1)
+//             return (printf ("permission denied\n"), -1);
+//         dup2((*exec)->fd_append, STDOUT_FILENO);
+//         close((*exec)->fd_append);
+//     }
+
+//     if ((*exec)->fd_in != 0)
+//     {
+//         if((*exec)->fd_in == -1 || (*exec)->fflag == 1)
+//         {
+//             printf("no such a file or directory\n");
+//             return -1;
+//         }
+//         dup2((*exec)->fd_in, STDIN_FILENO);
+//         close((*exec)->fd_in);
+//     }
+//     else if ((*exec)->fd_heredoc != 0)
+//     {
+//         dup2((*exec)->fd_heredoc, STDIN_FILENO);
+//         close((*exec)->fd_heredoc);
+//     }
+//     return 0;
+// }

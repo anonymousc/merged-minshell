@@ -260,9 +260,9 @@ int export_with_value(t_exec *exec, char *arg, char *equal, char *plus)
     return 1;
 }
 
-int export_without_value(t_exec *exec, char *arg)
+int export_without_value(t_env *env, char *arg)
 {
-    t_env *existing = find_env_variable(exec->env, arg);
+    t_env *existing = find_env_variable(env, arg);
     t_env *new_var;
 
     if (!existing)
@@ -271,7 +271,7 @@ int export_without_value(t_exec *exec, char *arg)
         if (!new_var)
             return 0;
 
-        add_back(&(exec->env), new_var);
+        add_back(&(env), new_var);
         printf("Exported: %s\n", arg);
     }
     else
@@ -280,28 +280,24 @@ int export_without_value(t_exec *exec, char *arg)
     return 1;
 }
 
-int process_export_arg(t_exec *exec, char *arg)
+int process_export_arg(t_env *env, char *arg)
 {
     char *equal = strchr(arg, '=');
     char *plus = strchr(arg, '+');
 
     if (!equal)
-    {
-        return export_without_value(exec, arg);
-    }
+        return export_without_value(env, arg);
     else
-    {
-        return export_with_value(exec, arg, equal, plus);
-    }
+        return export_with_value(env, arg, equal, plus);
 }
 
-int my_export(t_exec *exec)
+int my_export(t_execution *exec , t_env *env)
 {
     int i = 1;
-    if (exec->ac == 1)
+    if (!exec->cmd[1])
     {
-        char **env_array = env_to_arr2(exec->env);
-        sort_strings(env_array, env_size(exec->env));
+        char **env_array = env_to_arr2(env);
+        sort_strings(env_array, env_size(env));
         
         i = 0;
         while (env_array[i])
@@ -313,14 +309,14 @@ int my_export(t_exec *exec)
         free(env_array);
         return 0;
     }
-    while (exec->av[i])
+    while (exec->cmd[i])
     {
-        char *arg = exec->av[i];
+        char *arg = exec->cmd[i];
 
         if (is_valid_identifier(arg) < 0)
             return 1;
 
-        if (!process_export_arg(exec, arg))
+        if (!process_export_arg(env, arg))
             return 1;
 
         i++;

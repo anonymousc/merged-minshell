@@ -49,14 +49,14 @@ void free_env(t_env *env);
 //pwd
 int my_pwd(int fd);
 //export
-int my_export(t_exec *exec);
+int my_export(t_execution *exec , t_env *env);
 char **env_to_arr2(t_env *env);
 char **env_to_arr(t_env *env);
 t_env *find_env_variable (t_env *env, char *varname);
 //unset
 void my_unset (t_exec **exec, char *s);
 //cd
-int my_cd(t_exec *exec);
+int my_cd(t_execution *exec , t_env *env);
 //echo
 int my_echo (int ac, char **av);
 //execute builtins
