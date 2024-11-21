@@ -124,7 +124,7 @@ static char	**str_all_fill_v2(char **str, char const *s)
 		else if (!is_separators(*s))
 		{
 			start = s;
-			while (*s && !is_separators(*s) && !is_quotes(*s))
+			while (*s && !(is_separators(*s) || is_quotes(*s)))
 				s++;
 			len = s - start;
 			str[i] = (char *)malloc((len + 1) * sizeof(char));

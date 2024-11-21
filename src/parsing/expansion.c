@@ -43,7 +43,7 @@ char *find_env_variable2 (t_env *env, char *varname)
         }
         env = env->next;
     }
-    return NULL;
+    return (NULL);
 }
 
 char	*ft_strjoin2(char *s, char *s1)
@@ -132,6 +132,7 @@ char *expander(char *expansion, t_env *envp)
 void expander_final(t_token **final ,t_env *env)
 {
 	t_token *curr;
+	char *tmp;
 
 	curr = *final;
 	while (curr)
@@ -140,7 +141,7 @@ void expander_final(t_token **final ,t_env *env)
 			{
 				if (check_in_db_or_sq(curr->data) == 2 || !check_in_db_or_sq(curr->data))
 				{
-					curr->data = ft_strdup(remove_quotes(curr->data));
+					curr->data = ft_strdup(curr->data);
 					int i = 0;
 					while (curr->data[i])
 					{
@@ -159,13 +160,12 @@ void expander_final(t_token **final ,t_env *env)
 							if(tmp && *tmp == '\v')
 							{
 								i++;
-								continue;	
+								continue;
 							}
 							if(*tmp)
 							{
-								tmp[ft_strlen(ft_strdup(tmp))] = '\0';
-								curr->data = ft_strjoin(curr->data ,tmp);
-								free(tmp);
+								tmp = ft_strjoin(curr->data ,tmp);
+								curr->data = tmp;
 							}
 							else
 								*(curr->data + i) = '\0';
