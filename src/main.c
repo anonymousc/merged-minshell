@@ -133,6 +133,6 @@ int main (int ac, char **av, char **envp)
 		free(data);
 		fri_ol(splitted_array);
 		free(line);
+		// free_lists();
 	}
 }
-

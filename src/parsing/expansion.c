@@ -133,7 +133,7 @@ void expander_final(t_token **final ,t_env *env)
 {
 	t_token *curr;
 	char *tmp;
-
+	
 	curr = *final;
 	while (curr)
 	{
@@ -151,7 +151,7 @@ void expander_final(t_token **final ,t_env *env)
 								break;
 							if(curr->data[i + 1] && curr->data[i + 1] == '?')
 									printf("exitstatus\n");
-							char *tmp = expander(curr->data + i , env);
+							tmp = expander(curr->data + i , env);
 							if (tmp)
 								printf("final expanded value is %s\n", tmp);
 							else if (!tmp)
