@@ -109,7 +109,6 @@ static char	**str_all_fill_v2(char **str, char const *s)
 	const char	*start;
 	int			i;
 	int			len;
-	// Token		t;
 
 	i = 0;
 	while (s && *s)
@@ -118,16 +117,13 @@ static char	**str_all_fill_v2(char **str, char const *s)
 			s = qoutes_detailer((char *)s , str , &i);
 		else if (is_separators(*s))
 		{
-			// t = get_token ((char *)s);
 			s = norm_to_minimize_part1((char *)s , str , &i);
-			if (!str[i])
-				return (fri_ol_v2(str));
 			i++;
 		}
 		else if (!is_separators(*s))
 		{
 			start = s;
-			while (*s && !is_separators(*s) && !is_quotes(*s))
+			while (*s && !(is_separators(*s) || is_quotes(*s)))
 				s++;
 			len = s - start;
 			str[i] = (char *)malloc((len + 1) * sizeof(char));

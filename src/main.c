@@ -154,23 +154,29 @@ void	free_stackhhh(t_execution **stack)
 	}
 	stack = NULL;
 }
+int parsing(t_token **final ,t_env *env, char **line)
+{
+	tokenization(line , final);
+	sanitizer(final);
+	expander_final(final , env);
+	process_quotes(final);
+	if (check_syntax_extended(final))
+		return 1;
+	free_spaces2(final);
+	return 0;
+}
 
 int main (int ac, char **av, char **envp)
 {
 	(void)ac;
 	(void)av;
-	// (void)envp;
 	char *line;
 	char **splitted_array;
 	t_token  **final;
 	t_execution **data;
-	t_exec *exec = malloc (sizeof(t_exec));
-	exec->env_orginal = envp;
-	t_env *env = make_env(exec);
-	exec->env = env;
-	exec->env = env;
+	t_env *env = make_env(envp);
 	line = NULL;
-	char **env2 = env_to_arr(exec->env);
+	char **env2 = env_to_arr(env);
 	while(1)
 	{
 		line = retline();
@@ -179,14 +185,8 @@ int main (int ac, char **av, char **envp)
 		if(!line)
 			continue;
 		splitted_array = split_to_lex(line);
-		tokenization(splitted_array , final);
-		
-		sanitizer(final);
-		expander_final(final ,env);
-		process_quotes(final);
-		if (check_syntax_extended(final))
+		if(parsing(final , env, splitted_array))
 			continue;
-		free_spaces2(final);
 		for_execute(final , data);
 		execute_bins(data, env2);
 		// print_tokens(*final);
@@ -198,3 +198,4 @@ int main (int ac, char **av, char **envp)
 		free(line);
 	}
 }
+

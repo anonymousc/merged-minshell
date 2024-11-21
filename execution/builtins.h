@@ -36,7 +36,7 @@ char	**ft_splita(char const *s, char sep);
 void	free_split(char **s, int n);
 // size_t	ft_strlen(char *str);
 void print_env(t_env *env);
-t_env * make_env(t_exec *exec);
+t_env * make_env(char **envp);
 // char *ft_strchr(char *str, int c);
 char *ft_strndup (char *str, size_t n);
 char *ft_strdup (char *str);

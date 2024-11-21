@@ -22,7 +22,7 @@ char  *retline(void)
 		signal(SIGINT , sig_handler);
 		add_history(line);
 		if(!line)
-			return (free(line) ,printf("exit\n"), exit(1) , NULL);
+			return (free(line) ,printf("exit\n") ,exit(1) ,NULL);
 		else if(line)
 		{
 			line = check_syntax(line);

@@ -1,20 +1,20 @@
 #include "builtins.h"
 
-t_env *make_env(t_exec *exec) 
+t_env *make_env(char **env_orginal) 
 {
     int i = 0;
     t_env *envir = NULL;
     t_env *new;
     char *delimiter;
-    while (exec->env_orginal && exec->env_orginal[i])
+    while (env_orginal && env_orginal[i])
     {
         new = malloc(sizeof(t_env));
         if (!new)
             return NULL;
-        delimiter = strchr(exec->env_orginal[i], '=');
+        delimiter = strchr(env_orginal[i], '=');
         if (!delimiter)
             free(new); 
-        new->variable = strndup(exec->env_orginal[i], delimiter - exec->env_orginal[i]);
+        new->variable = strndup(env_orginal[i], delimiter - env_orginal[i]);
         if (!new->variable)
         {
             free(new);  
@@ -31,7 +31,7 @@ t_env *make_env(t_exec *exec)
         add_back(&envir, new);
         i++;
     }
-    exec->env = envir;
+    // env = envir;
     return envir;
 }
 

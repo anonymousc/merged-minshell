@@ -44,7 +44,7 @@ char *find_env_variable2 (t_env *env, char *varname)
         }
         env = env->next;
     }
-    return NULL;
+    return (NULL);
 }
 
 char *expander(char *expansion, t_env *envp)
@@ -57,13 +57,10 @@ char *expander(char *expansion, t_env *envp)
 	char *to_expand = malloc (l + 1);
 	strncpy(to_expand, expansion, l);
 	to_expand[l] = '\0';
-	printf("to_expand == %s\n", to_expand);
 	if (!tmp)
 		return (free(to_expand), expander(tmp, envp));
 	if(!(find_env_variable2(envp , to_expand)) && tmp)
-	{
 		return (free(to_expand) , ft_strdup("\v"));
-	}
 	if (!tmp)
 		return (find_env_variable2(envp , to_expand));
 	else if (ft_strncmp(to_expand, "\v", 1))
@@ -75,6 +72,7 @@ char *expander(char *expansion, t_env *envp)
 void expander_final(t_token **final ,t_env *env)
 {
 	t_token *curr;
+	char *tmp;
 
 	curr = *final;
 	while (curr)
@@ -83,7 +81,7 @@ void expander_final(t_token **final ,t_env *env)
 			{
 				if (check_in_db_or_sq(curr->data) == 2 || !check_in_db_or_sq(curr->data))
 				{
-					curr->data = ft_strdup(remove_quotes(curr->data));
+					curr->data = ft_strdup(curr->data);
 					int i = 0;
 					while (curr->data[i])
 					{
@@ -93,18 +91,17 @@ void expander_final(t_token **final ,t_env *env)
 								break;
 							if(curr->data[i + 1] && curr->data[i + 1] == '?')
 									printf("exitstatus\n");
-							char *tmp = expander(curr->data + i , env);
+							tmp = expander(curr->data + i , env);
 							*(curr->data + i) = '\0';
 							if(*tmp == '\v')
 							{
 								i++;
-								continue;	
+								continue;
 							}
 							if(*tmp)
 							{
-								tmp[ft_strlen(ft_strdup(tmp))] = '\0';
-								curr->data = ft_strjoin(curr->data ,tmp);
-								free(tmp);
+								tmp = ft_strjoin(curr->data ,tmp);
+								curr->data = tmp;
 							}
 							else
 								*(curr->data + i) = '\0';
@@ -117,66 +114,3 @@ void expander_final(t_token **final ,t_env *env)
 	}
 	final  = &curr;
 }
-// void expander_final(t_token **final, t_env *env)
-// {
-//     t_token *curr;
-//     char *expand_res = NULL;
-    
-//     curr = *final;
-    
-//     while (curr)
-//     {
-//         if (curr->value == WORD)
-//         {
-//             if (check_in_db_or_sq(curr->data) == 2 || !check_in_db_or_sq(curr->data))
-//             {
-//                 expand_res = NULL;
-//                 curr->data = ft_strdup(remove_quotes(curr->data));
-//                 char **segments = ft_split(curr->data, '%');
-//                 int i = 0;
-//                 while (segments[i])
-//                 {
-//                     int j = 0;
-//                     int dollar_found = 0;
-                    
-//                     while (segments[i][j])
-//                     {
-//                         if (segments[i][j] == '$')
-//                         {
-//                             dollar_found = 1;
-//                             char *tmp = expander(segments[i] + j, env);
-//                             if (ft_strcmp(tmp, "\v"))
-//                             {
-//                                 expand_res = ft_strjoin2(expand_res, tmp);
-//                             }
-//                         }
-//                         j++;
-//                     }
-                    
-//                     if (!dollar_found)
-//                     {
-//                         expand_res = ft_strjoin2(expand_res, segments[i]);
-//                     }
-//                     i++;
-//                 }
-                
-//                 if (!ft_strchr(expand_res, '\v'))
-//                 {
-//                     free(curr->data);
-//                     curr->data = ft_strdup(expand_res);
-//                     free(expand_res);
-//                 }
-                
-//                 i = 0;
-//                 while (segments[i])
-//                 {
-//                     free(segments[i]);
-//                     i++;
-//                 }
-//                 free(segments);
-//             }
-//         }
-//         curr = curr->next;
-//     }
-
-// }
