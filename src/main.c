@@ -12,69 +12,6 @@
 
 #include "../includes/minishell.h"
 
-// char is_data_quotes(char c)
-// {
-// 	if(c == '\'')
-// 		return '\'';
-// 	else if(c == '"')
-// 		return '"';
-// 	return 0;
-// }
-// int count_qoutes(char *s , char quoted)
-// {
-// 	int wc = 0;
-// 	while (s && *s)
-// 	{
-// 		if(*s == quoted)
-// 			wc++;
-// 		s++;
-// 	}
-// 	return wc;
-// }
-// char *d_qoutes_remover(char *s , char quoted)
-// {
-// 	int alloc = ft_strlen(s) - count_qoutes(s , quoted);
-// 	char *replace = malloc(sizeof(char ) * (alloc + 1));
-// 	int i = 0;
-// 	int j = 0;
-// 	while (s[i])
-// 	{
-// 		if (s[i] != quoted)
-// 		{
-// 			replace[j] = s[i];
-// 			j++;
-// 		}
-// 		i++;
-// 	}
-// 	replace[alloc] = 0;
-// 	return(replace);
-// }
-
-// void if_s_or_d(t_token **final)
-// {
-// 	t_token *curr = *final;
-// 	while (curr)
-// 	{
-// 		if(curr->value == WORD)
-// 		{
-// 			while(!is_quotes(*curr->data)  && (*curr->data))
-// 			{
-// 				curr->data++;
-// 			}
-// 			curr->data = d_qoutes_remover(curr->data , is_data_quotes(*curr->data));
-// 		}
-// 		curr = curr->next;
-// 	}
-// 	final = &curr;
-// }
-
-// typedef struct 
-// {
-//     char *str;
-//     int in_dquote;
-//     int in_squote;
-// } quote_state;
-
 char is_quote(char c) 
 {
     if (c == '\'') return '\'';
@@ -188,7 +125,7 @@ int main (int ac, char **av, char **envp)
 		if(parsing(final , env, splitted_array))
 			continue;
 		for_execute(final , data);
-		execute_bins(data, env2);
+		(execute_bins(data, env2 ,  env));
 		// print_tokens(*final);
 		free_stackhhh(data);
 		free_stack(final);

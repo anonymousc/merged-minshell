@@ -1,11 +1,12 @@
 #include "builtins.h"
 
-int my_pwd()
+int my_pwd(int fd)
 {
     char path[1024];
 
+    ft_printf(fd,"test\n");
     if (getcwd(path, sizeof (path)))
-        printf ("%s\n", path);
+        ft_printf (fd ,"%s\n", path);
     else
         perror ("error\n");
     return 0;

@@ -59,7 +59,10 @@ int quotes_cout_word(char *s,char q)
 		i++;
 	return i;
 }
-
+// char *data_to_send(char *delim , char **s ,char **str , int **i)
+// {
+// 	str[(*i)]
+// }
 char *norm_to_minimize_part1(char *s, char **str , int *i)
 {
 	Token t;
@@ -94,6 +97,7 @@ char *norm_to_minimize_part1(char *s, char **str , int *i)
 		str[(*i)] = ft_strdup(is_space_veta(*s));
 		s++;
 	}
+	(*i)++;
 	return s;
 }
 char *qoutes_detailer(char *s , char **str , int *i)
@@ -116,10 +120,7 @@ static char	**str_all_fill_v2(char **str, char const *s)
 		if (is_quotes((char )*s))
 			s = qoutes_detailer((char *)s , str , &i);
 		else if (is_separators(*s))
-		{
 			s = norm_to_minimize_part1((char *)s , str , &i);
-			i++;
-		}
 		else if (!is_separators(*s))
 		{
 			start = s;

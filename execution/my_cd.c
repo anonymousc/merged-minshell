@@ -58,11 +58,11 @@ int check_path (char *path)
     return 0;
 }
 
-int my_cd(t_exec *exec)
+int my_cd(t_execution *exec , t_env *env)
 {
     char old_pwd[4096];
 
-    if (exec->ac != 2)
+    if (!exec->cmd[1])
     {
         printf("cd: wrong number of arguments\n");
         return 1;
@@ -76,14 +76,14 @@ int my_cd(t_exec *exec)
         return 2;
     }
 
-    if (chdir(exec->av[1]) != 0)
+    if (chdir(exec->cmd[1]) != 0)
     {
         perror("cd");
         return 3;
     }
 
-    update_oldpwd(exec->env, old_pwd);
-    update_pwd(exec->env);
+    update_oldpwd(env, old_pwd);
+    update_pwd(env);
 
     return 0;
 }
