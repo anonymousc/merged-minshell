@@ -42,7 +42,7 @@ char **env_to_arr2(t_env *env)
     {
         int var_len = ft_strlen(env->variable);
         int val_len = ft_strlen(env->value);
-        int len = var_len + val_len + 4;
+        int len = var_len + val_len + 1 + 3 * (val_len != 0);
 
         envir[i] = malloc(len);
         int j = 0;
@@ -60,14 +60,16 @@ char **env_to_arr2(t_env *env)
         int k = 0;
         while (k < var_len)
             envir[i][j++] = env->variable[k++];
-        envir[i][j++] = '=';
-        envir[i][j++] = '"';
-        k = 0;
-        while (k < val_len)
-            envir[i][j++] = env->value[k++];
-        envir[i][j++] = '"';
+        if(val_len)
+        {
+            envir[i][j++] = '=';
+            envir[i][j++] = '"';
+            k = 0;
+            while (k < val_len)
+                envir[i][j++] = env->value[k++];
+            envir[i][j++] = '"';
+        }
         envir[i][j] = '\0';
-
         env = env->next;
         i++;
     }
@@ -192,7 +194,7 @@ int update_existing_var(t_env *existing, char *value, int is_append)
         new_value = ft_strjoin(existing->value, value);
         if (!new_value)
             return 0; 
-        free(existing->value);
+        // free(existing->value);
         existing->value = new_value;
     }
     else
@@ -200,7 +202,7 @@ int update_existing_var(t_env *existing, char *value, int is_append)
         new_value = ft_strdup(value);
         if (!new_value)
             return 0;
-        free(existing->value);
+        // free(existing->value);
         existing->value = new_value;
     }
     printf("Updated: %s=%s\n", existing->variable, existing->value);
@@ -208,9 +210,9 @@ int update_existing_var(t_env *existing, char *value, int is_append)
 }
 
 
-int handle_existing_var(t_exec *exec, char *var_name, char *value, int is_append)
+int handle_existing_var(t_env *env, char *var_name, char *value, int is_append)
 {
-    t_env *existing = find_env_variable(exec->env, var_name);
+    t_env *existing = find_env_variable(env, var_name);
     t_env *new_var;
 
     if (existing)
@@ -227,13 +229,12 @@ int handle_existing_var(t_exec *exec, char *var_name, char *value, int is_append
         if (!new_var)
             return 0;
 
-        add_back(&(exec->env), new_var);
-        printf("Exported: %s=%s\n", var_name, value);
+        add_back(&(env), new_var);
     }
     return 1;
 }
 
-int export_with_value(t_exec *exec, char *arg, char *equal, char *plus)
+int export_with_value(t_env *env, char *arg, char *equal, char *plus)
 {
     int is_append = (plus && plus + 1 == equal);
     int name_len;
@@ -252,7 +253,7 @@ int export_with_value(t_exec *exec, char *arg, char *equal, char *plus)
 
     char *value = equal + 1;
 
-    if (!handle_existing_var(exec, var_name, value, is_append))
+    if (!handle_existing_var(env, var_name, value, is_append))
     {
         free(var_name);
         return 0;
@@ -320,20 +321,6 @@ int my_export(t_execution *exec , t_env *env)
             return 1;
 
         i++;
-		printf("data == %s\n", arg);
     }
     return 0;
 }
-
-// int main (int ac , char **av, char **env)
-// {
-//     t_exec *exec = malloc(sizeof(t_exec));
-//     exec->ac = ac;
-//     exec->av = av;
-//     exec->env_orginal = env;
-//     t_env *envir = make_env(exec);
-//     exec->env = envir;
-//     char **arr = env_to_arr(envir);
-//     print(arr);
-//     // my_export(exec);
-// }

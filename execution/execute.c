@@ -306,9 +306,12 @@ void execute_bins(t_execution **exec, char **env , t_env *env1)
                         free(pids);
                         exit(1);
                     }
-                    // struct stat data;
-                    // if(stat(fullcmd, &data) && data.st_mode == S_ISDIR)
-                    //     printf("is directory\n");
+                    struct stat data;
+                    if(stat(fullcmd, &data))
+                    {
+                        if(S_ISDIR (data.st_mode))
+                            printf("%s is directory\n", fullcmd);
+                    }
                     if (execve(fullcmd, curr->cmd, env) == -1)
                     {
                         free_stack1(&curr);

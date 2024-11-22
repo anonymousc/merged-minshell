@@ -77,10 +77,7 @@ void	tokenization(char **line , t_token **fill_line)
 	i = -1;
 	*fill_line = NULL;
 	while (line && line[++i])
-	{
-
 		ft_lstadd_back(fill_line , ft_lstnew(line[i] , get_token(line[i])));
-	}
 }
 
 void free_spaces2(t_token **head)
@@ -121,7 +118,7 @@ void sanitizer(t_token **fill_line)
 	data = *fill_line;
     while (data && (data)->next) 
 	{
-        if ((data)->value == WORD && (data)->next->value == WORD) 
+        if ((data)->value == WORD && (data)->next->value == WORD)
 		{
 			tmp = data->next;
             (data)->data = ft_strjoin((data)->data, (data)->next->data);
@@ -199,10 +196,11 @@ int count_cmds(t_token **data)
 	return wc;
 }
 
-void for_execute(t_token **final, t_execution **data)
+void for_execute(t_token **final, t_execution **data , int *expansion)
 {
 	struct stat dstat;
     t_token *curr = *final;
+	(void)expansion;
     *data = NULL;
     while (curr)
     {
@@ -298,11 +296,18 @@ void for_execute(t_token **final, t_execution **data)
 					curr = curr->next;
 				}
 			}
+			// else if(curr->value == WORD && *expansion == 0)
+			// {
+			// 	cmd = ft_split(curr->data , ' ');
+			// }
             else if (curr->value == WORD && i < word_count)
             {
-                cmd[i] = strdup(curr->data);
-                i++;
+					cmd[i] = strdup(curr->data);
+                	i++;
             }
+			for (int i = 0; cmd[i]; i++)
+				printf("cmd[%d] == |%s|\n",i , cmd[i]);
+			
             curr = curr->next;
         }
         t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc, fflag, dflag);
