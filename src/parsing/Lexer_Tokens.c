@@ -296,18 +296,11 @@ void for_execute(t_token **final, t_execution **data , int *expansion)
 					curr = curr->next;
 				}
 			}
-			// else if(curr->value == WORD && *expansion == 0)
-			// {
-			// 	cmd = ft_split(curr->data , ' ');
-			// }
             else if (curr->value == WORD && i < word_count)
             {
 					cmd[i] = strdup(curr->data);
                 	i++;
             }
-			for (int i = 0; cmd[i]; i++)
-				printf("cmd[%d] == |%s|\n",i , cmd[i]);
-			
             curr = curr->next;
         }
         t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc, fflag, dflag);

@@ -32,6 +32,8 @@ void print_tokens(t_token *list)
 			printf("token type : WORD its_data == %s\n" , list->data);
 		if(list->value == WHITESPACE)
 			printf("token type : WHITESPACE its_data == %d\n" ,  (*list->data));
+		if(list->value == DOLLAR_SIGN)
+			printf("token type : DOLLAR_SIGN its_data == %s\n" ,  list->data);
 		list = list->next;
 	}
 }

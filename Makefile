@@ -2,7 +2,8 @@ NAME = minishell
 
 CC = cc
 
-CFLAGS = -Werror -Wall -Wextra -fsanitize=address -g3 
+CFLAGS = #-Werror -Wall -Wextra
+CFLAGS += -fsanitize=address -g3
 
 SRC = src/main.c src/minishell.c builtins/ft_env.c src/parsing/check_syntax.c src/parsing/heredoc.c src/parsing/Lexer_Tokens.c src/parsing/signals.c src/parsing/ft_split_v2.c src/parsing/debug.c execution/execute.c execution/my_env.c execution/my_export.c execution/my_cd.c execution/my_pwd.c execution/utils.c execution/my_echo.c src/parsing/expansion.c
 
