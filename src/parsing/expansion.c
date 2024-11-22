@@ -73,8 +73,6 @@ char	*ft_strjoin2(char *s, char *s1)
 	if (s1)
 		while (s1[i])
 			*(p++) = s1[i++];
-	// free(s);
-	// free(s1);
 	return (str);
 }
 
@@ -107,14 +105,12 @@ char *expander(char *expansion, t_env *envp)
 	while(tmp && *tmp && ft_isalnum(*tmp))
 	while(tmp && *tmp && ft_isalnum(*tmp))
 		tmp++;
-	// in case it wasnt stooped by $
 	//$HOMEffff%%%%%%%$HOME
 	int l = tmp - expansion;
 	char *to_expand = malloc (l + 1);
 	strncpy(to_expand, expansion, l);
 	to_expand[l] = '\0';
 	//printf("to_expand == %s\n", to_expand);
-	// going to expand
 	expanded_word = find_env_variable2(envp , to_expand);
 	if (*tmp && *tmp != '$')
 	{
@@ -129,52 +125,90 @@ char *expander(char *expansion, t_env *envp)
 	return (ft_strjoin2(expanded_word, expander(tmp, envp)));
 }
 
-void expander_final(t_token **final ,t_env *env)
+int expander_final(t_token **final ,t_env *env)
 {
 	t_token *curr;
 	char *tmp;
-	
+	int ret = -1;
+
 	curr = *final;
 	while (curr)
 	{
-			if(curr->value == WORD)
+		if(curr->value == WORD)
+		{
+			if (check_in_db_or_sq(curr->data) == 2)
 			{
-				if (check_in_db_or_sq(curr->data) == 2 || !check_in_db_or_sq(curr->data))
+				curr->data = ft_strdup(curr->data);
+				int i = 0;
+				while (curr->data[i])
 				{
-					curr->data = ft_strdup(curr->data);
-					int i = 0;
-					while (curr->data[i])
+					if(curr->data[i] == '$')
 					{
-						if(curr->data[i] == '$')
+						if(!curr->data[i + 1] || curr->data[i + 1] == '$')
+							break;
+						if(curr->data[i + 1] && curr->data[i + 1] == '?')
+								printf("exitstatus\n");
+						tmp = expander(curr->data + i , env);
+						*(curr->data + i) = '\0';
+						if(tmp && *tmp == '\v')
 						{
-							if(!curr->data[i + 1] || curr->data[i + 1] == '$')
-								break;
-							if(curr->data[i + 1] && curr->data[i + 1] == '?')
-									printf("exitstatus\n");
-							tmp = expander(curr->data + i , env);
-							if (tmp)
-								printf("final expanded value is %s\n", tmp);
-							else if (!tmp)
-								return ;
-							*(curr->data + i) = '\0';
-							if(tmp && *tmp == '\v')
-							{
-								i++;
-								continue;
-							}
-							if(*tmp)
-							{
-								tmp = ft_strjoin(curr->data ,tmp);
-								curr->data = tmp;
-							}
-							else
-								*(curr->data + i) = '\0';
+							i++;
+							continue;
 						}
-						i++;
+						if(tmp && *tmp)
+						{
+							tmp = ft_strjoin(curr->data ,tmp);
+							curr->data = tmp;
+						}
+						else
+							*(curr->data + i) = '\0';
+						ret = 1;
 					}
+					i++;
 				}
 			}
-			curr = curr->next;
+			if(!check_in_db_or_sq(curr->data))
+			{
+				curr->data = ft_strdup(curr->data);
+				int i = 0;
+				while (curr->data[i])
+				{
+					if(curr->data[i] == '$')
+					{
+						if(!curr->data[i + 1] || curr->data[i + 1] == '$')
+							break;
+						if(curr->data[i + 1] && curr->data[i + 1] == '?')
+								printf("exitstatus\n");
+						tmp = expander(curr->data + i , env);
+						*(curr->data + i) = '\0';
+						if(tmp && *tmp == '\v')
+						{
+							i++;
+							continue;
+						}
+						if(tmp && *tmp)
+						{
+							tmp = ft_strjoin(curr->data ,tmp);
+							curr->data = tmp;
+						}
+						else
+							*(curr->data + i) = '\0';
+						ret = 0;
+					}
+					i++;
+				}
+			}
+		}
+		curr = curr->next;
 	}
 	final  = &curr;
+	return ret;
 }
+
+// void increment_list (t_token **token, int *a)
+// {
+// 	while (*a--)
+// 	{
+// 		*token = *token->next;
+// 	}
+// }

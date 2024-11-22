@@ -98,7 +98,7 @@ void		sanitizer(t_token **fill_line);
 int			check_syntax_extended (t_token **final);
 t_token		*free_spaces (t_token *curr);
 void		free_spaces2(t_token **head);
-void		expander_final(t_token **final ,t_env *env);
+int		expander_final(t_token **final ,t_env *env);
 /* **************************** */
 // to remove
 // int here_doc(t_token **final, int *fd);

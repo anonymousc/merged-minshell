@@ -91,11 +91,11 @@ void	free_stackhhh(t_execution **stack)
 	}
 	stack = NULL;
 }
-int parsing(t_token **final ,t_env *env, char **line)
+int parsing(t_token **final ,t_env *env, char **line, int *expansion)
 {
 	tokenization(line , final);
 	sanitizer(final);
-	expander_final(final , env);
+	*expansion = expander_final(final , env);
 	process_quotes(final);
 	if (check_syntax_extended(final))
 		return 1;
@@ -109,6 +109,7 @@ int main (int ac, char **av, char **envp)
 	(void)av;
 	char *line;
 	char **splitted_array;
+	int expansion = 2;
 	t_token  **final;
 	t_execution **data;
 	t_env *env = make_env(envp);
@@ -122,9 +123,9 @@ int main (int ac, char **av, char **envp)
 		if(!line)
 			continue;
 		splitted_array = split_to_lex(line);
-		if(parsing(final , env, splitted_array))
+		if(parsing(final , env, splitted_array , &expansion))
 			continue;
-		for_execute(final , data);
+		for_execute(final , data , &expansion);
 		(execute_bins(data, env2 ,  env));
 		// print_tokens(*final);
 		free_stackhhh(data);

@@ -34,9 +34,6 @@ typedef enum
 	APPEND,
 	DOLLAR_SIGN,
 	WORD,
-	SYNTAX_ERROR_OUT,
-	SYNTAX_ERROR_IN,
-	SYNTAX_ERROR_PIPE,
 	WHITESPACE
 
 } Token;
@@ -55,6 +52,7 @@ typedef	struct	s_Tokenization
 	struct s_Tokenization	*next;
 
 }		t_token;
+
 typedef struct s_execution
 {
 	char 				**cmd;
@@ -64,8 +62,6 @@ typedef struct s_execution
 	int					fd_out;
 	int					fd_append;
 	int					fd_heredoc;
-	// int					fd[2];
-	// int					pid;
 	struct s_execution	*next;
 }					t_execution;
 
@@ -84,7 +80,7 @@ int		ft_strncmp(char const *s1, char const *s2, size_t n);
 int		is_space(char c);
 int		ft_strcmp(char *s1, char *s2);
 char	*is_space_veta(char s);
-void 	for_execute(t_token **final , t_execution **data);
+void 	for_execute(t_token **final , t_execution **data , int *expansion);
 
 
 char	*ft_itoa(int n);
