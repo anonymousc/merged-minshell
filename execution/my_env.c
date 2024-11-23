@@ -31,15 +31,14 @@ t_env *make_env(char **env_orginal)
         add_back(&envir, new);
         i++;
     }
-    // env = envir;
     return envir;
 }
 
-int my_env(t_env *env) 
+int my_env(int fd, t_env *env) 
 {
     while (env) 
     {
-        printf("%s=%s\n", env->variable, env->value);
+        ft_printf(fd, "%s=%s\n", env->variable, env->value);
         env = env->next;
     }
     return 0;
@@ -57,20 +56,3 @@ void free_env(t_env *env)
         free(temp);
     }
 }
-
-// int main(int argc, char **argv, char **envp)
-// {
-//     t_execution *exec = malloc (sizeof (t_execution));
-//     exec->env_orginal = envp;
-//     t_env *env = make_env(exec);
-//     if (!env)
-//     {
-//         printf("Failed to create environment list\n");
-//         return 1;
-//     }
-
-//     my_env(env);
-
-//     free_env(env);
-//     return 0;
-// }

@@ -1,13 +1,14 @@
 #include "builtins.h"
 
-void unset_var(t_exec **exec, char *s) 
+void unset_var(t_execution **exec, char *s, t_env *env) 
 {
-    t_env *curr = (*exec)->env;
+    (void)exec;
+    t_env *curr = env;
     t_env *to_remove = NULL;
 
     while (curr && curr->next) 
 	{
-        if (strncmp(curr->next->variable, s, strlen(s)) == 0) 
+        if (strcmp(curr->next->variable, s) == 0) 
 		{
             to_remove = curr->next;
             curr->next = curr->next->next;
@@ -19,37 +20,22 @@ void unset_var(t_exec **exec, char *s)
         }
     }
 
-    curr = (*exec)->env;
-    if (curr && strncmp(curr->variable, s, strlen(s)) == 0) 
+    curr = env;
+    if (curr && strcmp(curr->variable, s) == 0) 
 	{
         to_remove = curr;
-        (*exec)->env = curr->next;
+        env = curr->next;
     	free(to_remove);
     }
 }
 
-int my_unset(t_exec **exec)
+int my_unset(t_execution **exec, t_env *env)
 {
 	int i = 1;
-	while ((*exec)->av[i])
+	while ((*exec)->cmd[i])
 	{
-		unset_var(exec, (*exec)->av[i]);
+		unset_var(exec, (*exec)->cmd[i], env);
 		i++;
 	}
 	return 0;
 }
-
-// int main(int ac ,char **av , char **envp)
-// {
-// 	t_exec *exec = malloc(sizeof(t_exec));
-// 	exec->env_orginal = envp;
-// 	t_env *env = make_env(exec);
-// 	exec->env = env;
-// 	exec->av = av;
-// 	exec->ac = ac;
-// 	int i = 0;
-// 	my_unset(&exec);
-// 	t_env *current = exec->env;
-// 	my_env(&current);
-// 	free_env(&current);
-// }

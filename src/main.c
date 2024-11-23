@@ -93,10 +93,11 @@ void	free_stackhhh(t_execution **stack)
 }
 int parsing(t_token **final ,t_env *env, char **line, int *expansion)
 {
+	(void) expansion;
 	tokenization(line , final);
 	sanitizer(final);
-	*expansion = expander_final(final , env);
-	print_tokens(*final);
+	// *expansion = expander_final(final , env);
+	// print_tokens(*final);
 	process_quotes(final);
 	if (check_syntax_extended(final))
 		return 1;

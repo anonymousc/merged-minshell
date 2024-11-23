@@ -57,6 +57,7 @@ typedef struct s_execution
 {
 	char 				**cmd;
 	int 				fflag;
+	int					cmd_len;
 	int 				dflag;
 	int					fd_in;
 	int					fd_out;

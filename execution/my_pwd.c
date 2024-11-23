@@ -1,6 +1,6 @@
 #include "builtins.h"
 
-int my_pwd(int fd)
+int my_pwd(int fd, t_env *env)
 {
     char path[1024];
 
@@ -8,11 +8,6 @@ int my_pwd(int fd)
     if (getcwd(path, sizeof (path)))
         ft_printf (fd ,"%s\n", path);
     else
-        perror ("error\n");
+        ft_printf (fd, "%s\n",find_env_variable2(env, "PWD"));
     return 0;
 }
-
-// int main ()
-// {
-//     my_pwd();
-// }

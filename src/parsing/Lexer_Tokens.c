@@ -162,7 +162,7 @@ void	ft_lstadd_back_exec(t_execution  **stacks, t_execution  *new)
 	new->next = NULL;
 }
 
-t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int fd_out ,int fd_append , int fd_heredoc, int flag, int dflag)
+t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int fd_out ,int fd_append , int fd_heredoc, int flag, int dflag, int wordcnt)
 {
 	t_execution   *list;
 
@@ -176,6 +176,7 @@ t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int fd_out ,int fd_append ,
 	list->fd_heredoc = fd_heredoc;
 	list->fflag = flag;
 	list->dflag = dflag;
+	list->cmd_len = wordcnt;
 	list->next = NULL;
 	return (list);
 }
@@ -303,7 +304,7 @@ void for_execute(t_token **final, t_execution **data , int *expansion)
             }
             curr = curr->next;
         }
-        t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc, fflag, dflag);
+        t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc, fflag, dflag, word_count);
 		// ft_free11(cmd);
 		if (!*data)
             *data = new_cmd;

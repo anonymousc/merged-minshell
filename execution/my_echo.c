@@ -5,7 +5,7 @@ bool check_newline(int ac, char **av, int *start_i)
     bool new_line = true;
     *start_i = 1;
 
-    while (*start_i < ac && av[*start_i][0] == '-') 
+    while (av[*start_i] && *start_i < ac && av[*start_i][0] == '-') 
     {
         int i = 1;
         while (av[*start_i][i] == 'n') 
@@ -22,26 +22,23 @@ bool check_newline(int ac, char **av, int *start_i)
     return new_line;
 }
 
-int my_echo (int ac, char **av)
+int my_echo (int fd, int ac, char **av)
 {
     int start_i;
     bool new_line;
+    if (!av[start_i])
+        ft_printf (fd , "\n");
 
     new_line = check_newline(ac, av, &start_i);
     while (start_i < ac)
     {
-        printf ("%s", av[start_i]);
+        ft_printf (fd, "%s", av[start_i]);
         if (start_i < ac - 1)
-            printf(" ");
+            ft_printf(fd, " ");
         start_i++;
     }
 
     if (new_line)
-        printf ("\n");
+        ft_printf (fd , "\n");
     return 0;
 }
-
-// int main (int ac , char **av)
-// {
-//     my_echo(ac, av);
-// }

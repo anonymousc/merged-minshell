@@ -165,19 +165,19 @@ t_env *creat_env_var (char *varname, char *value)
     return new_var;
 }
 
-int is_valid_identifier (char *arg)
+int is_valid_identifier (int fd, char *arg)
 {
     int  i = 1;
     if (!is_alpha(arg[0]) && arg[0] != '_')
     {
-        printf ("%s not a valid identifier\n", arg);
+        ft_printf (fd ,"%s not a valid identifier\n", arg);
         return -1;
     }
     while (arg[i] && (arg[i] != '+' && arg[i] != '='))
     {
         if (!is_alphanum(arg[i]) && arg[i] != '_')
         {
-            printf ("%s not a valid identifier\n", arg);
+            ft_printf (fd, "%s not a valid identifier\n", arg);
             return -1;
         }
         i++;
@@ -205,7 +205,6 @@ int update_existing_var(t_env *existing, char *value, int is_append)
         // free(existing->value);
         existing->value = new_value;
     }
-    printf("Updated: %s=%s\n", existing->variable, existing->value);
     return 1;
 }
 
@@ -292,7 +291,7 @@ int process_export_arg(t_env *env, char *arg)
         return export_with_value(env, arg, equal, plus);
 }
 
-int my_export(t_execution *exec , t_env *env)
+int my_export(t_execution *exec , t_env *env, int fd)
 {
     int i = 1;
     if (!exec->cmd[1])
@@ -303,7 +302,7 @@ int my_export(t_execution *exec , t_env *env)
         i = 0;
         while (env_array[i])
         {
-            printf("declare -x %s\n", env_array[i]);
+            ft_printf(fd, "declare -x %s\n", env_array[i]);
             free(env_array[i]);
             i++;
         }
@@ -314,7 +313,7 @@ int my_export(t_execution *exec , t_env *env)
     {
         char *arg = exec->cmd[i];
 
-        if (is_valid_identifier(arg) < 0)
+        if (is_valid_identifier(fd, arg) < 0)
             return 1;
 
         if (!process_export_arg(env, arg))
