@@ -143,5 +143,4 @@ void	ft_lstclear(t_token  **lst);
 void	ft_lstadd_back(t_token  **lst, t_token *new);
 void	ft_lstadd_front(t_token  *lst, t_token *new);
 int		ft_lstsize(t_token  *lst);
-
 #endif

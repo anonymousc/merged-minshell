@@ -10,18 +10,18 @@ void printenv(char **s)
 	}
 }
 
-char *find_env_variable2 (t_env *env, char *varname)
-{
-    while (env)
-    {
-        if (ft_strcmp(env->variable, varname) == 0)
-        {
-            return env->value;
-        }
-        env = env->next;
-    }
-    return (NULL);
-}
+// char *find_env_variable2 (t_env *env, char *varname)
+// {
+//     while (env)
+//     {
+//         if (ft_strcmp(env->variable, varname) == 0)
+//         {
+//             return env->value;
+//         }
+//         env = env->next;
+//     }
+//     return (NULL);
+// }
 
 int execute_builtins(t_execution *exec  ,t_env *env)
 {
@@ -263,7 +263,7 @@ void execute_bins(t_execution **exec, char **env, t_env *env1)
             }
         }
         
-        if (curr->cmd && check_builtins(curr))
+        if (!curr->next &&  check_builtins(curr))
         {
             execute_builtins(curr, env1);
             free(pids);
@@ -281,11 +281,10 @@ void execute_bins(t_execution **exec, char **env, t_env *env1)
         if (pids[i] == 0)
         {
             signal(SIGINT, sighhh);
-            
             if (redirect_io(&curr, &flag) == -1)
             {
                 free(pids);
-                exit(1);
+                exit(1); 
             }
             
             if (i > 0)
@@ -310,7 +309,7 @@ void execute_bins(t_execution **exec, char **env, t_env *env1)
                 exit(1);
             }
             
-            if (check_builtins(curr))
+            if (curr->next && check_builtins(curr))
             {
                 execute_builtins(curr, env1);
                 free_stack1(&curr);
@@ -371,3 +370,4 @@ void execute_bins(t_execution **exec, char **env, t_env *env1)
     
     free(pids);
 }
+

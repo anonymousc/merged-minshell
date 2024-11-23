@@ -1,11 +1,10 @@
 #include "builtins.h"
 
-bool check_newline(int ac, char **av, int *start_i)
+bool check_newline( int ac, char **av, int *start_i)
 {
     bool new_line = true;
     *start_i = 1;
-
-    while (av[*start_i] && *start_i < ac && av[*start_i][0] == '-') 
+    while (*start_i < ac && av[*start_i][0] == '-') 
     {
         int i = 1;
         while (av[*start_i][i] == 'n') 
@@ -22,13 +21,17 @@ bool check_newline(int ac, char **av, int *start_i)
     return new_line;
 }
 
-int my_echo (int fd, int ac, char **av)
+int my_echo (int fd ,int ac, char **av)
 {
     int start_i;
     bool new_line;
-    if (!av[start_i])
-        ft_printf (fd , "\n");
 
+    // ft_printf(fd, "waaaaaa ha li khdem\n");
+    if(!av[1])
+    {
+        ft_printf(fd , "\n");
+        return false;
+    }
     new_line = check_newline(ac, av, &start_i);
     while (start_i < ac)
     {
@@ -39,6 +42,6 @@ int my_echo (int fd, int ac, char **av)
     }
 
     if (new_line)
-        ft_printf (fd , "\n");
+        ft_printf (fd, "\n");
     return 0;
 }

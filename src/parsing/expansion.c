@@ -33,18 +33,18 @@ int check_in_db_or_sq(char *s)
 	return 0;
 }
 
-char *find_env_variable2 (t_env *env, char *varname)
-{
-    while (env)
-    {
-        if (ft_strcmp(env->variable, varname) == 0)
-        {
-            return env->value;
-        }
-        env = env->next;
-    }
-    return (NULL);
-}
+// char *find_env_variable2 (t_env *env, char *varname)
+// {
+//     while (env)
+//     {
+//         if (ft_strcmp(env->variable, varname) == 0)
+//         {
+//             return env->value;
+//         }
+//         env = env->next;
+//     }
+//     return (NULL);
+// }
 
 char	*ft_strjoin2(char *s, char *s1)
 {
@@ -125,36 +125,6 @@ char *expander(char *expansion, t_env *envp)
 	return (ft_strjoin2(expanded_word, expander(tmp, envp)));
 }
 
-void join_expansion(t_token **final, char *data , t_token *current, t_token *head)
-{
-	t_token *prev = *final;
-	while (prev)
-	{
-		if(prev && !ft_strcmp((prev)->data ,current->data))
-		{
-			prev->next = NULL;
-			prev = head;
-			break;
-		}
-		prev = (prev)->next;
-	}
-	prev = head;
-	printf("prev == %s\n" , prev->data);
-	final = &prev;
-	printf("print tokens 1 ");
-	print_tokens(*final);
-	// while(prev)
-	// {
-	// 	if(!(prev)->next)
-	// 		break;
-	// 	(prev) = (prev)->next;
-	// }
-	// printf("%s" , (*final)->data);
-	// (prev)  = current->next;
-	// current = NULL;
-	// final = &prev;
-}
-
 int expander_final(t_token **final ,t_env *env)
 {
 	t_token *curr;
@@ -224,22 +194,6 @@ int expander_final(t_token **final ,t_env *env)
 						else
 							*(curr->data + i) = '\0';
 						ret = 0;
-						char *data =  ft_strdup(curr->data);	
-						char **str = ft_split(curr->data, ' ');
-						t_token *to_join = NULL;
-						i = 0;
-						while (str[i])
-						{
-							ft_lstadd_back(&to_join , ft_lstnew(str[i] , WORD));
-							i++;
-						}
-						if(curr && to_join)
-						{
-							// curr->data = ft_strdup(to_join->data);// curr->data = ls
-							join_expansion(final, data,  curr, to_join);
-							// to_join = to_join->next;
-							// join_expansion(final, &to_join);
-						}
 					}
 					i++;
 				}
@@ -251,3 +205,10 @@ int expander_final(t_token **final ,t_env *env)
 	return ret;
 }
 
+// void increment_list (t_token **token, int *a)
+// {
+// 	while (*a--)
+// 	{
+// 		*token = *token->next;
+// 	}
+// }

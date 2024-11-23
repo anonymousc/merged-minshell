@@ -30,7 +30,7 @@ typedef struct s_exec
 
 
 //utils
-int list_len(t_env *env);
+int     list_len(t_env *env);
 char	*ft_strjoin(char *s1, char *s2);
 size_t	count_words(char const *str, char sep);
 char	**ft_splita(char const *s, char sep);

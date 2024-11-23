@@ -64,8 +64,6 @@ typedef struct s_alloc
 
 /*  ********* BULTINS *********  */
 
-// void	ft_pwd(void);
-// void	ft_env(t_env **env);
 char	*quotes_holder(char *line);
 /* **************************** */
 /*  ******** PARSING *********  */
@@ -77,7 +75,6 @@ int is_quotes(char c);
 
 /*  ******** PARSING *********  */
 
-// t_env		**fill_env(char **envp, t_env **env);
 char		**parser(char **av);
 char		*check_syntax(char *s);
 t_token 	**ft_fill(char *line);
@@ -98,12 +95,11 @@ void		sanitizer(t_token **fill_line);
 int			check_syntax_extended (t_token **final);
 t_token		*free_spaces (t_token *curr);
 void		free_spaces2(t_token **head);
-// int			expander_final(t_token **final ,t_env *env);
+// int		expander_final(t_token **final ,t_env *env);
 /* **************************** */
 // to remove
 // int here_doc(t_token **final, int *fd);
 int		here_doc(t_token **final);
-// char	*expander(char *expansion, t_env *envp);
 int		file_size(t_token **data);
 
 //execution
@@ -114,6 +110,7 @@ int		file_size(t_token **data);
 char *remove_quotes(char *s);
 
 // char *find_env_variable2 (t_env *env, char *varname);
+
 
 void ft_free11(char **s);
 

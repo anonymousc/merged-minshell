@@ -57,6 +57,18 @@ int check_path (char *path)
     }
     return 0;
 }
+char *find_env_variable2 (t_env *env, char *varname)
+{
+    while (env)
+    {
+        if (ft_strcmp(env->variable, varname) == 0)
+        {
+            return env->value;
+        }
+        env = env->next;
+    }
+    return (NULL);
+}
 
 int my_cd(t_execution *exec , t_env *env)
 {
@@ -64,7 +76,7 @@ int my_cd(t_execution *exec , t_env *env)
 
     if (!exec->cmd[1])
     {
-        printf("cd: wrong number of arguments\n");
+        chdir(find_env_variable2(env, "HOME"));
         return 1;
     }
 
@@ -87,20 +99,3 @@ int my_cd(t_execution *exec , t_env *env)
 
     return 0;
 }
-
-// int main (int ac, char **av, char **env)
-// {
-//     t_exec *exec = malloc (sizeof(t_exec));
-//     exec->env_orginal = env;
-//     t_env *test = make_env(exec);
-//     exec->ac = ac;
-//     exec->av = av;
-//     exec->env = test;
-//     printf ("----------------------before cd ------------------\n");
-//     my_env(test);
-//     my_cd(exec);
-//     printf ("----------------------after cd ------------------\n");
-//     my_env(test);
-//     printf ("-------------------------------------------------\n");
-//     my_pwd();
-// }
