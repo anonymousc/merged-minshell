@@ -125,34 +125,30 @@ char *expander(char *expansion, t_env *envp)
 	return (ft_strjoin2(expanded_word, expander(tmp, envp)));
 }
 
-void join_expansion(t_token **final, char *data , t_token *current, t_token *head)
+t_token  **join_expansion(t_token **final, char *data , t_token *current, t_token **head)
 {
-	t_token *prev = *final;
-	while (prev)
+	t_token *tmp = current->next;
+	t_token *node = *final;
+	if (*final == current)
 	{
-		if(prev && !ft_strcmp((prev)->data ,current->data))
+		*final = *head;
+		return (final);	
+	}
+	while (node)
+	{
+		if(node && !ft_strcmp((node)->data ,current->data))
 		{
-			prev->next = NULL;
-			prev = head;
+			node = *head;
 			break;
 		}
-		prev = (prev)->next;
+		node = (node)->next;
 	}
-	prev = head;
-	printf("prev == %s\n" , prev->data);
-	final = &prev;
-	printf("print tokens 1 ");
+	while ((*head)->next)
+		*head = (*head)->next;
+	(*head)->next = tmp;
 	print_tokens(*final);
-	// while(prev)
-	// {
-	// 	if(!(prev)->next)
-	// 		break;
-	// 	(prev) = (prev)->next;
-	// }
-	// printf("%s" , (*final)->data);
-	// (prev)  = current->next;
-	// current = NULL;
-	// final = &prev;
+	return (final);
+
 }
 
 int expander_final(t_token **final ,t_env *env)
@@ -227,7 +223,7 @@ int expander_final(t_token **final ,t_env *env)
 						char *data =  ft_strdup(curr->data);	
 						char **str = ft_split(curr->data, ' ');
 						t_token *to_join = NULL;
-						i = 0;
+						int i = 0;
 						while (str[i])
 						{
 							ft_lstadd_back(&to_join , ft_lstnew(str[i] , WORD));
@@ -235,10 +231,8 @@ int expander_final(t_token **final ,t_env *env)
 						}
 						if(curr && to_join)
 						{
-							// curr->data = ft_strdup(to_join->data);// curr->data = ls
-							join_expansion(final, data,  curr, to_join);
-							// to_join = to_join->next;
-							// join_expansion(final, &to_join);
+							final = join_expansion(final, data,  curr, &to_join);
+							print_tokens(*final);
 						}
 					}
 					i++;
@@ -247,7 +241,6 @@ int expander_final(t_token **final ,t_env *env)
 		}
 		curr = curr->next;
 	}
-	final  = &curr;
 	return ret;
 }
 
