@@ -39,6 +39,7 @@ int count_chars_after_removal(char *s)
     return count;
 }
 
+
 char *remove_quotes(char *s) 
 {    
     int len = count_chars_after_removal(s);
@@ -97,7 +98,12 @@ int parsing(t_token **final ,t_env *env, char **line, int *expansion)
 	(void)env;
 	tokenization(line , final);
 	sanitizer(final);
+// <<<<<<< HEAD
 	// *expansion = expander_final(final , env);
+// =======
+	*expansion = expander_final(final , env);
+	// print_tokens(*final);
+// >>>>>>> b1406bdc0bbde4a6ef92671d8d1587bfa63d1abd
 	process_quotes(final);
 	if (check_syntax_extended(final))
 		return 1;

@@ -125,6 +125,36 @@ char *expander(char *expansion, t_env *envp)
 	return (ft_strjoin2(expanded_word, expander(tmp, envp)));
 }
 
+// <<<<<<< HEAD
+// =======
+// t_token  **join_expansion(t_token **final, char *data , t_token *current, t_token **head)
+// {
+// 	t_token *tmp = current->next;
+// 	t_token *node = *final;
+// 	if (*final == current)
+// 	{
+// 		*final = *head;
+// 		return (final);	
+// 	}
+// 	while (node)
+// 	{
+// 		if(node && !ft_strcmp((node)->data ,current->data))
+// 		{
+// 			node = *head;
+// 			break;
+// 		}
+// 		node = (node)->next;
+// 	}
+// 	while ((*head)->next)
+// 		*head = (*head)->next;
+// 	(*head)->next = tmp;
+// 	print_tokens(*final);
+// 	return (final);
+
+
+// }
+
+// >>>>>>> b1406bdc0bbde4a6ef92671d8d1587bfa63d1abd
 int expander_final(t_token **final ,t_env *env)
 {
 	t_token *curr;
@@ -194,6 +224,23 @@ int expander_final(t_token **final ,t_env *env)
 						else
 							*(curr->data + i) = '\0';
 						ret = 0;
+// <<<<<<< HEAD
+// =======
+// 						char *data =  ft_strdup(curr->data);	
+// 						char **str = ft_split(curr->data, ' ');
+// 						t_token *to_join = NULL;
+// 						int i = 0;
+// 						while (str[i])
+// 						{
+// 							ft_lstadd_back(&to_join , ft_lstnew(str[i] , WORD));
+// 							i++;
+// 						}
+// 						if(curr && to_join)
+// 						{
+// 							final = join_expansion(final, data,  curr, &to_join);
+// 							print_tokens(*final);
+// 						}
+// >>>>>>> b1406bdc0bbde4a6ef92671d8d1587bfa63d1abd
 					}
 					i++;
 				}
@@ -201,7 +248,6 @@ int expander_final(t_token **final ,t_env *env)
 		}
 		curr = curr->next;
 	}
-	final  = &curr;
 	return ret;
 }
 
