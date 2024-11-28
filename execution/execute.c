@@ -23,40 +23,40 @@ void printenv(char **s)
 //     return (NULL);
 // }
 
-int execute_builtins(t_execution *exec  ,t_env *env)
+int execute_builtins(t_execution *exec  ,t_env **env, char **envs)
 {
+    (void) envs;
 	int ret = 0;
+
      if(!*(exec->cmd))
             return (0);
 	if (strncmp(exec->cmd[0], "echo", 5) == 0)
     {
-		my_echo(exec->fd_out, exec->cmd_len, exec->cmd);
-        ret = 1;
+		ret = my_echo(exec->fd_out, exec->cmd_len, exec->cmd);
     }
 	if (strncmp (exec->cmd[0], "cd", 3) == 0)
     {
-		my_cd(exec , env);
-        ret = 1;
+		ret = my_cd(exec , *env);
     }
 	if (strncmp(exec->cmd[0], "pwd", 4) == 0)
     {
-		my_pwd(exec->fd_out, env);
-        ret = 1;
+		ret = my_pwd(exec->fd_out, *env);
     }
 	else if (strncmp (exec->cmd[0] , "env", 4) == 0)
     {
-		my_env(exec->fd_out, env);
-        ret = 1;
+		ret = my_env(exec->fd_out, env);
     }
 	else if (strncmp(exec->cmd[0] , "export", 7) == 0)
 	{
-        my_export(exec , env, exec->fd_out);
-        ret = 1; 
+        ret = my_export(exec , env, exec->fd_out);
     }
     else if (strncmp (exec->cmd[0] , "unset", 6) == 0)
     {
-        my_unset(&exec, env);
-		ret = 1;
+        ret = my_unset(&exec, env);
+    }
+    else if(!ft_strcmp(exec->cmd[0], "exit"))
+    {
+        my_exit(exec);
     }
     return ret;
 }
@@ -66,17 +66,19 @@ int check_builtins(t_execution *exec)
 	int ret = 0;
      if(!exec->cmd[0])
          return 0;
-	if (strncmp(exec->cmd[0], "echo", 5) == 0)
+	if (ft_strncmp(exec->cmd[0], "echo", 5) == 0)
 		ret = 1;
-	if (strncmp(exec->cmd[0], "cd", 3) == 0)
+	if (ft_strncmp(exec->cmd[0], "cd", 3) == 0)
 		ret = 1;
 	if (ft_strcmp(exec->cmd[0], "pwd") == 0)
 		ret = 1;
-	if (strncmp(exec->cmd[0] , "export", 7) == 0)
+	if (ft_strncmp(exec->cmd[0] , "export", 7) == 0)
         ret = 1;
-	if (strncmp (exec->cmd[0] , "env", 4) == 0)
+	if (ft_strncmp (exec->cmd[0] , "env", 4) == 0)
 		ret = 1;
-    if (strncmp (exec->cmd[0] , "unset", 6) == 0)
+    if (ft_strncmp (exec->cmd[0] , "unset", 6) == 0)
+        ret = 1;
+    if (ft_strcmp (exec->cmd[0] , "exit") == 0)
 		ret = 1;
     return ret;
 }
@@ -92,6 +94,7 @@ char *find_path(char *cmd, char **env)
 {
     char *full_path;
     char *full_command;
+    char **paths = NULL;
     char *path_var = NULL;
     if(!cmd)
         return NULL;
@@ -114,7 +117,15 @@ char *find_path(char *cmd, char **env)
     }
     if (!path_var)
         return NULL;
-    char **paths = ft_split(path_var, ':');
+    if(ft_strchr(path_var , ':'))
+        paths = ft_split(path_var, ':');
+    else
+    {
+        paths = (char **)malloc(16);
+        paths[0] = remove_quotes(path_var);
+        paths[1] = NULL;
+
+    }
     if (!paths)
     {
         free(paths);
@@ -126,12 +137,11 @@ char *find_path(char *cmd, char **env)
         full_path = ft_strjoin(paths[i], "/");
         full_command = ft_strjoin(full_path, cmd);
         if (access(full_command, F_OK | X_OK) == 0)
-        {
-            return full_command;
-        }
+            return (ft_free11(paths) ,full_command);
         free(full_command);
         i++;    
 	}
+    ft_free11(paths);
     return NULL;
 }
 
@@ -228,7 +238,7 @@ void sighhh(int data)
     printf("\n");
 }
 
-void execute_bins(t_execution **exec, char **env, t_env *env1)
+void execute_bins(t_execution **exec, char **env, t_env **env1 )
 {
     t_execution *curr = *exec;
     char *fullcmd;
@@ -240,7 +250,6 @@ void execute_bins(t_execution **exec, char **env, t_env *env1)
     int curr_pipe[2];
     int flag = 0;
     t_execution *temp = curr;
-    
     while (temp)
     {
         cmd_count++;
@@ -253,6 +262,8 @@ void execute_bins(t_execution **exec, char **env, t_env *env1)
         
     while (curr && i < cmd_count)
     {
+        // envs = env_to_arr2(*env1);
+        // *env1 = make_env(envs);
         if (i < cmd_count - 1)
         {
             if (pipe(curr_pipe) == -1)
@@ -262,12 +273,13 @@ void execute_bins(t_execution **exec, char **env, t_env *env1)
                 return;
             }
         }
-        
         if (!curr->next &&  check_builtins(curr))
         {
-            execute_builtins(curr, env1);
+            exit_status = execute_builtins(curr, env1, env);
+            env = env_to_arr2(*env1);
+            // printenv(env);
             free(pids);
-            return;
+            return ;
         }
         
         pids[i] = fork();
@@ -304,16 +316,17 @@ void execute_bins(t_execution **exec, char **env, t_env *env1)
             
             if (curr->cmd[0] == NULL)
             {
-                free_stack1(&curr);
+                free_stack1(exec);
                 free(pids);
                 exit(1);
             }
             
+            env = env_to_arr2(*env1);
             if (curr->next && check_builtins(curr))
             {
-                execute_builtins(curr, env1);
-                free_stack1(&curr);
+                free_stack1(exec);
                 free(pids);
+                exit_status = execute_builtins(curr, env1, env);
                 exit(0);
             }
             else
@@ -321,9 +334,12 @@ void execute_bins(t_execution **exec, char **env, t_env *env1)
                 fullcmd = find_path(curr->cmd[0], env);
                 if (!fullcmd)
                 {
+                    free(fullcmd);
                     fprintf(stderr, "Command not found: %s\n", curr->cmd[0]);
-                    free_stack1(&curr);
+                    ft_free11((*exec)->cmd);
+                    free_stack1(exec);
                     free(pids);
+                    exit_status = 127;
                     exit(1);
                 }
                 
@@ -333,16 +349,19 @@ void execute_bins(t_execution **exec, char **env, t_env *env1)
                     printf("%s is directory\n", fullcmd);
                     exit(1);
                 }
-                
+                if(!curr->cmd)
+                    curr->cmd[0] = ft_strdup("");
+                // printenv(env);
                 if (execve(fullcmd, curr->cmd, env) == -1)
                 {
-                    free_stack1(&curr);
+                    free_stack1(exec);
                     perror("minishell");
                     free(fullcmd);
                     free(pids);
                     exit(1);
                 }
             }
+            free(fullcmd);
         }
         else
         {
@@ -363,11 +382,13 @@ void execute_bins(t_execution **exec, char **env, t_env *env1)
         curr = curr->next;
         i++;
     }
-    
     i = -1;
     while (++i < cmd_count)
         waitpid(pids[i], &status, 0);
-    
+    if (WIFEXITED(status))
+    {
+        exit_status = WEXITSTATUS(status);
+    }
     free(pids);
+    free_stack1(exec);
 }
-

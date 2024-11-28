@@ -18,14 +18,14 @@ typedef struct s_env
     struct s_env *next;
 } t_env;
 
-typedef struct s_exec
-{
-    int ac;
-    char **env_orginal;
-    char **av;
-    char *input;
-    t_env  *env;
-} t_exec;
+// typedef struct s_exec
+// {
+//     int ac;
+//     char **env_orginal;
+//     char **av;
+//     char *input;
+//     t_env  *env;
+// } t_exec;
 
 
 
@@ -45,25 +45,27 @@ void    add_back(t_env **envir, t_env *var);
 t_env   *get_last(t_env *envir);
 //my_env
 void    free_env(t_env *env);
-int     my_env(int fd, t_env *env);
+int     my_env(int fd, t_env **env);
 void    free_env(t_env *env);
 //pwd
 int     my_pwd(int fd, t_env *env);
 //export
-int     my_export(t_execution *exec , t_env *env, int fd);
+int     my_export(t_execution *exec , t_env **env, int fd);
 char    **env_to_arr2(t_env *env);
 char    **env_to_arr(t_env *env);
 t_env   *find_env_variable (t_env *env, char *varname);
 //unset
-int     my_unset(t_execution **exec, t_env *env);
+int     my_unset(t_execution **exec, t_env **env);
 //cd
 int     my_cd(t_execution *exec , t_env *env);
 //echo
 int     my_echo (int fd, int ac, char **av);
 char 	*find_env_variable2 (t_env *env, char *varname);
 //execute builtins
-int     execute_builtins(t_execution *exec, t_env *env);
+int     execute_builtins(t_execution *exec, t_env **env, char **envs);
 
-void    execute_bins(t_execution **exec, char **env, t_env *env1);
+void    execute_bins(t_execution **exec, char **env, t_env **env1);
 
+t_env **update_env(t_env **env);
+void my_exit(t_execution *list);
 #endif

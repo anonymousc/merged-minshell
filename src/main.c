@@ -6,11 +6,13 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 12:03:40 by aessadik          #+#    #+#             */
-/*   Updated: 2024/10/28 17:05:20 by kali             ###   ########.fr       */
+/*   Updated: 2024/11/26 22:03:33 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
+
+int exit_status;
 
 char is_quote(char c) 
 {
@@ -64,19 +66,20 @@ char *remove_quotes(char *s)
     return result;
 }
 
-void process_quotes(t_token **final) 
+void process_quotes(t_token **final)
 {
     t_token *curr = *final;
-    
+    char *processed;
     while (curr) 
 	{
         if (curr->value == WORD) 
 		{
-            char *processed = remove_quotes(curr->data);
+            processed = remove_quotes(curr->data);
             curr->data = processed;
         }
         curr = curr->next;
     }
+	// free(processed);
 }
 
 void	free_stackhhh(t_execution **stack)
@@ -92,21 +95,20 @@ void	free_stackhhh(t_execution **stack)
 	}
 	stack = NULL;
 }
-int parsing(t_token **final ,t_env *env, char **line, int *expansion)
+
+int parsing(t_token **final ,t_env *env, char **line)
 {
-	(void)expansion;
 	(void)env;
 	tokenization(line , final);
+	// ft_free11(line);
 	sanitizer(final);
-// <<<<<<< HEAD
-	// *expansion = expander_final(final , env);
-// =======
-	*expansion = expander_final(final , env);
-	// print_tokens(*final);
-// >>>>>>> b1406bdc0bbde4a6ef92671d8d1587bfa63d1abd
+	expander_final(final , env);
 	process_quotes(final);
 	if (check_syntax_extended(final))
+	{
+		ft_free11(line);
 		return 1;
+	}
 	free_spaces2(final);
 	return 0;
 }
@@ -117,31 +119,39 @@ int main (int ac, char **av, char **envp)
 	(void)av;
 	char *line;
 	char **splitted_array;
-	int expansion = 2;
-	t_token  **final;
+	t_token  **final = NULL;
 	t_execution **data;
-	t_env *env = make_env(envp);
+	t_env *env;
 	line = NULL;
-	char **env2 = env_to_arr(env);
+	env = NULL;
 	while(1)
 	{
 		line = retline();
 		final = (t_token  **)malloc(sizeof(t_token  *));
 		data = (t_execution  **)malloc(sizeof(t_execution  *));
+		if (!env)
+			env = make_env(envp);
 		if(!line)
 			continue;
 		splitted_array = split_to_lex(line);
-		if(parsing(final , env, splitted_array , &expansion))
+		free(line);
+		if(parsing(final , env, splitted_array))
+		{
+			// ft_free11(splitted_array);
+			// free_stack(final);
+			*final = NULL;
 			continue;
-		for_execute(final , data , &expansion);
-		(execute_bins(data, env2 , env));
+		}
+		for_execute(final , data);
+		free_stack(final);
+		(execute_bins(data, envp , &env));
 		// print_tokens(*final);
 		free_stackhhh(data);
-		free_stack(final);
+		// free_stack(final);
 		free(final);
 		free(data);
-		fri_ol(splitted_array);
-		free(line);
+		// ft_free11(splitted_array);
+		// fri_ol(splitted_array);
 		// free_lists();
 	}
 }

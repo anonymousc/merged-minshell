@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:11:54 by aessadik          #+#    #+#             */
-/*   Updated: 2024/10/27 23:21:16 by kali             ###   ########.fr       */
+/*   Updated: 2024/11/26 20:39:49 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,12 +203,11 @@ int cmd_len (char **cmd)
 	return i;
 }
 
-void for_execute(t_token **final, t_execution **data , int *expansion)
+void for_execute(t_token **final, t_execution **data)
 {
 	struct stat dstat;
     t_token *curr = *final;
-	(void)expansion;
-    *data = NULL;
+	*data = NULL;
     while (curr)
     {
         int word_count = 0;
@@ -256,6 +255,9 @@ void for_execute(t_token **final, t_execution **data , int *expansion)
 					if (fd_in == -1)
 					{
 						fflag = 1;
+						fd_out = -1;
+						fd_append = -1;
+						fd_heredoc = -1;
 					}
 					else if (!ft_strncmp(curr->next->data, "/dev/stdin" , ft_strlen("/dev/stdin")))
 						fd_in--;
@@ -275,7 +277,8 @@ void for_execute(t_token **final, t_execution **data , int *expansion)
 					}
 					if(*(curr->next->data) && *(curr->next->data) != '\v')
 					{
-						fd_out = open(curr->next->data, O_CREAT | O_RDWR | O_TRUNC, 0666);
+						if(fd_out == 1)
+							fd_out = open(curr->next->data, O_CREAT | O_RDWR | O_TRUNC, 0666);
 						if(access(curr->next->data , R_OK | W_OK) == -1)
 							fflag = 1;
 						if (!ft_strncmp(curr->next->data, "/dev/stdout" , ft_strlen("/dev/stdout")) && !curr->next->next)
@@ -306,18 +309,19 @@ void for_execute(t_token **final, t_execution **data , int *expansion)
 			}
             else if (curr->value == WORD && i < word_count)
             {
-					cmd[i] = strdup(curr->data);
+					cmd[i] = ft_strdup(curr->data);
                 	i++;
             }
             curr = curr->next;
         }
         t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc, fflag, dflag , cmdlen);
-		// ft_free11(cmd);
 		if (!*data)
             *data = new_cmd;
         else
             ft_lstadd_back_exec(data, new_cmd);
         if (curr && curr->value == PIPE)
+		{
             curr = curr->next;
+		}
     }
 }

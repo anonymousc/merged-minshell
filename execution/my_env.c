@@ -1,30 +1,36 @@
-#include "builtins.h"
+#include "../includes/minishell.h"
 
-t_env *make_env(char **env_orginal) 
+t_env *make_env(char **env_original)
 {
     int i = 0;
     t_env *envir = NULL;
     t_env *new;
     char *delimiter;
-    while (env_orginal && env_orginal[i])
+
+    while (env_original && env_original[i])
     {
         new = malloc(sizeof(t_env));
         if (!new)
             return NULL;
-        delimiter = strchr(env_orginal[i], '=');
+
+        delimiter = strchr(env_original[i], '=');
         if (!delimiter)
-            free(new); 
-        new->variable = strndup(env_orginal[i], delimiter - env_orginal[i]);
-        if (!new->variable)
         {
-            free(new);  
+            // free_env(new);
             return NULL;
         }
+
+        new->variable = strndup(env_original[i], delimiter - env_original[i]);
+        if (!new->variable)
+        {
+            // free_env(new);
+            return NULL;
+        }
+
         new->value = strdup(delimiter + 1);
         if (!new->value)
         {
-            free(new->variable);
-            free(new);
+            // free_env(new);
             return NULL;
         }
         new->next = NULL;
@@ -34,12 +40,13 @@ t_env *make_env(char **env_orginal)
     return envir;
 }
 
-int my_env(int fd, t_env *env) 
+int my_env(int fd, t_env **env)
 {
-    while (env) 
+    t_env *curr = *env;
+    while (curr)
     {
-        ft_printf(fd, "%s=%s\n", env->variable, env->value);
-        env = env->next;
+        ft_printf(fd, "%s=%s\n", curr->variable, curr->value);
+        curr = curr->next;
     }
     return 0;
 }

@@ -1,4 +1,4 @@
-#include "builtins.h"
+#include "../includes/minishell.h"
 
 int is_alpha (int c)
 {
@@ -50,10 +50,10 @@ char **env_to_arr2(t_env *env)
         {
             while (j < i)
             {
-                free(envir[j]);
+                // free(envir[j]);
                 j++;
             }
-            free(envir);
+            // free(envir);
             return NULL;
         }
         j = 0;
@@ -98,10 +98,10 @@ char **env_to_arr(t_env *env)
         {
             while (j < i)
             {
-                free(envir[j]);
+                // free(envir[j]);
                 j++;
             }
-            free(envir);
+            // free(envir);
             return NULL;
         }
         j = 0;
@@ -291,13 +291,13 @@ int process_export_arg(t_env *env, char *arg)
         return export_with_value(env, arg, equal, plus);
 }
 
-int my_export(t_execution *exec , t_env *env, int fd)
+int my_export(t_execution *exec , t_env **env, int fd)
 {
     int i = 1;
     if (!exec->cmd[1])
     {
-        char **env_array = env_to_arr2(env);
-        sort_strings(env_array, env_size(env));
+        char **env_array = env_to_arr2(*env);
+        sort_strings(env_array, env_size(*env));
         
         i = 0;
         while (env_array[i])
@@ -316,7 +316,7 @@ int my_export(t_execution *exec , t_env *env, int fd)
         if (is_valid_identifier(fd, arg) < 0)
             return 1;
 
-        if (!process_export_arg(env, arg))
+        if (!process_export_arg(*env, arg))
             return 1;
 
         i++;

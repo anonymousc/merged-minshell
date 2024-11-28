@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 18:16:47 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/10/27 18:44:33 by kali             ###   ########.fr       */
+/*   Updated: 2024/11/24 21:47:37 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ int		ft_strncmp(char const *s1, char const *s2, size_t n);
 int		is_space(char c);
 int		ft_strcmp(char *s1, char *s2);
 char	*is_space_veta(char s);
-void 	for_execute(t_token **final , t_execution **data , int *expansion);
+void 	for_execute(t_token **final , t_execution **data);
 
 
 char	*ft_itoa(int n);

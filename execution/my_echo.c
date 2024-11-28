@@ -1,4 +1,4 @@
-#include "builtins.h"
+#include "../includes/minishell.h"
 
 bool check_newline( int ac, char **av, int *start_i)
 {
@@ -26,7 +26,6 @@ int my_echo (int fd ,int ac, char **av)
     int start_i;
     bool new_line;
 
-    // ft_printf(fd, "waaaaaa ha li khdem\n");
     if(!av[1])
     {
         ft_printf(fd , "\n");

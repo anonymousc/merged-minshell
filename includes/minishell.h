@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/06 13:21:40 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/10/28 17:01:10 by kali             ###   ########.fr       */
+/*   Updated: 2024/11/26 22:03:47 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@
 /* ****************************** */
 
 /* ********** TYPEDEFS ********** */
+extern t_env *env;
 
 typedef struct	s_syntax
 {
@@ -60,6 +61,8 @@ typedef struct s_alloc
 	void			*addr;
 	struct s_alloc	*next;
 }					t_alloc;
+
+extern int exit_status;
 /* ****************************** */
 
 /*  ********* BULTINS *********  */
@@ -95,7 +98,7 @@ void		sanitizer(t_token **fill_line);
 int			check_syntax_extended (t_token **final);
 t_token		*free_spaces (t_token *curr);
 void		free_spaces2(t_token **head);
-// int		expander_final(t_token **final ,t_env *env);
+void		expander_final(t_token **final ,t_env *env);
 /* **************************** */
 // to remove
 // int here_doc(t_token **final, int *fd);

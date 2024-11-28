@@ -1,4 +1,4 @@
-#include "builtins.h"
+#include "../includes/minishell.h"
 
 t_env *find_variable(t_env *env, const char *variable_name)
 {
@@ -85,13 +85,13 @@ int my_cd(t_execution *exec , t_env *env)
     if (getcwd(old_pwd, sizeof(old_pwd)) == NULL)
     {
         perror("getcwd error");
-        return 2;
+        return 1;
     }
 
     if (chdir(exec->cmd[1]) != 0)
     {
         perror("cd");
-        return 3;
+        return 1;
     }
 
     update_oldpwd(env, old_pwd);

@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 20:48:19 by kali              #+#    #+#             */
-/*   Updated: 2024/10/28 18:58:25 by kali             ###   ########.fr       */
+/*   Updated: 2024/11/27 21:03:42 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,74 +92,43 @@ char	*before_dollar_word(char	*str)
 	strncpy(word,str, i);
 	return (word);
 }
+
 char *expander(char *expansion, t_env *envp)
 {
-	//"rewrew$HOMErrrr$HOME"
 	char *before_dollar = NULL;
 	char *expanded_word;
 	if (!expansion || *expansion != '$')
 		return (NULL); 
-	//printf ("expansion START with %c\n", *expansion);
-	expansion = expansion + 1; // skips $
+	expansion = expansion + 1;
 	char *tmp = expansion;
-	while(tmp && *tmp && ft_isalnum(*tmp))
+	if (tmp && *tmp == '?')
+	{
+		char *exit = ft_itoa(exit_status);
+		return(ft_strjoin2(exit, expander(tmp + 1, envp)));
+	}
+	if (*tmp)
+		tmp++;
 	while(tmp && *tmp && ft_isalnum(*tmp))
 		tmp++;
-	//$HOMEffff%%%%%%%$HOME
 	int l = tmp - expansion;
 	char *to_expand = malloc (l + 1);
 	strncpy(to_expand, expansion, l);
 	to_expand[l] = '\0';
-	//printf("to_expand == %s\n", to_expand);
 	expanded_word = find_env_variable2(envp , to_expand);
 	if (*tmp && *tmp != '$')
 	{
 		before_dollar = before_dollar_word(tmp);
 		while (*tmp && *tmp != '$')
 			tmp++;
-		//printf("beforedollar is %s\n", before_dollar);
 		expanded_word = ft_strjoin2(expanded_word, before_dollar);
-		//printf("newly expanded word %s\n", expanded_word);
 	}
-	//printf("expanded_word is %s\n", expanded_word);
 	return (ft_strjoin2(expanded_word, expander(tmp, envp)));
 }
 
-// <<<<<<< HEAD
-// =======
-// t_token  **join_expansion(t_token **final, char *data , t_token *current, t_token **head)
-// {
-// 	t_token *tmp = current->next;
-// 	t_token *node = *final;
-// 	if (*final == current)
-// 	{
-// 		*final = *head;
-// 		return (final);	
-// 	}
-// 	while (node)
-// 	{
-// 		if(node && !ft_strcmp((node)->data ,current->data))
-// 		{
-// 			node = *head;
-// 			break;
-// 		}
-// 		node = (node)->next;
-// 	}
-// 	while ((*head)->next)
-// 		*head = (*head)->next;
-// 	(*head)->next = tmp;
-// 	print_tokens(*final);
-// 	return (final);
-
-
-// }
-
-// >>>>>>> b1406bdc0bbde4a6ef92671d8d1587bfa63d1abd
-int expander_final(t_token **final ,t_env *env)
+void expander_final(t_token **final ,t_env *env)
 {
 	t_token *curr;
 	char *tmp;
-	int ret = -1;
 
 	curr = *final;
 	while (curr)
@@ -174,10 +143,6 @@ int expander_final(t_token **final ,t_env *env)
 				{
 					if(curr->data[i] == '$')
 					{
-						if(!curr->data[i + 1] || curr->data[i + 1] == '$')
-							break;
-						if(curr->data[i + 1] && curr->data[i + 1] == '?')
-								printf("exitstatus\n");
 						tmp = expander(curr->data + i , env);
 						*(curr->data + i) = '\0';
 						if(tmp && *tmp == '\v')
@@ -192,7 +157,6 @@ int expander_final(t_token **final ,t_env *env)
 						}
 						else
 							*(curr->data + i) = '\0';
-						ret = 1;
 					}
 					i++;
 				}
@@ -205,10 +169,6 @@ int expander_final(t_token **final ,t_env *env)
 				{
 					if(curr->data[i] == '$')
 					{
-						if(!curr->data[i + 1] || curr->data[i + 1] == '$')
-							break;
-						if(curr->data[i + 1] && curr->data[i + 1] == '?')
-								printf("exitstatus\n");
 						tmp = expander(curr->data + i , env);
 						*(curr->data + i) = '\0';
 						if(tmp && *tmp == '\v')
@@ -223,7 +183,6 @@ int expander_final(t_token **final ,t_env *env)
 						}
 						else
 							*(curr->data + i) = '\0';
-						ret = 0;
 // <<<<<<< HEAD
 // =======
 // 						char *data =  ft_strdup(curr->data);	
@@ -248,13 +207,4 @@ int expander_final(t_token **final ,t_env *env)
 		}
 		curr = curr->next;
 	}
-	return ret;
 }
-
-// void increment_list (t_token **token, int *a)
-// {
-// 	while (*a--)
-// 	{
-// 		*token = *token->next;
-// 	}
-// }
