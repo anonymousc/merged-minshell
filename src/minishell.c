@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hatalhao <hatalhao@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/06 13:23:23 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/09/12 02:03:41 by hatalhao         ###   ########.fr       */
+/*   Updated: 2024/11/28 20:56:54 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,10 @@ char  *retline(void)
 		{
 			line = check_syntax(line);
 			if(!line)
+			{
+				exit_status = 2;	
 				free(line);
+			}
 		}
 		return line;
 }

@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 20:48:19 by kali              #+#    #+#             */
-/*   Updated: 2024/11/27 21:03:42 by kali             ###   ########.fr       */
+/*   Updated: 2024/11/28 02:42:21 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,16 @@ void expander_final(t_token **final ,t_env *env)
 						if(tmp && *tmp)
 						{
 							tmp = ft_strjoin(curr->data ,tmp);
+							free(curr->data);
 							curr->data = tmp;
+							// TODO
+							//check if tmp has white space
+							//split the shit
+							//create a new list of tokens && return the head 
+							//get the last token before the curr
+							//get the last element of the new list
+							//connect the shit
+							//if the curr is the head *token , the new head is the new lists head 
 						}
 						else
 							*(curr->data + i) = '\0';
@@ -183,23 +192,6 @@ void expander_final(t_token **final ,t_env *env)
 						}
 						else
 							*(curr->data + i) = '\0';
-// <<<<<<< HEAD
-// =======
-// 						char *data =  ft_strdup(curr->data);	
-// 						char **str = ft_split(curr->data, ' ');
-// 						t_token *to_join = NULL;
-// 						int i = 0;
-// 						while (str[i])
-// 						{
-// 							ft_lstadd_back(&to_join , ft_lstnew(str[i] , WORD));
-// 							i++;
-// 						}
-// 						if(curr && to_join)
-// 						{
-// 							final = join_expansion(final, data,  curr, &to_join);
-// 							print_tokens(*final);
-// 						}
-// >>>>>>> b1406bdc0bbde4a6ef92671d8d1587bfa63d1abd
 					}
 					i++;
 				}

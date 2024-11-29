@@ -220,7 +220,6 @@ int redirect_io(t_execution **exec, int *flag)
         return (printf("ambigous redirection\n"), -1);
     if ((*exec)->fflag == 2)
         return (printf("no such a file or directory\n"), -1);
-
     if (handle_output_redirection(exec, flag) == -1)
         return -1;
     if (handle_append_redirection(exec) == -1)
@@ -232,163 +231,125 @@ int redirect_io(t_execution **exec, int *flag)
     return 0;
 }
 
-void sighhh(int data)
+void sigfork(int data)
 {
     (void)data;
+    exit_status = 130;
     printf("\n");
 }
+void ft_close(int *fd1 , int *fd2)
+{
+    close(*fd1);
+    close(*fd2);
+}
+void ft_combine_free(void *s ,t_execution **exec, t_token **final)
+{
+    free(s);
+    if(final)
+        free_stack(final);
+    free_stack1(exec);
+}
+int ft_pip_count(t_execution * curr)
+{
+    t_execution *temp;
+    int         pipe_counter;
 
+    temp = curr;
+    pipe_counter = 0;
+    while (temp)
+    {
+        pipe_counter++;
+        temp = temp->next;
+    }
+    return (pipe_counter);
+}
 void execute_bins(t_execution **exec, char **env, t_env **env1 )
 {
     t_execution *curr = *exec;
     char *fullcmd;
-    int status;
     pid_t *pids;
-    int cmd_count = 0;
+    int pipe_count;
     int i = 0;
     int prev_pipe[2] = {0, 1};
     int curr_pipe[2];
     int flag = 0;
-    t_execution *temp = curr;
-    while (temp)
-    {
-        cmd_count++;
-        temp = temp->next;
-    }
-    
-    pids = malloc(sizeof(pid_t) * cmd_count);
+
+    pipe_count = ft_pip_count(curr);
+    pids = malloc(sizeof(pid_t) * pipe_count);
     if (!pids)
         return;
-        
-    while (curr && i < cmd_count)
+    while (curr && i < pipe_count)
     {
-        // envs = env_to_arr2(*env1);
-        // *env1 = make_env(envs);
-        if (i < cmd_count - 1)
-        {
-            if (pipe(curr_pipe) == -1)
-            {
-                perror("pipe");
-                free(pids);
-                return;
-            }
-        }
+        if (i < pipe_count - 1)
+            pipe(curr_pipe);
         if (!curr->next &&  check_builtins(curr))
-        {
-            exit_status = execute_builtins(curr, env1, env);
-            env = env_to_arr2(*env1);
-            // printenv(env);
-            free(pids);
-            return ;
-        }
-        
+            return (exit_status = execute_builtins(curr, env1, env), free(pids), env = env_to_arr2(*env1), (void)0);
         pids[i] = fork();
-        if (pids[i] == -1)
-        {
-            perror("fork");
-            free(pids);
-            return;
-        }
-        
+        signal(SIGQUIT , sig_handler1);
+        signal(SIGINT, sigfork);
         if (pids[i] == 0)
         {
-            signal(SIGINT, sighhh);
+            signal(SIGINT, SIG_DFL);
+            signal(SIGQUIT , SIG_DFL);
             if (redirect_io(&curr, &flag) == -1)
-            {
-                free(pids);
-                exit(1); 
-            }
-            
+                return (free(pids) , exit(1) , (void)0);
             if (i > 0)
             {
                 dup2(prev_pipe[0], STDIN_FILENO);
-                close(prev_pipe[0]);
-                close(prev_pipe[1]);
+                ft_close(&prev_pipe[0] , &prev_pipe[1]);
             }
-            
-            if (i < cmd_count - 1)
+            if (i < pipe_count - 1)
             {
-                close(curr_pipe[0]);
                 if (flag == 0)
                     dup2(curr_pipe[1], STDOUT_FILENO);
-                close(curr_pipe[1]);
+                ft_close(&curr_pipe[0] , &curr_pipe[1]);
             }
-            
             if (curr->cmd[0] == NULL)
-            {
-                free_stack1(exec);
-                free(pids);
-                exit(1);
-            }
-            
+                return (ft_combine_free(pids , exec, NULL) , exit(1), (void)0);
             env = env_to_arr2(*env1);
             if (curr->next && check_builtins(curr))
             {
-                free_stack1(exec);
-                free(pids);
                 exit_status = execute_builtins(curr, env1, env);
-                exit(0);
+                return (ft_combine_free(pids, exec , NULL), exit (0), (void)0);
             }
             else
             {
                 fullcmd = find_path(curr->cmd[0], env);
                 if (!fullcmd)
                 {
-                    free(fullcmd);
-                    fprintf(stderr, "Command not found: %s\n", curr->cmd[0]);
-                    ft_free11((*exec)->cmd);
-                    free_stack1(exec);
-                    free(pids);
                     exit_status = 127;
-                    exit(1);
+                    fprintf(stderr, "Command not found: %s\n", curr->cmd[0]);
+                    return (free(pids) ,ft_combine_free(fullcmd , exec , NULL), exit(1), (void)0);
                 }
-                
                 struct stat data;
                 if (stat(fullcmd, &data) == 0 && S_ISDIR(data.st_mode))
-                {
-                    printf("%s is directory\n", fullcmd);
-                    exit(1);
-                }
+                    return (printf("%s is directory\n", fullcmd), exit(1) , (void)0);
                 if(!curr->cmd)
                     curr->cmd[0] = ft_strdup("");
-                // printenv(env);
                 if (execve(fullcmd, curr->cmd, env) == -1)
                 {
-                    free_stack1(exec);
-                    perror("minishell");
-                    free(fullcmd);
                     free(pids);
-                    exit(1);
+                    return (free_stack1(exec), perror("minishell"),free(fullcmd), exit(1),(void)0);
                 }
+                free(fullcmd);
             }
-            free(fullcmd);
         }
         else
         {
-            signal(SIGINT, SIG_IGN);
             if (i > 0)
-            {
-                close(prev_pipe[0]);
-                close(prev_pipe[1]);
-            }
-            
-            if (i < cmd_count - 1)
+                ft_close(&prev_pipe[0] , &prev_pipe[1]);
+            if (i < pipe_count - 1)
             {
                 prev_pipe[0] = curr_pipe[0];
                 prev_pipe[1] = curr_pipe[1];
             }
         }
-        
         curr = curr->next;
         i++;
     }
     i = -1;
-    while (++i < cmd_count)
-        waitpid(pids[i], &status, 0);
-    if (WIFEXITED(status))
-    {
-        exit_status = WEXITSTATUS(status);
-    }
-    free(pids);
-    free_stack1(exec);
+    while (++i < pipe_count)
+        waitpid(pids[i], &exit_status, 0);
+    WIFEXITED(exit_status);
+    ft_combine_free(pids, exec, NULL);
 }

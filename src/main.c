@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 12:03:40 by aessadik          #+#    #+#             */
-/*   Updated: 2024/11/26 22:03:33 by kali             ###   ########.fr       */
+/*   Updated: 2024/11/28 20:55:55 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,7 @@ int parsing(t_token **final ,t_env *env, char **line)
 	if (check_syntax_extended(final))
 	{
 		ft_free11(line);
+		exit_status = 2;
 		return 1;
 	}
 	free_spaces2(final);

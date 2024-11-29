@@ -97,7 +97,6 @@ char *norm_to_minimize_part1(char *s, char **str , int *i)
 		str[(*i)] = ft_strdup(is_space_veta(*s));
 		s++;
 	}
-	// (*i)++;
 	return s;
 }
 char *qoutes_detailer(char *s , char **str , int *i)
