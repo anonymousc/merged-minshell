@@ -76,7 +76,7 @@ char	*before_dollar_word(char	*str)
 		return (NULL);
 	word = (char *)malloc(i + 1);
 	word[i] = 0;
-	ft_strncpy(word,str, i);
+	strncpy(word,str, i);
 	return (word);
 }
 
@@ -186,7 +186,9 @@ void expander_final(t_token **final ,t_env *env)
 	{
 		if(curr->next)
 			prev = curr;
-		if(curr->value == WORD)
+		if(curr->value == HEREDOC)
+			curr = curr->next->next;
+		else if(curr->value == WORD)
 		{
 			if (check_in_db_or_sq(curr->data) == 2)
 			{
@@ -269,4 +271,5 @@ void expander_final(t_token **final ,t_env *env)
 		if(curr)
 			curr = curr->next;
 	}
+	extra_sanitize(final);
 }

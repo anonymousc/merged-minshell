@@ -119,20 +119,6 @@ void sanitizer(t_token **fill_line)
     }
 	fill_line = &data;
 }
-// to remove or enhance
-
-// int file_size(t_token **data)
-// {
-// 	t_token *curr = *data;
-// 	int wc = 0;
-// 	while (curr)
-// 	{
-// 		if(curr && curr->value == REDIRECTION_OUT)
-// 			wc++;
-// 		curr = curr->next;
-// 	}
-// 	return wc;
-// }
 
 void	ft_lstadd_back_exec(t_execution  **stacks, t_execution  *new)
 {
@@ -191,7 +177,7 @@ int cmd_len (char **cmd)
 	return i;
 }
 
-void for_execute(t_token **final, t_execution **data, int *fd_heredoc_main)
+void for_execute(t_token **final, t_execution **data, t_env *env)
 {
 	struct stat dstat;
     t_token *curr = *final;
@@ -241,12 +227,7 @@ void for_execute(t_token **final, t_execution **data, int *fd_heredoc_main)
                 {
                     fd_in = open(curr->next->data, O_RDONLY, 0444);
 					if (fd_in == -1)
-					{
-						fflag = 1;
 						fd_out = -1;
-						fd_append = -1;
-						fd_heredoc = -1;
-					}
 					else if (!ft_strncmp(curr->next->data, "/dev/stdin" , ft_strlen("/dev/stdin")))
 						fd_in--;
 					curr = curr->next;
@@ -263,17 +244,15 @@ void for_execute(t_token **final, t_execution **data, int *fd_heredoc_main)
 							dflag = 1;
 						}
 					}
-					if(*(curr->next->data) && *(curr->next->data) != '\v')
+					if(*(curr->next->data))
 					{
-						if(fd_out == 1)
+						if(fd_out != -1)
 							fd_out = open(curr->next->data, O_CREAT | O_RDWR | O_TRUNC, 0666);
 						if(access(curr->next->data , R_OK | W_OK) == -1)
 							fflag = 1;
 						if (!ft_strncmp(curr->next->data, "/dev/stdout" , ft_strlen("/dev/stdout")) && !curr->next->next)
 							fd_out--;
 					}
-					else
-						fflag = 2 + (ft_strchr(curr->next->data,'\v') == NULL);
                     curr = curr->next;
                 }
             }
@@ -281,7 +260,7 @@ void for_execute(t_token **final, t_execution **data, int *fd_heredoc_main)
 			{
 				if(curr->next && curr->next->data)
 				{
-					fd_heredoc = *fd_heredoc_main;
+					fd_heredoc = here_doc(&curr ,env);
 					curr = curr->next;
 				}
 			}
@@ -303,7 +282,6 @@ void for_execute(t_token **final, t_execution **data, int *fd_heredoc_main)
             curr = curr->next;
         }
         t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc, fflag, dflag , cmdlen);
-		printf("fd_heredoc == %d\n", fd_heredoc);
 		if (!*data)
             *data = new_cmd;
         else

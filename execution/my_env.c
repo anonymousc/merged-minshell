@@ -28,12 +28,12 @@ t_env *make_env(char **env_original)
     return envir;
 }
 
-int my_env(int fd, t_env **env)
+int my_env(int fd, int fda, t_env **env)
 {
     t_env *curr = *env;
     while (curr)
     {
-        ft_printf(fd, "%s=%s\n", curr->variable, curr->value);
+        ft_printf((fda != 1) ? fda : fd, "%s=%s\n", curr->variable, curr->value);
         curr = curr->next;
     }
     return 0;

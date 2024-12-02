@@ -72,7 +72,9 @@ void process_quotes(t_token **final)
     char *processed;
     while (curr) 
 	{
-        if (curr->value == WORD) 
+		if(curr->value == HEREDOC && curr->next->next)
+			curr = curr->next->next;
+        else if (curr->value == WORD) 
 		{
             processed = remove_quotes(curr->data);
             curr->data = processed;
@@ -95,25 +97,34 @@ void	free_stackhhh(t_execution **stack)
 	}
 	stack = NULL;
 }
-void extra_sanitize(t_token **fill_line)
+void extra_sanitize(t_token **head)
 {
-		t_token *data;
-	t_token *tmp;
+    t_token* current = *head;
+    t_token* tmp;
 
-	data = *fill_line;
-    while (data && (data)->next) 
+    while (current && current->next) 
 	{
-        if ((data)->value == WORD && !(*data->data))
+        if (current->value == WORD && !(*current->data)) 
 		{
-			tmp = data->next;
-            (data)->data = ft_strjoin((data)->data, (data)->next->data);
-            (data)->next = (data)->next->next;
+            tmp = current;
+            current = current->next;
+
+            if (tmp == *head) 
+                *head = current;
+			else 
+			{
+                t_token* prev = *head;
+                while (prev && prev->next != tmp) 
+                    prev = prev->next;
+                if (prev) 
+                    prev->next = current;
+            }
+
             free(tmp);
         } 
 		else 
-            data = (data)->next;
+            current = current->next;
     }
-	fill_line = &data;
 }
 
 int parsing(t_token **final ,t_env **env, char **envp,t_execution **data)
@@ -121,7 +132,6 @@ int parsing(t_token **final ,t_env **env, char **envp,t_execution **data)
 	(void)env;
 	char *readline;
 	char **line;
-	int fd_heredoc;
 
 	line = NULL;
 	if (!*env)
@@ -133,14 +143,15 @@ int parsing(t_token **final ,t_env **env, char **envp,t_execution **data)
 	free(readline);
 	tokenization(line , final);
 	sanitizer(final);
-	// fd_heredoc = here_doc(final, *env);
 	expander_final(final , *env);
+	// here_doc(final, *env);
 	process_quotes(final);
 	if (check_syntax_extended(final))
 		return (ft_free11(line), exit_status = 2, 1);
-	extra_sanitize(final);
 	free_spaces2(final);
-	for_execute(final , data, &fd_heredoc);
+	// extra_sanitize(final);
+	print_tokens(*final);
+	for_execute(final , data , *env);
 	return 0;
 }
 

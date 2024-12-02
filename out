@@ -1,1 +1,7 @@
-hi bye 
+minishell$ export | grep PWD
+declare -x OLDPWD=/home/aait-bou
+declare -x PWD=/home/aait-bou/Desktop/merged-minshell
+minishell$ cd
+minishell$ export | grep PWD
+declare -x OLDPWD=/home/aait-bou
+declare -x PWD=/home/aait-bou/Desktop/merged-minshell

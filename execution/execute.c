@@ -31,15 +31,15 @@ int execute_builtins(t_execution *exec  ,t_env **env, char **envs)
      if(!*(exec->cmd))
             return (0);
 	if (strncmp(exec->cmd[0], "echo", 5) == 0)
-		ret = my_echo(exec->fd_out, exec->cmd_len, exec->cmd);
+		ret = my_echo(exec->fd_out, exec->fd_append,  exec->cmd_len, exec->cmd);
 	if (strncmp (exec->cmd[0], "cd", 3) == 0)
 		ret = my_cd(exec , *env);
 	if (strncmp(exec->cmd[0], "pwd", 4) == 0)
-		ret = my_pwd(exec->fd_out, *env);
+		ret = my_pwd(exec->fd_out, exec->fd_append, *env);
 	else if (strncmp (exec->cmd[0] , "env", 4) == 0)
-		ret = my_env(exec->fd_out, env);
+		ret = my_env(exec->fd_out,exec->fd_append, env);
 	else if (strncmp(exec->cmd[0] , "export", 7) == 0)
-        ret = my_export(exec , env, exec->fd_out);
+        ret = my_export(exec , env, exec->fd_out, exec->fd_append);
     else if (strncmp (exec->cmd[0] , "unset", 6) == 0)
         ret = my_unset(&exec, env);
     else if(!ft_strcmp(exec->cmd[0], "exit"))
@@ -153,7 +153,7 @@ int handle_output_redirection(t_execution **exec, int *flag)
 {
     if ((*exec)->fd_out != 1)
     {
-        if ((*exec)->fflag == 1)
+        if ((*exec)->fflag == -1)
             return (printf("permission denied1\n"), -1);
         *flag = 1;
         dup2((*exec)->fd_out, STDOUT_FILENO);
@@ -262,7 +262,7 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
     int prev_pipe[2] = {0, 1};
     int curr_pipe[2];
     int flag = 0;
-
+    int tmp;
     pipe_count = ft_pip_count(curr);
     pids = malloc(sizeof(pid_t) * pipe_count);
     if (!pids)
@@ -271,7 +271,7 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
     {
         if (i < pipe_count - 1)
             pipe(curr_pipe);
-        if (pipe_count == 1 && !curr->next &&  check_builtins(curr))
+        if (pipe_count == 1 && !curr->next && check_builtins(curr))
             return (exit_status = execute_builtins(curr, env1, env), free(pids), env = env_to_arr2(*env1), (void)0);
         pids[i] = fork();
         signal(SIGQUIT , sig_handler1);
@@ -303,18 +303,18 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
             }
             else
             {
-                fullcmd = find_path(curr->cmd[0], env);
-                if (!fullcmd)
+                if((curr->cmd[0][0]) != '\0')
                 {
-                    fprintf(stderr, "Command not found: %s\n", curr->cmd[0]);
-                    exit_status = 127;
-                    return (free(pids) ,ft_combine_free(fullcmd , NULL , NULL) ,exit(1) ,(void)0);
+                    fullcmd = find_path(curr->cmd[0], env);
+                    if (!fullcmd)
+                    {
+                        fprintf(stderr, "Command not found: %s\n", curr->cmd[0]);
+                        return (free(pids) ,ft_combine_free(fullcmd , NULL , NULL) ,exit(127) ,(void)0);
+                    }
+                 struct stat data;
+                 if (stat(fullcmd, &data) == 0 && S_ISDIR(data.st_mode))
+                    return (printf("%s is directory\n", fullcmd), exit(126) , (void)0);
                 }
-                struct stat data;
-                if (stat(fullcmd, &data) == 0 && S_ISDIR(data.st_mode))
-                    return (printf("%s is directory\n", fullcmd), exit(1) , (void)0);
-                if(!curr->cmd)
-                    curr->cmd[0] = ft_strdup("");
                 if (execve(fullcmd, curr->cmd, env) == -1)
                     return (ft_combine_free(pids, NULL , NULL) ,perror("minishell") ,free(fullcmd) ,exit(1) ,(void)0);
                 free(fullcmd);
@@ -333,10 +333,12 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
         curr = curr->next;
         i++;
     }
+    tmp = exit_status;
     i = -1;
+    printf("exit_status %d\n", tmp);
     while (++i < pipe_count)
         waitpid(pids[i], &exit_status, 0);
-    if(exit_status != 127)
+    if(WEXITSTATUS (exit_status))
         WIFEXITED(exit_status);
     ft_combine_free(pids, NULL, NULL);
 }

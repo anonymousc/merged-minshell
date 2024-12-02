@@ -21,7 +21,7 @@ bool check_newline( int ac, char **av, int *start_i)
     return new_line;
 }
 
-int my_echo (int fd ,int ac, char **av)
+int my_echo (int fd , int fda, int ac, char **av)
 {
     int start_i;
     bool new_line;
@@ -29,21 +29,21 @@ int my_echo (int fd ,int ac, char **av)
     printf("fd == %d\n", fd);
     if(!av[1])
     {
-        ft_printf(fd , "\n");
+        ft_printf((fda != 1) ? fda : fd , "\n");
         return false;
     }
     new_line = check_newline(ac, av, &start_i);
     while (av[start_i] && start_i < ac)
     {
-        ft_printf (fd, "%s", av[start_i]);
+        ft_printf ((fda != 1) ? fda : fd, "%s", av[start_i]);
         if (start_i < ac - 1)
-            ft_printf(fd, " ");
+            ft_printf((fda != 1) ? fda : fd, " ");
         start_i++;
     }
 
     if (new_line)
     {
-        ft_printf (fd, "\n");
+        ft_printf ((fda != 1) ? fda : fd, "\n");
     }
     return 0;
 }

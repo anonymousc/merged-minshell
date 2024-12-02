@@ -1,6 +1,6 @@
 #include "../includes/minishell.h"
 
-int	my_pwd(int fd, t_env *env)
+int	my_pwd(int fd, int fda, t_env *env)
 {
 	char	*s;
 
@@ -8,6 +8,10 @@ int	my_pwd(int fd, t_env *env)
 	if (!s)
 		return 1;
 	if (!getcwd(s, PATH_MAX))
-        return (ft_printf(fd, "%s\n", find_env_variable2(env , "PWD")) ,free(s) , 1);
-    return (ft_printf(fd, "%s\n", getcwd(s, PATH_MAX)) ,free(s) ,0);
+	{
+        ft_printf((fda != 1) ? fda : fd, "%s\n", find_env_variable2(env , "PWD"));
+		free(s);
+		return 1;
+	}
+    return (ft_printf((fda != 1) ? fda : fd, "%s\n", getcwd(s, PATH_MAX)) ,free(s) ,0);
 }

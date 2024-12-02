@@ -104,7 +104,7 @@ void		expander_final(t_token **final ,t_env *env);
 /* **************************** */
 // to remove
 // int here_doc(t_token **final, int *fd);
-int		here_doc(t_token **final, t_env *env);
+int		here_doc(t_token **final ,t_env *env);
 int		file_size(t_token **data);
 
 //execution
@@ -122,5 +122,9 @@ void ft_free11(char **s);
 int check_in_db_or_sq(char *s);
 
 char *expander(char *expansion, t_env *envp);
+void for_execute(t_token **final, t_execution **data, t_env *env);
+char	*before_dollar_word(char	*str);
+char	*ft_strjoin2(char *s, char *s1);
+void extra_sanitize(t_token **head);
 
 #endif

@@ -168,6 +168,7 @@ t_env *creat_env_var (char *varname, char *value)
 int is_valid_identifier (int fd, char *arg)
 {
     int  i = 1;
+    fd = 2;
     if (!is_alpha(arg[0]) && arg[0] != '_')
     {
         ft_printf (fd ,"%s not a valid identifier\n", arg);
@@ -291,7 +292,7 @@ int process_export_arg(t_env *env, char *arg)
         return export_with_value(env, arg, equal, plus);
 }
 
-int my_export(t_execution *exec , t_env **env, int fd)
+int my_export(t_execution *exec , t_env **env, int fd, int fda)
 {
     int i = 1;
     if (!exec->cmd[1])
@@ -302,7 +303,8 @@ int my_export(t_execution *exec , t_env **env, int fd)
         i = 0;
         while (env_array[i])
         {
-            ft_printf(fd, "declare -x %s\n", env_array[i]);
+            printf("to wrirte to %d \n",(fda != 1) ? fda : fd);
+            ft_printf((fda != 1) ? fda : fd, "declare -x %s\n", env_array[i]);
             free(env_array[i]);
             i++;
         }
