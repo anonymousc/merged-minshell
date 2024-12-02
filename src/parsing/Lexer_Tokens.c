@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:11:54 by aessadik          #+#    #+#             */
-/*   Updated: 2024/11/26 20:39:49 by kali             ###   ########.fr       */
+/*   Updated: 2024/12/01 23:03:00 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,17 +41,6 @@ char *quotes_holder2(char *s, int  *i)
 	while (s && s[(*i)] && !check_is_same_quotes2(s[(*i)], quote))
 		(*i)++;
 	return (s);
-}
-
-char *is_tokens(char s)
-{
-	if(s == '|')
-		return ("|");
-	else if(s == '>')
-		return (">");
-	else if(s == '<')
-		return ("<");
-	return 0;
 }
 
 Token get_token (char *str)
@@ -130,7 +119,6 @@ void sanitizer(t_token **fill_line)
     }
 	fill_line = &data;
 }
-
 // to remove or enhance
 
 // int file_size(t_token **data)
@@ -203,7 +191,7 @@ int cmd_len (char **cmd)
 	return i;
 }
 
-void for_execute(t_token **final, t_execution **data)
+void for_execute(t_token **final, t_execution **data, int *fd_heredoc_main)
 {
 	struct stat dstat;
     t_token *curr = *final;
@@ -293,7 +281,7 @@ void for_execute(t_token **final, t_execution **data)
 			{
 				if(curr->next && curr->next->data)
 				{
-					fd_heredoc = here_doc(&curr);
+					fd_heredoc = *fd_heredoc_main;
 					curr = curr->next;
 				}
 			}
@@ -315,6 +303,7 @@ void for_execute(t_token **final, t_execution **data)
             curr = curr->next;
         }
         t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc, fflag, dflag , cmdlen);
+		printf("fd_heredoc == %d\n", fd_heredoc);
 		if (!*data)
             *data = new_cmd;
         else

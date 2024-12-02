@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/06 13:21:40 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/11/26 22:03:47 by kali             ###   ########.fr       */
+/*   Updated: 2024/12/01 21:38:46 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@
 /* ****************************** */
 
 /* ********** TYPEDEFS ********** */
-extern t_env *env;
 
 typedef struct	s_syntax
 {
@@ -47,20 +46,23 @@ typedef struct	s_syntax
 	int iter;
 }				t_syntax;
 
-typedef	struct	s_AST
+typedef struct s_norminette
 {
-	char			*data;
-	int				fd;
-	
-	struct s_AST	*right;
+	int i;
+	int flag;
+}			t_norminette;
 
-}				t_AST;
-
-typedef struct s_alloc
+typedef struct s_files
 {
-	void			*addr;
-	struct s_alloc	*next;
-}					t_alloc;
+	int file_out;
+	int file_in;
+	int file_append;
+	int file_heredoc;
+	int is_dir;
+	int flag_error;
+
+}				t_files;
+
 
 extern int exit_status;
 /* ****************************** */
@@ -91,7 +93,7 @@ char		*quotes_holder2(char *s, int  *i);
 void		skip_space2(char *str , int *pos);
 Token		get_token (char *str);
 int			is_separators(char c);
-char		**split_to_lex(char const *s);
+char		**split_to_lex(char *s);
 int			is_quotes(char c);
 void		tokenization(char **line , t_token **fill_line);
 void		sanitizer(t_token **fill_line);
@@ -102,7 +104,7 @@ void		expander_final(t_token **final ,t_env *env);
 /* **************************** */
 // to remove
 // int here_doc(t_token **final, int *fd);
-int		here_doc(t_token **final);
+int		here_doc(t_token **final, t_env *env);
 int		file_size(t_token **data);
 
 //execution
@@ -116,5 +118,9 @@ char *remove_quotes(char *s);
 
 
 void ft_free11(char **s);
+
+int check_in_db_or_sq(char *s);
+
+char *expander(char *expansion, t_env *envp);
 
 #endif

@@ -26,13 +26,14 @@ int my_echo (int fd ,int ac, char **av)
     int start_i;
     bool new_line;
 
+    printf("fd == %d\n", fd);
     if(!av[1])
     {
         ft_printf(fd , "\n");
         return false;
     }
     new_line = check_newline(ac, av, &start_i);
-    while (start_i < ac)
+    while (av[start_i] && start_i < ac)
     {
         ft_printf (fd, "%s", av[start_i]);
         if (start_i < ac - 1)
@@ -41,6 +42,8 @@ int my_echo (int fd ,int ac, char **av)
     }
 
     if (new_line)
+    {
         ft_printf (fd, "\n");
+    }
     return 0;
 }

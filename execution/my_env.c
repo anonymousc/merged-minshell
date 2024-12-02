@@ -12,27 +12,15 @@ t_env *make_env(char **env_original)
         new = malloc(sizeof(t_env));
         if (!new)
             return NULL;
-
         delimiter = strchr(env_original[i], '=');
         if (!delimiter)
-        {
-            // free_env(new);
-            return NULL;
-        }
-
+            return (/*free_env(new),*/NULL);
         new->variable = strndup(env_original[i], delimiter - env_original[i]);
         if (!new->variable)
-        {
-            // free_env(new);
-            return NULL;
-        }
-
+            return (/*free_env(new),*/NULL);
         new->value = strdup(delimiter + 1);
         if (!new->value)
-        {
-            // free_env(new);
-            return NULL;
-        }
+            return (/*free_env(new),*/NULL);
         new->next = NULL;
         add_back(&envir, new);
         i++;

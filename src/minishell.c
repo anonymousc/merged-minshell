@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/06 13:23:23 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/11/28 20:56:54 by kali             ###   ########.fr       */
+/*   Updated: 2024/12/01 01:01:46 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,29 +60,3 @@ void	lstadd_back(t_env **list, t_env *new)
 	head->next = new;
 	new->next = NULL;
 }
-// t_env *lst_new(char *data)
-// {
-// 	t_env *test;
-// 	test = malloc(sizeof(t_env));
-// 	test->env = data;
-// 	test->next = NULL;
-// 	return (test);
-// }
-
-// t_env	**fill_env(char **envp, t_env **env)
-// {
-// 	int 	i;
-// 	int 	size;
-// 	// t_env	*iter;
-
-// 	i = -1;
-// 	size = envp_size(envp);
-// 	env = malloc(sizeof(t_env *));
-// 	if(!env)
-// 		return (free(env), NULL);
-// 	*env = 0;
-// 	// iter = *env;
-// 	while(envp && ++i < size)
-// 		lstadd_back(env, lst_new(envp[i]));
-// 	return (env);
-// }

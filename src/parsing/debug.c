@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 18:24:30 by aessadik          #+#    #+#             */
-/*   Updated: 2024/10/10 15:43:08 by kali             ###   ########.fr       */
+/*   Updated: 2024/12/01 01:21:08 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,6 @@ void print_tokens(t_token *list)
 			printf("token type : WORD its_data == %s\n" , list->data);
 		if(list->value == WHITESPACE)
 			printf("token type : WHITESPACE its_data == %d\n" ,  (*list->data));
-		if(list->value == DOLLAR_SIGN)
-			printf("token type : DOLLAR_SIGN its_data == %s\n" ,  list->data);
 		list = list->next;
 	}
 }

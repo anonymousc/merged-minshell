@@ -31,41 +31,29 @@ int execute_builtins(t_execution *exec  ,t_env **env, char **envs)
      if(!*(exec->cmd))
             return (0);
 	if (strncmp(exec->cmd[0], "echo", 5) == 0)
-    {
 		ret = my_echo(exec->fd_out, exec->cmd_len, exec->cmd);
-    }
 	if (strncmp (exec->cmd[0], "cd", 3) == 0)
-    {
 		ret = my_cd(exec , *env);
-    }
 	if (strncmp(exec->cmd[0], "pwd", 4) == 0)
-    {
 		ret = my_pwd(exec->fd_out, *env);
-    }
 	else if (strncmp (exec->cmd[0] , "env", 4) == 0)
-    {
 		ret = my_env(exec->fd_out, env);
-    }
 	else if (strncmp(exec->cmd[0] , "export", 7) == 0)
-	{
         ret = my_export(exec , env, exec->fd_out);
-    }
     else if (strncmp (exec->cmd[0] , "unset", 6) == 0)
-    {
         ret = my_unset(&exec, env);
-    }
     else if(!ft_strcmp(exec->cmd[0], "exit"))
-    {
         my_exit(exec);
-    }
     return ret;
 }
 
 int check_builtins(t_execution *exec)
 {
-	int ret = 0;
+	int ret;
+
+    ret = 0;
      if(!exec->cmd[0])
-         return 0;
+         return (0);
 	if (ft_strncmp(exec->cmd[0], "echo", 5) == 0)
 		ret = 1;
 	if (ft_strncmp(exec->cmd[0], "cd", 3) == 0)
@@ -154,8 +142,8 @@ void	free_stack1(t_execution **stack)
 	while (tmp)
 	{
 		*stack = (*stack)->next;
-		free(tmp);
 		tmp = *stack;
+		free(tmp);
 	}
 	stack = NULL;
 }
@@ -246,8 +234,9 @@ void ft_combine_free(void *s ,t_execution **exec, t_token **final)
 {
     free(s);
     if(final)
-        free_stack(final);
-    free_stack1(exec);
+        return(free_stack(final), final = NULL , (void)0);
+    if(exec)
+        return(free_stack(final), final = NULL , (void)0);
 }
 int ft_pip_count(t_execution * curr)
 {
@@ -282,7 +271,7 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
     {
         if (i < pipe_count - 1)
             pipe(curr_pipe);
-        if (!curr->next &&  check_builtins(curr))
+        if (pipe_count == 1 && !curr->next &&  check_builtins(curr))
             return (exit_status = execute_builtins(curr, env1, env), free(pids), env = env_to_arr2(*env1), (void)0);
         pids[i] = fork();
         signal(SIGQUIT , sig_handler1);
@@ -305,21 +294,21 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
                 ft_close(&curr_pipe[0] , &curr_pipe[1]);
             }
             if (curr->cmd[0] == NULL)
-                return (ft_combine_free(pids , exec, NULL) , exit(1), (void)0);
+                return (ft_combine_free(pids , NULL, NULL) ,exit(1) ,(void)0);
             env = env_to_arr2(*env1);
-            if (curr->next && check_builtins(curr))
+            if (pipe_count > 1 && check_builtins(curr))
             {
                 exit_status = execute_builtins(curr, env1, env);
-                return (ft_combine_free(pids, exec , NULL), exit (0), (void)0);
+                return (ft_combine_free(pids, NULL , NULL), exit (0), (void)0);
             }
             else
             {
                 fullcmd = find_path(curr->cmd[0], env);
                 if (!fullcmd)
                 {
-                    exit_status = 127;
                     fprintf(stderr, "Command not found: %s\n", curr->cmd[0]);
-                    return (free(pids) ,ft_combine_free(fullcmd , exec , NULL), exit(1), (void)0);
+                    exit_status = 127;
+                    return (free(pids) ,ft_combine_free(fullcmd , NULL , NULL) ,exit(1) ,(void)0);
                 }
                 struct stat data;
                 if (stat(fullcmd, &data) == 0 && S_ISDIR(data.st_mode))
@@ -327,10 +316,7 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
                 if(!curr->cmd)
                     curr->cmd[0] = ft_strdup("");
                 if (execve(fullcmd, curr->cmd, env) == -1)
-                {
-                    free(pids);
-                    return (free_stack1(exec), perror("minishell"),free(fullcmd), exit(1),(void)0);
-                }
+                    return (ft_combine_free(pids, NULL , NULL) ,perror("minishell") ,free(fullcmd) ,exit(1) ,(void)0);
                 free(fullcmd);
             }
         }
@@ -350,6 +336,7 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
     i = -1;
     while (++i < pipe_count)
         waitpid(pids[i], &exit_status, 0);
-    WIFEXITED(exit_status);
-    ft_combine_free(pids, exec, NULL);
+    if(exit_status != 127)
+        WIFEXITED(exit_status);
+    ft_combine_free(pids, NULL, NULL);
 }

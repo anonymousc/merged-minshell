@@ -63,7 +63,7 @@ int     my_echo (int fd, int ac, char **av);
 char 	*find_env_variable2 (t_env *env, char *varname);
 //execute builtins
 int     execute_builtins(t_execution *exec, t_env **env, char **envs);
-
+int check_builtins(t_execution *exec);
 void    execute_bins(t_execution **exec, char **env, t_env **env1);
 
 t_env **update_env(t_env **env);

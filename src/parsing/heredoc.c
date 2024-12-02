@@ -44,7 +44,7 @@ void delete_file(char *filename)
     unlink(filename);
 }
  
-void here_doc_child(t_token *final , int *fd1)
+void here_doc_child(t_token *final , int *fd1, t_env *env)
 {
     t_token *curr = final;
     int fd;
@@ -56,10 +56,17 @@ void here_doc_child(t_token *final , int *fd1)
         fd = file_to_write_on(&filename);
         curr = free_spaces(curr->next);
         char *delim = curr->data;
+        int check = check_in_db_or_sq(delim);
         while (1)   
         {
             signal(SIGINT, sig_handler1);
             line = readline(">");
+            if (!check && line[0] == '$')
+            {
+                line = expander(line, env);
+                if(!line)
+                    line = ft_strdup("");
+            }
             if (!line)
             {
                 ft_printf(2, "warning: here-doc delimited by end-of-file\n");
@@ -70,10 +77,10 @@ void here_doc_child(t_token *final , int *fd1)
                 free(line);
                 break;
             }
+            printf ("kiktb f %d\n",fd);
             if (write(fd, line, ft_strlen(line)) == -1 || write(fd, "\n", 1) == -1)
                 ft_printf(2, "Error: Unable to write to heredoc file\n");
             free(line);
-            // signal(SIGINT, sig_handler1);
         }
         close(fd);
         fd = open(filename, O_RDONLY);
@@ -82,7 +89,7 @@ void here_doc_child(t_token *final , int *fd1)
 	*fd1 = fd;
 }
 
-int here_doc(t_token **final)
+int here_doc(t_token **final, t_env *env)
 {
     int hc = 0;
     t_token *curr = *final;
@@ -104,7 +111,7 @@ int here_doc(t_token **final)
     if (curr->value == HEREDOC)
     {
         free_spaces(curr->next);
-        here_doc_child(curr , &fd);
+        here_doc_child(curr , &fd, env);
     }
 	return (fd);
 }

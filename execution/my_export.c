@@ -63,11 +63,11 @@ char **env_to_arr2(t_env *env)
         if(val_len)
         {
             envir[i][j++] = '=';
-            envir[i][j++] = '"';
+            // envir[i][j++] = '"';
             k = 0;
             while (k < val_len)
                 envir[i][j++] = env->value[k++];
-            envir[i][j++] = '"';
+            // envir[i][j++] = '"';
         }
         envir[i][j] = '\0';
         env = env->next;
