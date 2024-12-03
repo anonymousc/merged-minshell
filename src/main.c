@@ -6,11 +6,13 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 12:03:40 by aessadik          #+#    #+#             */
-/*   Updated: 2024/10/28 17:05:20 by kali             ###   ########.fr       */
+/*   Updated: 2024/12/01 22:27:23 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
+
+int exit_status;
 
 char is_quote(char c) 
 {
@@ -39,6 +41,7 @@ int count_chars_after_removal(char *s)
     return count;
 }
 
+
 char *remove_quotes(char *s) 
 {    
     int len = count_chars_after_removal(s);
@@ -63,19 +66,22 @@ char *remove_quotes(char *s)
     return result;
 }
 
-void process_quotes(t_token **final) 
+void process_quotes(t_token **final)
 {
     t_token *curr = *final;
-    
+    char *processed;
     while (curr) 
 	{
-        if (curr->value == WORD) 
+		if(curr->value == HEREDOC && curr->next->next)
+			curr = curr->next->next;
+        else if (curr->value == WORD) 
 		{
-            char *processed = remove_quotes(curr->data);
+            processed = remove_quotes(curr->data);
             curr->data = processed;
         }
         curr = curr->next;
     }
+	// free(processed);
 }
 
 void	free_stackhhh(t_execution **stack)
@@ -91,50 +97,84 @@ void	free_stackhhh(t_execution **stack)
 	}
 	stack = NULL;
 }
-int parsing(t_token **final ,t_env *env, char **line, int *expansion)
+void extra_sanitize(t_token **head)
 {
+    t_token* current = *head;
+    t_token* tmp;
+
+    while (current && current->next) 
+	{
+        if (current->value == WORD && !(*current->data)) 
+		{
+            tmp = current;
+            current = current->next;
+
+            if (tmp == *head) 
+                *head = current;
+			else 
+			{
+                t_token* prev = *head;
+                while (prev && prev->next != tmp) 
+                    prev = prev->next;
+                if (prev) 
+                    prev->next = current;
+            }
+
+            free(tmp);
+        } 
+		else 
+            current = current->next;
+    }
+}
+
+int parsing(t_token **final ,t_env **env, char **envp,t_execution **data)
+{
+	(void)env;
+	char *readline;
+	char **line;
+
+	line = NULL;
+	if (!*env)
+		*env = make_env(envp);
+	readline = retline();
+	if(!readline)
+		return 1;
+	line = split_to_lex(readline);
+	free(readline);
 	tokenization(line , final);
 	sanitizer(final);
-	*expansion = expander_final(final , env);
-	// print_tokens(*final);
+	expander_final(final , *env);
+	// here_doc(final, *env);
 	process_quotes(final);
 	if (check_syntax_extended(final))
-		return 1;
+		return (ft_free11(line), exit_status = 2, 1);
 	free_spaces2(final);
+	// extra_sanitize(final);
+	print_tokens(*final);
+	for_execute(final , data , *env);
 	return 0;
 }
 
+void execution(t_execution **data ,char **envp ,t_env *env)
+{
+	execute_bins(data, envp , &env);
+}
 int main (int ac, char **av, char **envp)
 {
 	(void)ac;
 	(void)av;
-	char *line;
-	char **splitted_array;
-	int expansion = 2;
 	t_token  **final;
 	t_execution **data;
-	t_env *env = make_env(envp);
-	line = NULL;
-	char **env2 = env_to_arr(env);
+	t_env *env;
+
+	env = NULL;
 	while(1)
 	{
-		line = retline();
 		final = (t_token  **)malloc(sizeof(t_token  *));
 		data = (t_execution  **)malloc(sizeof(t_execution  *));
-		if(!line)
+		if(!data || parsing(final , &env, envp, data) || !final)
 			continue;
-		splitted_array = split_to_lex(line);
-		if(parsing(final , env, splitted_array , &expansion))
-			continue;
-		for_execute(final , data , &expansion);
-		(execute_bins(data, env2 ,  env));
-		// print_tokens(*final);
-		free_stackhhh(data);
-		free_stack(final);
-		free(final);
-		free(data);
-		fri_ol(splitted_array);
-		free(line);
-		// free_lists();
+		execution( data, envp, env);
+		ft_combine_free(NULL, data, final);
 	}
 }

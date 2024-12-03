@@ -43,46 +43,90 @@ void delete_file(char *filename)
 {
     unlink(filename);
 }
- 
-void here_doc_child(t_token *final , int *fd1)
+ char *expander_heredoc(char *expansion, t_env *envp)
+{
+	char *before_dollar;
+	char *expanded_word;
+	char *tmp;
+	char *exit;
+
+	before_dollar = NULL;
+	if (!expansion || *expansion != '$')
+		return (expansion);
+	expansion = expansion + 1;
+	tmp = expansion;
+	if (tmp && *tmp == '?')
+	{
+		exit = ft_itoa(exit_status);
+		before_dollar = before_dollar_word(tmp + 1);
+		exit = ft_strjoin2(exit, before_dollar);
+		return(ft_strjoin2(exit, expander(tmp + ft_strlen(before_dollar) + 1, envp)));
+	}
+	if (*tmp)
+		tmp++;
+	while(tmp && *tmp && ft_isalnum(*tmp))
+		tmp++;
+	int l = tmp - expansion;
+	char *to_expand = malloc (l + 1);
+	strncpy(to_expand, expansion, l);
+	to_expand[l] = '\0';
+	expanded_word = find_env_variable2(envp , to_expand);
+	if (*tmp && *tmp != '$')
+	{
+		before_dollar = before_dollar_word(tmp);
+		while (*tmp && *tmp != '$')
+			tmp++;
+		expanded_word = ft_strjoin2(expanded_word, before_dollar);
+	}
+	return (ft_strjoin2(expanded_word, expander(tmp, envp)));
+}
+void here_doc_child(t_token *final , int *fd1 ,t_env *env)
 {
     t_token *curr = final;
     int fd;
     char *line;
     char *filename = NULL;
-    fd = 0;
-    if (curr && curr->value == HEREDOC)
+    fd = file_to_write_on(&filename);
+    char *delim = curr->next->data;
+    int check = check_in_db_or_sq(delim);
+    if(check)
+        delim = remove_quotes(delim);
+    int pid = fork();
+    if (pid == 0)
     {
-        fd = file_to_write_on(&filename);
-        curr = free_spaces(curr->next);
-        char *delim = curr->data;
         while (1)   
         {
-            signal(SIGINT, sig_handler1);
+            if(signal(SIGINT, SIG_DFL) == 0)
+                exit_status = 130;
             line = readline(">");
-            if (!line)
+            if(!line)
             {
                 ft_printf(2, "warning: here-doc delimited by end-of-file\n");
                 break;
+            }
+            if(check == 0 && ft_strchr(line, '$'))
+            {
+                char *before_dollar = before_dollar_word(line);
+                line = ft_strchr(line, '$');
+                line = ft_strjoin2(before_dollar, expander(line, env));
             }
             if (!ft_strncmp(delim, line, ft_strlen(delim) + 1))
             {
                 free(line);
                 break;
             }
-            if (write(fd, line, ft_strlen(line)) == -1 || write(fd, "\n", 1) == -1)
-                ft_printf(2, "Error: Unable to write to heredoc file\n");
+            ft_printf(fd, "%s\n", line);
             free(line);
-            // signal(SIGINT, sig_handler1);
         }
-        close(fd);
-        fd = open(filename, O_RDONLY);
-        delete_file(filename);
     }
-	*fd1 = fd;
+    wait (NULL);
+    close(fd);
+    fd = open(filename, O_RDONLY);
+    delete_file(filename);
+    *fd1 = fd;
 }
 
-int here_doc(t_token **final)
+int here_doc(t_token **final ,t_env *env)
 {
     int hc = 0;
     t_token *curr = *final;
@@ -101,10 +145,6 @@ int here_doc(t_token **final)
         }
         herecount = herecount->next;
     }
-    if (curr->value == HEREDOC)
-    {
-        free_spaces(curr->next);
-        here_doc_child(curr , &fd);
-    }
+    here_doc_child(curr , &fd ,env);
 	return (fd);
 }

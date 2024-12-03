@@ -1,46 +1,40 @@
-#include "builtins.h"
+#include "../includes/minishell.h"
 
-t_env *make_env(char **env_orginal) 
+t_env *make_env(char **env_original)
 {
     int i = 0;
     t_env *envir = NULL;
     t_env *new;
     char *delimiter;
-    while (env_orginal && env_orginal[i])
+
+    while (env_original && env_original[i])
     {
         new = malloc(sizeof(t_env));
         if (!new)
             return NULL;
-        delimiter = strchr(env_orginal[i], '=');
+        delimiter = strchr(env_original[i], '=');
         if (!delimiter)
-            free(new); 
-        new->variable = strndup(env_orginal[i], delimiter - env_orginal[i]);
+            return (/*free_env(new),*/NULL);
+        new->variable = strndup(env_original[i], delimiter - env_original[i]);
         if (!new->variable)
-        {
-            free(new);  
-            return NULL;
-        }
+            return (/*free_env(new),*/NULL);
         new->value = strdup(delimiter + 1);
         if (!new->value)
-        {
-            free(new->variable);
-            free(new);
-            return NULL;
-        }
+            return (/*free_env(new),*/NULL);
         new->next = NULL;
         add_back(&envir, new);
         i++;
     }
-    // env = envir;
     return envir;
 }
 
-int my_env(t_env *env) 
+int my_env(int fd, int fda, t_env **env)
 {
-    while (env) 
+    t_env *curr = *env;
+    while (curr)
     {
-        printf("%s=%s\n", env->variable, env->value);
-        env = env->next;
+        ft_printf((fda != 1) ? fda : fd, "%s=%s\n", curr->variable, curr->value);
+        curr = curr->next;
     }
     return 0;
 }
@@ -57,20 +51,3 @@ void free_env(t_env *env)
         free(temp);
     }
 }
-
-// int main(int argc, char **argv, char **envp)
-// {
-//     t_execution *exec = malloc (sizeof (t_execution));
-//     exec->env_orginal = envp;
-//     t_env *env = make_env(exec);
-//     if (!env)
-//     {
-//         printf("Failed to create environment list\n");
-//         return 1;
-//     }
-
-//     my_env(env);
-
-//     free_env(env);
-//     return 0;
-// }

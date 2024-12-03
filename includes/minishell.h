@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/06 13:21:40 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/10/28 17:01:10 by kali             ###   ########.fr       */
+/*   Updated: 2024/12/01 21:38:46 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,26 +46,29 @@ typedef struct	s_syntax
 	int iter;
 }				t_syntax;
 
-typedef	struct	s_AST
+typedef struct s_norminette
 {
-	char			*data;
-	int				fd;
-	
-	struct s_AST	*right;
+	int i;
+	int flag;
+}			t_norminette;
 
-}				t_AST;
-
-typedef struct s_alloc
+typedef struct s_files
 {
-	void			*addr;
-	struct s_alloc	*next;
-}					t_alloc;
+	int file_out;
+	int file_in;
+	int file_append;
+	int file_heredoc;
+	int is_dir;
+	int flag_error;
+
+}				t_files;
+
+
+extern int exit_status;
 /* ****************************** */
 
 /*  ********* BULTINS *********  */
 
-void	ft_pwd(void);
-void	ft_env(t_env **env);
 char	*quotes_holder(char *line);
 /* **************************** */
 /*  ******** PARSING *********  */
@@ -77,7 +80,6 @@ int is_quotes(char c);
 
 /*  ******** PARSING *********  */
 
-t_env		**fill_env(char **envp, t_env **env);
 char		**parser(char **av);
 char		*check_syntax(char *s);
 t_token 	**ft_fill(char *line);
@@ -91,31 +93,38 @@ char		*quotes_holder2(char *s, int  *i);
 void		skip_space2(char *str , int *pos);
 Token		get_token (char *str);
 int			is_separators(char c);
-char		**split_to_lex(char const *s);
+char		**split_to_lex(char *s);
 int			is_quotes(char c);
 void		tokenization(char **line , t_token **fill_line);
 void		sanitizer(t_token **fill_line);
 int			check_syntax_extended (t_token **final);
 t_token		*free_spaces (t_token *curr);
 void		free_spaces2(t_token **head);
-int		expander_final(t_token **final ,t_env *env);
+void		expander_final(t_token **final ,t_env *env);
 /* **************************** */
 // to remove
 // int here_doc(t_token **final, int *fd);
-int		here_doc(t_token **final);
-char	*expander(char *expansion, t_env *envp);
+int		here_doc(t_token **final ,t_env *env);
 int		file_size(t_token **data);
 
 //execution
-void execute_bins (t_execution **exec, char **env , t_env *env1);
+// void execute_bins (t_execution **exec, char **env , t_env *env1);
 
-int execute_builtins(t_execution *exec, t_env *env1);
+// int execute_builtins(t_execution *exec, t_env *env1);
 
 char *remove_quotes(char *s);
 
-char *find_env_variable2 (t_env *env, char *varname);
+// char *find_env_variable2 (t_env *env, char *varname);
 
 
 void ft_free11(char **s);
+
+int check_in_db_or_sq(char *s);
+
+char *expander(char *expansion, t_env *envp);
+void for_execute(t_token **final, t_execution **data, t_env *env);
+char	*before_dollar_word(char	*str);
+char	*ft_strjoin2(char *s, char *s1);
+void extra_sanitize(t_token **head);
 
 #endif

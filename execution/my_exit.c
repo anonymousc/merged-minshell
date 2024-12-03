@@ -1,32 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signals.c                                          :+:      :+:    :+:   */
+/*   my_exit.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/11 00:07:35 by aessadik          #+#    #+#             */
-/*   Updated: 2024/11/28 20:59:44 by kali             ###   ########.fr       */
+/*   Created: 2024/11/25 23:17:52 by kali              #+#    #+#             */
+/*   Updated: 2024/11/25 23:17:53 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/minishell.h"
+#include "../includes/minishell.h"
 
-void sig_handler(int test)
+void my_exit(t_execution *list)
 {
-	(void)test;
-	printf("\n");
-	rl_on_new_line ();
-	rl_replace_line ("", 0);
-	rl_redisplay();
-	exit_status = 130;
-	return ;
-}
-
-void sig_handler1(int test)
-{
-	(void)test;
-	exit_status = 131;
-	printf("\n");
-	return ;
+	if((long long)ft_atoi(list->cmd[1]) < INT_MAX)
+	{
+		printf("exit\n");
+		exit(ft_atoi(list->cmd[1]));
+	}
+	if(list->cmd[2])
+	{
+		printf("too many arguements\n");
+		return ;
+	}
 }

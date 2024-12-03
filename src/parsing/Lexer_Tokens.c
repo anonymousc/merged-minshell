@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:11:54 by aessadik          #+#    #+#             */
-/*   Updated: 2024/10/27 23:21:16 by kali             ###   ########.fr       */
+/*   Updated: 2024/12/01 23:03:00 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,17 +41,6 @@ char *quotes_holder2(char *s, int  *i)
 	while (s && s[(*i)] && !check_is_same_quotes2(s[(*i)], quote))
 		(*i)++;
 	return (s);
-}
-
-char *is_tokens(char s)
-{
-	if(s == '|')
-		return ("|");
-	else if(s == '>')
-		return (">");
-	else if(s == '<')
-		return ("<");
-	return 0;
 }
 
 Token get_token (char *str)
@@ -131,21 +120,6 @@ void sanitizer(t_token **fill_line)
 	fill_line = &data;
 }
 
-// to remove or enhance
-
-// int file_size(t_token **data)
-// {
-// 	t_token *curr = *data;
-// 	int wc = 0;
-// 	while (curr)
-// 	{
-// 		if(curr && curr->value == REDIRECTION_OUT)
-// 			wc++;
-// 		curr = curr->next;
-// 	}
-// 	return wc;
-// }
-
 void	ft_lstadd_back_exec(t_execution  **stacks, t_execution  *new)
 {
 	t_execution 	*head;
@@ -162,7 +136,7 @@ void	ft_lstadd_back_exec(t_execution  **stacks, t_execution  *new)
 	new->next = NULL;
 }
 
-t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int fd_out ,int fd_append , int fd_heredoc, int flag, int dflag)
+t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int fd_out ,int fd_append , int fd_heredoc, int flag, int dflag, int cmdlen)
 {
 	t_execution   *list;
 
@@ -170,6 +144,7 @@ t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int fd_out ,int fd_append ,
 	if (!list)
 		return (NULL);
 	list->cmd = cmd;
+	list->cmd_len = cmdlen;
 	list->fd_in = fd_in;
 	list->fd_out = fd_out;
 	list->fd_append = fd_append;
@@ -179,7 +154,6 @@ t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int fd_out ,int fd_append ,
 	list->next = NULL;
 	return (list);
 }
-
 int count_cmds(t_token **data)
 {
 	int wc = 0;
@@ -195,13 +169,19 @@ int count_cmds(t_token **data)
 	}
 	return wc;
 }
+int cmd_len (char **cmd)
+{
+	int i = 0;
+	while (cmd[i])
+		i++;
+	return i;
+}
 
-void for_execute(t_token **final, t_execution **data , int *expansion)
+void for_execute(t_token **final, t_execution **data, t_env *env)
 {
 	struct stat dstat;
     t_token *curr = *final;
-	(void)expansion;
-    *data = NULL;
+	*data = NULL;
     while (curr)
     {
         int word_count = 0;
@@ -228,6 +208,7 @@ void for_execute(t_token **final, t_execution **data , int *expansion)
 		int fd_out = 1;
 		int fflag = 0;
 		int dflag = 0;
+		int cmdlen = word_count;
         while (curr && curr->value != PIPE)
         {
             if (!curr->data)
@@ -246,9 +227,7 @@ void for_execute(t_token **final, t_execution **data , int *expansion)
                 {
                     fd_in = open(curr->next->data, O_RDONLY, 0444);
 					if (fd_in == -1)
-					{
-						fflag = 1;
-					}
+						fd_out = -1;
 					else if (!ft_strncmp(curr->next->data, "/dev/stdin" , ft_strlen("/dev/stdin")))
 						fd_in--;
 					curr = curr->next;
@@ -265,16 +244,15 @@ void for_execute(t_token **final, t_execution **data , int *expansion)
 							dflag = 1;
 						}
 					}
-					if(*(curr->next->data) && *(curr->next->data) != '\v')
+					if(*(curr->next->data))
 					{
-						fd_out = open(curr->next->data, O_CREAT | O_RDWR | O_TRUNC, 0666);
+						if(fd_out != -1)
+							fd_out = open(curr->next->data, O_CREAT | O_RDWR | O_TRUNC, 0666);
 						if(access(curr->next->data , R_OK | W_OK) == -1)
 							fflag = 1;
 						if (!ft_strncmp(curr->next->data, "/dev/stdout" , ft_strlen("/dev/stdout")) && !curr->next->next)
 							fd_out--;
 					}
-					else
-						fflag = 2 + (ft_strchr(curr->next->data,'\v') == NULL);
                     curr = curr->next;
                 }
             }
@@ -282,7 +260,7 @@ void for_execute(t_token **final, t_execution **data , int *expansion)
 			{
 				if(curr->next && curr->next->data)
 				{
-					fd_heredoc = here_doc(&curr);
+					fd_heredoc = here_doc(&curr ,env);
 					curr = curr->next;
 				}
 			}
@@ -298,18 +276,19 @@ void for_execute(t_token **final, t_execution **data , int *expansion)
 			}
             else if (curr->value == WORD && i < word_count)
             {
-					cmd[i] = strdup(curr->data);
+					cmd[i] = ft_strdup(curr->data);
                 	i++;
             }
             curr = curr->next;
         }
-        t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc, fflag, dflag);
-		// ft_free11(cmd);
+        t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc, fflag, dflag , cmdlen);
 		if (!*data)
             *data = new_cmd;
         else
             ft_lstadd_back_exec(data, new_cmd);
         if (curr && curr->value == PIPE)
+		{
             curr = curr->next;
+		}
     }
 }

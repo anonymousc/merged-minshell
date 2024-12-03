@@ -1,55 +1,45 @@
-#include "builtins.h"
+#include "../includes/minishell.h"
 
-void unset_var(t_exec **exec, char *s) 
+void	rotate(t_env **stack)
 {
-    t_env *curr = (*exec)->env;
-    t_env *to_remove = NULL;
 
-    while (curr && curr->next) 
+	if ((*stack) && (*stack)->next)
 	{
-        if (strncmp(curr->next->variable, s, strlen(s)) == 0) 
-		{
-            to_remove = curr->next;
-            curr->next = curr->next->next;
-            free(to_remove);
-        } 
-		else 
-		{
-            curr = curr->next;
-        }
-    }
-
-    curr = (*exec)->env;
-    if (curr && strncmp(curr->variable, s, strlen(s)) == 0) 
-	{
-        to_remove = curr;
-        (*exec)->env = curr->next;
-    	free(to_remove);
-    }
+		(*stack) = (*stack)->next;
+	}
 }
 
-int my_unset(t_exec **exec)
+t_env **unset_var(t_execution **exec, char *s, t_env **env) 
+{
+    (void)exec;
+
+    // t_env *to_remove = NULL;
+    if (*env && strcmp((*env)->variable, s) == 0)
+	{
+        rotate(env);
+    }
+    t_env *curr = *env;
+    while (curr && curr->next) 
+	{
+        if (strcmp(curr->next->variable, s) == 0) 
+		{
+            // to_remove = curr->next;
+            curr->next = curr->next->next;
+            // free(to_remove);
+        }
+		else 
+             curr = curr->next;
+    }
+    return env;
+    // curr = *env;
+}
+int my_unset(t_execution **exec, t_env **env)
 {
 	int i = 1;
-	while ((*exec)->av[i])
+	while ((*exec)->cmd[i])
 	{
-		unset_var(exec, (*exec)->av[i]);
-		i++;
+		env = unset_var(exec, (*exec)->cmd[i], env);
+        i++;
 	}
 	return 0;
 }
-
-// int main(int ac ,char **av , char **envp)
-// {
-// 	t_exec *exec = malloc(sizeof(t_exec));
-// 	exec->env_orginal = envp;
-// 	t_env *env = make_env(exec);
-// 	exec->env = env;
-// 	exec->av = av;
-// 	exec->ac = ac;
-// 	int i = 0;
-// 	my_unset(&exec);
-// 	t_env *current = exec->env;
-// 	my_env(&current);
-// 	free_env(&current);
-// }

@@ -1,18 +1,17 @@
-#include "builtins.h"
+#include "../includes/minishell.h"
 
-int my_pwd(int fd)
+int	my_pwd(int fd, int fda, t_env *env)
 {
-    char path[1024];
+	char	*s;
 
-    ft_printf(fd,"test\n");
-    if (getcwd(path, sizeof (path)))
-        ft_printf (fd ,"%s\n", path);
-    else
-        perror ("error\n");
-    return 0;
+	s = malloc(sizeof(char) * (PATH_MAX + 1));
+	if (!s)
+		return 1;
+	if (!getcwd(s, PATH_MAX))
+	{
+        ft_printf((fda != 1) ? fda : fd, "%s\n", find_env_variable2(env , "PWD"));
+		free(s);
+		return 1;
+	}
+    return (ft_printf((fda != 1) ? fda : fd, "%s\n", getcwd(s, PATH_MAX)) ,free(s) ,0);
 }
-
-// int main ()
-// {
-//     my_pwd();
-// }

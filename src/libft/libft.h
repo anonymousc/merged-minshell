@@ -6,7 +6,7 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 18:16:47 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/10/27 18:44:33 by kali             ###   ########.fr       */
+/*   Updated: 2024/12/01 21:46:31 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,18 +32,10 @@ typedef enum
 	REDIRECTION_IN,
 	HEREDOC,
 	APPEND,
-	DOLLAR_SIGN,
 	WORD,
 	WHITESPACE
 
 } Token;
-
-// typedef	struct		s_env
-// {
-// 	char			*env;
-// 	struct s_env	*next;
-
-// }					t_env;
 
 typedef	struct	s_Tokenization
 {
@@ -57,6 +49,7 @@ typedef struct s_execution
 {
 	char 				**cmd;
 	int 				fflag;
+	int					cmd_len;
 	int 				dflag;
 	int					fd_in;
 	int					fd_out;
@@ -80,7 +73,6 @@ int		ft_strncmp(char const *s1, char const *s2, size_t n);
 int		is_space(char c);
 int		ft_strcmp(char *s1, char *s2);
 char	*is_space_veta(char s);
-void 	for_execute(t_token **final , t_execution **data , int *expansion);
 
 
 char	*ft_itoa(int n);
@@ -116,21 +108,8 @@ size_t	ft_strlcat(char *dest, char const *src, size_t size);
 size_t	ft_strlcpy(char *dest, char const *src, size_t size);
 size_t	word_count(char const *s, char c);
 char **fri_ol(char **str);
+void ft_combine_free(void *s ,t_execution **exec, t_token **final);
 
-// GET_NEXT_LINE
-
-# ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 3
-
-# endif
-
-char	*get_new_line(char *s);
-char	*ft_strjoin(char *s, char *s1);
-int		find_newline(char *str);
-char	*get_next_line(int fd);
-char	*set_buffer(char *buffer, char *line);
-char	*read_line(char *ret, int fd);
-char	*ft_free(char *s);
 
 //    LINKED LISTS
 
@@ -142,5 +121,4 @@ void	ft_lstclear(t_token  **lst);
 void	ft_lstadd_back(t_token  **lst, t_token *new);
 void	ft_lstadd_front(t_token  *lst, t_token *new);
 int		ft_lstsize(t_token  *lst);
-
 #endif

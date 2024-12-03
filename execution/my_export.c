@@ -1,4 +1,4 @@
-#include "builtins.h"
+#include "../includes/minishell.h"
 
 int is_alpha (int c)
 {
@@ -50,10 +50,10 @@ char **env_to_arr2(t_env *env)
         {
             while (j < i)
             {
-                free(envir[j]);
+                // free(envir[j]);
                 j++;
             }
-            free(envir);
+            // free(envir);
             return NULL;
         }
         j = 0;
@@ -63,11 +63,11 @@ char **env_to_arr2(t_env *env)
         if(val_len)
         {
             envir[i][j++] = '=';
-            envir[i][j++] = '"';
+            // envir[i][j++] = '"';
             k = 0;
             while (k < val_len)
                 envir[i][j++] = env->value[k++];
-            envir[i][j++] = '"';
+            // envir[i][j++] = '"';
         }
         envir[i][j] = '\0';
         env = env->next;
@@ -98,10 +98,10 @@ char **env_to_arr(t_env *env)
         {
             while (j < i)
             {
-                free(envir[j]);
+                // free(envir[j]);
                 j++;
             }
-            free(envir);
+            // free(envir);
             return NULL;
         }
         j = 0;
@@ -165,19 +165,20 @@ t_env *creat_env_var (char *varname, char *value)
     return new_var;
 }
 
-int is_valid_identifier (char *arg)
+int is_valid_identifier (int fd, char *arg)
 {
     int  i = 1;
+    fd = 2;
     if (!is_alpha(arg[0]) && arg[0] != '_')
     {
-        printf ("%s not a valid identifier\n", arg);
+        ft_printf (fd ,"%s not a valid identifier\n", arg);
         return -1;
     }
     while (arg[i] && (arg[i] != '+' && arg[i] != '='))
     {
         if (!is_alphanum(arg[i]) && arg[i] != '_')
         {
-            printf ("%s not a valid identifier\n", arg);
+            ft_printf (fd, "%s not a valid identifier\n", arg);
             return -1;
         }
         i++;
@@ -205,7 +206,6 @@ int update_existing_var(t_env *existing, char *value, int is_append)
         // free(existing->value);
         existing->value = new_value;
     }
-    printf("Updated: %s=%s\n", existing->variable, existing->value);
     return 1;
 }
 
@@ -292,18 +292,19 @@ int process_export_arg(t_env *env, char *arg)
         return export_with_value(env, arg, equal, plus);
 }
 
-int my_export(t_execution *exec , t_env *env)
+int my_export(t_execution *exec , t_env **env, int fd, int fda)
 {
     int i = 1;
     if (!exec->cmd[1])
     {
-        char **env_array = env_to_arr2(env);
-        sort_strings(env_array, env_size(env));
+        char **env_array = env_to_arr2(*env);
+        sort_strings(env_array, env_size(*env));
         
         i = 0;
         while (env_array[i])
         {
-            printf("declare -x %s\n", env_array[i]);
+            printf("to wrirte to %d \n",(fda != 1) ? fda : fd);
+            ft_printf((fda != 1) ? fda : fd, "declare -x %s\n", env_array[i]);
             free(env_array[i]);
             i++;
         }
@@ -314,10 +315,10 @@ int my_export(t_execution *exec , t_env *env)
     {
         char *arg = exec->cmd[i];
 
-        if (is_valid_identifier(arg) < 0)
+        if (is_valid_identifier(fd, arg) < 0)
             return 1;
 
-        if (!process_export_arg(env, arg))
+        if (!process_export_arg(*env, arg))
             return 1;
 
         i++;
