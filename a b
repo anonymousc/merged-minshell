@@ -1,16 +1,14 @@
-1
-2
-3
--a
+a
+a b
 builtins
 Dockerfile
+e
 execution
+hello
 includes
--l
 Makefile
 minishell
 New Document.tldr
 out
-ppp
 readline.supp
 src

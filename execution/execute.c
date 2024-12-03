@@ -31,15 +31,15 @@ int execute_builtins(t_execution *exec  ,t_env **env, char **envs)
      if(!*(exec->cmd))
             return (0);
 	if (strncmp(exec->cmd[0], "echo", 5) == 0)
-		ret = my_echo(exec->fd_out, exec->fd_append,  exec->cmd_len, exec->cmd);
+		ret = my_echo(exec->fds[0], exec->fds[2],  exec->cmd_len, exec->cmd);
 	if (strncmp (exec->cmd[0], "cd", 3) == 0)
 		ret = my_cd(exec , *env);
 	if (strncmp(exec->cmd[0], "pwd", 4) == 0)
-		ret = my_pwd(exec->fd_out, exec->fd_append, *env);
+		ret = my_pwd(exec->fds[0], exec->fds[2], *env);
 	else if (strncmp (exec->cmd[0] , "env", 4) == 0)
-		ret = my_env(exec->fd_out,exec->fd_append, env);
+		ret = my_env(exec->fds[0],exec->fds[2], env);
 	else if (strncmp(exec->cmd[0] , "export", 7) == 0)
-        ret = my_export(exec , env, exec->fd_out, exec->fd_append);
+        ret = my_export(exec , env, exec->fds[0], exec->fds[2]);
     else if (strncmp (exec->cmd[0] , "unset", 6) == 0)
         ret = my_unset(&exec, env);
     else if(!ft_strcmp(exec->cmd[0], "exit"))
@@ -151,62 +151,62 @@ void	free_stack1(t_execution **stack)
 
 int handle_output_redirection(t_execution **exec, int *flag)
 {
-    if ((*exec)->fd_out != 1)
+    if ((*exec)->fds[0] != 1)
     {
-        if ((*exec)->fflag == -1)
+        if ((*exec)->fds[4] == -1)
             return (printf("permission denied1\n"), -1);
         *flag = 1;
-        dup2((*exec)->fd_out, STDOUT_FILENO);
-        if ((*exec)->fd_out != STDOUT_FILENO)
-            close((*exec)->fd_out);
+        dup2((*exec)->fds[0], STDOUT_FILENO);
+        if ((*exec)->fds[0] != STDOUT_FILENO)
+            close((*exec)->fds[0]);
     }
     return 0;
 }
 
 int handle_append_redirection(t_execution **exec)
 {
-    if ((*exec)->fd_append != 1)
+    if ((*exec)->fds[2] != 1)
     {
-        if ((*exec)->fflag == 1)
+        if ((*exec)->fds[4] == 1)
             return (printf("permission denied\n"), -1);
-        dup2((*exec)->fd_append, STDOUT_FILENO);
-        close((*exec)->fd_append);
+        dup2((*exec)->fds[2], STDOUT_FILENO);
+        close((*exec)->fds[2]);
     }
     return 0;
 }
 
 int handle_input_redirection(t_execution **exec)
 {
-    if ((*exec)->fd_in != 0)
+    if ((*exec)->fds[1] != 0)
     {
-        if ((*exec)->fd_in == -1 || (*exec)->fflag == 1)
+        if ((*exec)->fds[1] == -1 || (*exec)->fds[4] == 1)
         {
             printf("no such a file or directory\n");
             return -1;
         }
-        dup2((*exec)->fd_in, STDIN_FILENO);
-        close((*exec)->fd_in);
+        dup2((*exec)->fds[1], STDIN_FILENO);
+        close((*exec)->fds[1]);
     }
     return 0;
 }
 
 int handle_heredoc_redirection(t_execution **exec)
 {
-    if ((*exec)->fd_heredoc != 0)
+    if ((*exec)->fds[3] != 0)
     {
-        dup2((*exec)->fd_heredoc, STDIN_FILENO);
-        close((*exec)->fd_heredoc);
+        dup2((*exec)->fds[3], STDIN_FILENO);
+        close((*exec)->fds[3]);
     }
     return 0;
 }
 
 int redirect_io(t_execution **exec, int *flag)
 {
-    if ((*exec)->dflag == 1)
+    if ((*exec)->fds[5] == 1)
         return (printf("this is a directory\n"), -1);
-    if ((*exec)->fflag == 3)
+    if ((*exec)->fds[4] == 3)
         return (printf("ambigous redirection\n"), -1);
-    if ((*exec)->fflag == 2)
+    if ((*exec)->fds[4] == 2)
         return (printf("no such a file or directory\n"), -1);
     if (handle_output_redirection(exec, flag) == -1)
         return -1;
