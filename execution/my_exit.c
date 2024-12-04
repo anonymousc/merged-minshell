@@ -14,6 +14,7 @@
 
 void my_exit(t_execution *list)
 {
+	printf ("hhhh\n");
 	if((long long)ft_atoi(list->cmd[1]) < INT_MAX)
 	{
 		printf("exit\n");

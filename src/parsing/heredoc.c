@@ -18,6 +18,7 @@ char *namegen()
         i++;
     }
     file[j] = '\0';
+    close(fd);
     free(buf);
     return file;
 }
@@ -109,6 +110,8 @@ void here_doc_child(t_token *final , int *fd1 ,t_env *env)
                 char *before_dollar = before_dollar_word(line);
                 line = ft_strchr(line, '$');
                 line = ft_strjoin2(before_dollar, expander(line, env));
+                if(!line)
+                    line = ft_strdup("");
             }
             if (!ft_strncmp(delim, line, ft_strlen(delim) + 1))
             {
@@ -117,9 +120,11 @@ void here_doc_child(t_token *final , int *fd1 ,t_env *env)
             }
             ft_printf(fd, "%s\n", line);
             free(line);
+        
         }
+        exit(0);
     }
-    wait (NULL);
+    waitpid (pid, &exit_status, 0);
     close(fd);
     fd = open(filename, O_RDONLY);
     delete_file(filename);

@@ -295,6 +295,14 @@ int process_export_arg(t_env *env, char *arg)
 int my_export(t_execution *exec , t_env **env, int fd, int fda)
 {
     int i = 1;
+    char *secure_value = find_env_variable2(*env, "PWD");
+    char *secure_pwd = "#PWD=";
+    char *lekher = ft_strjoin2(secure_pwd, secure_value);
+    if(!exec)
+    {
+        process_export_arg(*env , lekher);
+        return 0;
+    }
     if (!exec->cmd[1])
     {
         char **env_array = env_to_arr2(*env);
@@ -303,8 +311,15 @@ int my_export(t_execution *exec , t_env **env, int fd, int fda)
         i = 0;
         while (env_array[i])
         {
-            printf("to wrirte to %d \n",(fda != 1) ? fda : fd);
-            ft_printf((fda != 1) ? fda : fd, "declare -x %s\n", env_array[i]);
+            if (env_array[i][0] == '#') 
+            {
+                i++;
+                continue;
+            }
+            if(fda == 1)
+                ft_printf(fd, "declare -x %s\n", env_array[i]);
+            else
+                ft_printf(fda, "declare -x %s\n", env_array[i]);
             free(env_array[i]);
             i++;
         }

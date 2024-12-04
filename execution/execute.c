@@ -10,20 +10,7 @@ void printenv(char **s)
 	}
 }
 
-// char *find_env_variable2 (t_env *env, char *varname)
-// {
-//     while (env)
-//     {
-//         if (ft_strcmp(env->variable, varname) == 0)
-//         {
-//             return env->value;
-//         }
-//         env = env->next;
-//     }
-//     return (NULL);
-// }
-
-int execute_builtins(t_execution *exec  ,t_env **env, char **envs)
+int execute_builtins(t_execution *exec  ,t_env **env, char **envs, int *flag)
 {
     (void) envs;
 	int ret = 0;
@@ -31,7 +18,7 @@ int execute_builtins(t_execution *exec  ,t_env **env, char **envs)
      if(!*(exec->cmd))
             return (0);
 	if (strncmp(exec->cmd[0], "echo", 5) == 0)
-		ret = my_echo(exec->fd_out, exec->fd_append,  exec->cmd_len, exec->cmd);
+		ret = my_echo(exec->fd_out, exec->fd_append,  exec->cmd_len, exec->cmd, flag);
 	if (strncmp (exec->cmd[0], "cd", 3) == 0)
 		ret = my_cd(exec , *env);
 	if (strncmp(exec->cmd[0], "pwd", 4) == 0)
@@ -88,11 +75,14 @@ char *find_path(char *cmd, char **env)
         return NULL;
     if ((ft_strchr(cmd , '/') || ft_strchr(cmd , '.')))
     {
-        if (!access(cmd , F_OK | X_OK))
+        if (!access(cmd , F_OK ))
             return cmd;
         else
             return NULL;
     }
+
+
+
     int j = 0;
     while (env && env[j])
     {
@@ -116,7 +106,7 @@ char *find_path(char *cmd, char **env)
     }
     if (!paths)
     {
-        free(paths);
+        ft_free11(paths);
         return NULL;
     }
     int i = 0;
@@ -125,7 +115,11 @@ char *find_path(char *cmd, char **env)
         full_path = ft_strjoin(paths[i], "/");
         full_command = ft_strjoin(full_path, cmd);
         if (access(full_command, F_OK | X_OK) == 0)
+        {   
+            free(full_path);
             return (ft_free11(paths) ,full_command);
+        }
+        free(full_path);
         free(full_command);
         i++;    
 	}
@@ -234,7 +228,9 @@ void ft_combine_free(void *s ,t_execution **exec, t_token **final)
 {
     free(s);
     if(final)
+    {
         return(free_stack(final), final = NULL , (void)0);
+    }
     if(exec)
         return(free_stack(final), final = NULL , (void)0);
 }
@@ -269,10 +265,11 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
         return;
     while (curr && i < pipe_count)
     {
+        wait(NULL);
         if (i < pipe_count - 1)
             pipe(curr_pipe);
-        if (pipe_count == 1 && !curr->next && check_builtins(curr))
-            return (exit_status = execute_builtins(curr, env1, env), free(pids), env = env_to_arr2(*env1), (void)0);
+        if (pipe_count == 1 && check_builtins(curr))
+            return (exit_status = execute_builtins(curr, env1, env, &flag), free(pids), env = env_to_arr2(*env1), (void)0);
         pids[i] = fork();
         signal(SIGQUIT , sig_handler1);
         signal(SIGINT, sigfork);
@@ -298,7 +295,12 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
             env = env_to_arr2(*env1);
             if (pipe_count > 1 && check_builtins(curr))
             {
-                exit_status = execute_builtins(curr, env1, env);
+                if (flag == 1)
+                {
+                    dup2 (STDOUT_FILENO, curr->fd_out);
+                    close(STDOUT_FILENO);
+                }
+                exit_status = execute_builtins(curr, env1, env, &flag);
                 return (ft_combine_free(pids, NULL , NULL), exit (0), (void)0);
             }
             else
@@ -313,11 +315,16 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
                     }
                  struct stat data;
                  if (stat(fullcmd, &data) == 0 && S_ISDIR(data.st_mode))
+                 {
+                    free(fullcmd);
                     return (printf("%s is directory\n", fullcmd), exit(126) , (void)0);
+                 }
                 }
                 if (execve(fullcmd, curr->cmd, env) == -1)
-                    return (ft_combine_free(pids, NULL , NULL) ,perror("minishell") ,free(fullcmd) ,exit(1) ,(void)0);
-                free(fullcmd);
+                {
+                    // printf("here3\n");
+                    return (ft_combine_free(pids, NULL , NULL) ,perror("minishell")  ,exit(1) ,(void)0);
+                }
             }
         }
         else
@@ -333,12 +340,13 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
         curr = curr->next;
         i++;
     }
+
     tmp = exit_status;
     i = -1;
     printf("exit_status %d\n", tmp);
     while (++i < pipe_count)
         waitpid(pids[i], &exit_status, 0);
-    if(WEXITSTATUS (exit_status))
-        WIFEXITED(exit_status);
+    if(WIFEXITED (exit_status))
+        exit_status = WEXITSTATUS(exit_status);
     ft_combine_free(pids, NULL, NULL);
 }

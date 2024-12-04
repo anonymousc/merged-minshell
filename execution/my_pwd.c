@@ -9,9 +9,16 @@ int	my_pwd(int fd, int fda, t_env *env)
 		return 1;
 	if (!getcwd(s, PATH_MAX))
 	{
-        ft_printf((fda != 1) ? fda : fd, "%s\n", find_env_variable2(env , "PWD"));
+		if(fda == 1)
+        	ft_printf(fd, "%s\n", find_env_variable2(env , "#PWD"));
+		else
+        	ft_printf(fda, "%s\n", find_env_variable2(env , "#PWD"));
 		free(s);
 		return 1;
 	}
-    return (ft_printf((fda != 1) ? fda : fd, "%s\n", getcwd(s, PATH_MAX)) ,free(s) ,0);
+	if(fda == 1)
+        ft_printf(fd, "%s\n", find_env_variable2(env , "#PWD"));
+	else
+        ft_printf(fda, "%s\n", find_env_variable2(env , "#PWD"));
+    return (getcwd(s, PATH_MAX) ,free(s) ,0);
 }

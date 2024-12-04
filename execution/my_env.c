@@ -31,9 +31,24 @@ t_env *make_env(char **env_original)
 int my_env(int fd, int fda, t_env **env)
 {
     t_env *curr = *env;
+    // my_unset(NULL, env);
+    int i = 1;
+    if(i > 1)
+    {
+        i--;
+        my_env(1 , 2 , env);
+    }
     while (curr)
     {
-        ft_printf((fda != 1) ? fda : fd, "%s=%s\n", curr->variable, curr->value);
+        if (curr->value[0] == '\0' || curr->variable[0] == '#') 
+        {
+            curr = curr->next;
+            continue;
+        }
+        if(fda == 1)
+            ft_printf(fd, "%s=%s\n", curr->variable, curr->value);
+        else
+            ft_printf(fda, "%s=%s\n", curr->variable, curr->value);
         curr = curr->next;
     }
     return 0;

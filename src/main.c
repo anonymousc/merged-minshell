@@ -127,15 +127,12 @@ void extra_sanitize(t_token **head)
     }
 }
 
-int parsing(t_token **final ,t_env **env, char **envp,t_execution **data)
+int parsing(t_token **final ,t_env **env ,t_execution **data)
 {
-	(void)env;
 	char *readline;
 	char **line;
 
 	line = NULL;
-	if (!*env)
-		*env = make_env(envp);
 	readline = retline();
 	if(!readline)
 		return 1;
@@ -144,14 +141,12 @@ int parsing(t_token **final ,t_env **env, char **envp,t_execution **data)
 	tokenization(line , final);
 	sanitizer(final);
 	expander_final(final , *env);
-	// here_doc(final, *env);
 	process_quotes(final);
 	if (check_syntax_extended(final))
 		return (ft_free11(line), exit_status = 2, 1);
 	free_spaces2(final);
-	// extra_sanitize(final);
-	print_tokens(*final);
 	for_execute(final , data , *env);
+	ft_free11(line);
 	return 0;
 }
 
@@ -172,8 +167,13 @@ int main (int ac, char **av, char **envp)
 	{
 		final = (t_token  **)malloc(sizeof(t_token  *));
 		data = (t_execution  **)malloc(sizeof(t_execution  *));
-		if(!data || parsing(final , &env, envp, data) || !final)
+		if (!env)
+			env = make_env(envp);
+		if(!data || parsing(final , &env, data) || !final)
+		{
 			continue;
+		}
+		my_export(NULL, &env, 0, 0);
 		execution( data, envp, env);
 		ft_combine_free(NULL, data, final);
 	}

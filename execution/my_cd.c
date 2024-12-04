@@ -27,6 +27,12 @@ void update_oldpwd(t_env *env, const char *old_pwd)
     update_env_value(env, "OLDPWD", old_pwd);
 }
 
+void _update_pwd(t_env *env)
+{
+    char *update = ft_strjoin2 (find_env_variable2(env, "#PWD"), "/..");
+    update_env_value(env, "#PWD", update);
+}
+
 void update_pwd(t_env *env)
 {
     char cwd[4096];
@@ -76,11 +82,13 @@ int my_cd(t_execution *exec , t_env *env)
 
     if (!exec->cmd[1])
     {
-        chdir(find_env_variable2(env, "HOME"));
+        if (chdir(find_env_variable2(env, "HOME")) != 0)
+            perror("cd");
+        update_oldpwd (env, find_env_variable2(env, "PWD"));
+        update_pwd(env);
         return 1;
     }
 
-    // int i = check_path(exec->av[1]);
 
     if (getcwd(old_pwd, sizeof(old_pwd)) == NULL)
     {
