@@ -48,13 +48,8 @@ typedef	struct	s_Tokenization
 typedef struct s_execution
 {
 	char 				**cmd;
-	int 				fflag;
+	int					*fds;
 	int					cmd_len;
-	int 				dflag;
-	int					fd_in;
-	int					fd_out;
-	int					fd_append;
-	int					fd_heredoc;
 	struct s_execution	*next;
 }					t_execution;
 

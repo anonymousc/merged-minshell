@@ -1,12 +1,12 @@
 a
 builtins
 Dockerfile
+env
 execution
 file
 includes
 Makefile
 minishell
 New Document.tldr
-out
 readline.supp
 src

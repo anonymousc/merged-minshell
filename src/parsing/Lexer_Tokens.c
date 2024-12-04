@@ -136,7 +136,7 @@ void	ft_lstadd_back_exec(t_execution  **stacks, t_execution  *new)
 	new->next = NULL;
 }
 
-t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int fd_out ,int fd_append , int fd_heredoc, int flag, int dflag, int cmdlen)
+t_execution  *ft_lstnew_exec(int *fds, char **cmd, int cmdlen)
 {
 	t_execution   *list;
 
@@ -144,13 +144,8 @@ t_execution  *ft_lstnew_exec(char **cmd, int fd_in , int fd_out ,int fd_append ,
 	if (!list)
 		return (NULL);
 	list->cmd = cmd;
+	list->fds = fds;
 	list->cmd_len = cmdlen;
-	list->fd_in = fd_in;
-	list->fd_out = fd_out;
-	list->fd_append = fd_append;
-	list->fd_heredoc = fd_heredoc;
-	list->fflag = flag;
-	list->dflag = dflag;
 	list->next = NULL;
 	return (list);
 }
@@ -322,7 +317,25 @@ static char **init_cmd_array(int word_count)
     return cmd;
 }
 
-/* Handle input redirection */
+int *init_fds(int *array)
+{
+    int i;
+
+    i = 0;
+    array = malloc(sizeof(int) * 7);
+    if(!array)
+        return NULL;
+    while (i < 7)
+    {
+        if(i == 0 || i == 2)
+            array[i] = 1;
+        else
+            array[i] = 0;
+        i++;
+    }
+    return array;
+}
+
 static int handle_input_redirection(t_token **curr, int *fd_out, int *fd_append)
 {
     int fd_in = 0;
@@ -342,7 +355,6 @@ static int handle_input_redirection(t_token **curr, int *fd_out, int *fd_append)
     return fd_in;
 }
 
-/* Handle output redirection */
 static int handle_output_redirection(t_token **curr, int *fflag, int *dflag)
 {
     struct stat dstat;
@@ -350,22 +362,14 @@ static int handle_output_redirection(t_token **curr, int *fflag, int *dflag)
 
     if ((*curr)->next && (*curr)->next->data)
     {
-        // Check if it's a directory
         if (stat((*curr)->next->data, &dstat) > -1)
-        {
             if (S_ISDIR(dstat.st_mode))
                 *dflag = 1;
-        }
-
         if (*(*curr)->next->data)
         {
-            fd_out = open((*curr)->next->data, 
-                          O_CREAT | O_RDWR | O_TRUNC, 0666);
-            
+            fd_out = open((*curr)->next->data, O_CREAT | O_RDWR | O_TRUNC, 0666);
             if (access((*curr)->next->data, R_OK | W_OK) == -1)
                 *fflag = 1;
-
-            // Special case for /dev/stdout
             if (!ft_strncmp((*curr)->next->data, "/dev/stdout",  ft_strlen("/dev/stdout")) && !(*curr)->next->next)
                 fd_out--;
         }
@@ -374,17 +378,19 @@ static int handle_output_redirection(t_token **curr, int *fflag, int *dflag)
     return fd_out;
 }
 
-/* Process tokens and create execution data */
 static t_execution *process_command_tokens(t_token **curr, t_env *env)
 {
     int word_count = count_words1(*curr);
     if (word_count == 0)
         return NULL;
-    char **cmd = init_cmd_array(word_count);
-    int i = 0, fd_in = 0, fd_out = 1, fd_append = 1;
-    int fd_heredoc = 0, fflag = 0, dflag = 0;
-    int cmdlen = word_count;
+    char **cmd;
+    int *fds;
+    int i;
+    int cmdlen;
 
+    fds = NULL;
+    cmd = init_cmd_array(word_count);
+    (void)(i = 0 ,cmdlen = word_count, fds = init_fds(fds));
     while (*curr && (*curr)->value != PIPE)
     {
         if (!(*curr)->data)
@@ -393,15 +399,14 @@ static t_execution *process_command_tokens(t_token **curr, t_env *env)
             continue;
         }
         if ((*curr)->value == REDIRECTION_IN)
-            fd_in = handle_input_redirection(curr, &fd_out, &fd_append);
-        else if ((*curr)->value == REDIRECTION_OUT && !dflag)
-            fd_out = handle_output_redirection(curr, &fflag, &dflag);
+            fds[1] = handle_input_redirection(curr, &fds[0], &fds[2]);
+        else if ((*curr)->value == REDIRECTION_OUT && !fds[5])
+            fds[0] = handle_output_redirection(curr, &fds[4], &fds[5]);
         else if ((*curr)->value == HEREDOC)
         {
             if ((*curr)->next && (*curr)->next->data)
             {
-                fd_heredoc = here_doc(curr, env);
-                printf("herdoc = %d\n", fd_heredoc);
+                fds[3] = here_doc(curr, env);
                 *curr = (*curr)->next;
             }
         }
@@ -409,18 +414,17 @@ static t_execution *process_command_tokens(t_token **curr, t_env *env)
         {
             if ((*curr)->next && (*curr)->next->data)
             {
-                fd_append = open((*curr)->next->data, O_CREAT | O_RDWR | O_APPEND, 0666);
+                fds[2] = open((*curr)->next->data, O_CREAT | O_RDWR | O_APPEND, 0666);
                 if (access((*curr)->next->data, R_OK | W_OK) == -1)
-                    fflag = 1;
+                    fds[4] = 1;
                 *curr = (*curr)->next;
             }
         }
         else if ((*curr)->value == WORD && i < word_count)
             cmd[i++] = ft_strdup((*curr)->data);
-
         *curr = (*curr)->next;
     }
-    return ft_lstnew_exec(cmd, fd_in, fd_out, fd_append, fd_heredoc, fflag, dflag, cmdlen);
+    return ft_lstnew_exec(fds, cmd, cmdlen);
 }
 
 /* Main execution parsing function */
@@ -440,8 +444,6 @@ void for_execute(t_token **final, t_execution **data, t_env *env)
             else
                 ft_lstadd_back_exec(data, new_cmd);
         }
-
-        // Move to next pipe if exists
         if (curr && curr->value == PIPE)
             curr = curr->next;
     }
