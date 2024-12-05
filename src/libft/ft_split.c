@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aessadik <aessadik@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 03:44:27 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/08/21 16:26:32 by aessadik         ###   ########.fr       */
+/*   Updated: 2024/10/16 23:31:46 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-size_t	word_count(char const *s)
+size_t	word_count(char const *s, char c)
 {
 	size_t		counter;
 	int			in_word;
@@ -25,7 +25,7 @@ size_t	word_count(char const *s)
 	p = s;
 	while (*p)
 	{
-		if (is_space(*p))
+		if (*p == c)
 			in_word = 0;
 		else if (in_word == 0)
 		{
@@ -49,7 +49,7 @@ char **fri_ol(char **str)
 	return (NULL);
 }
 
-static char	**str_all_fill(char **str, char const *s)
+static char	**str_all_fill(char **str, char const *s, char c)
 {
 	const char	*start;
 	int			i;
@@ -58,10 +58,10 @@ static char	**str_all_fill(char **str, char const *s)
 	i = 0;
 	while (*s)
 	{
-		if (!is_space(*s))
+		if (*s != c)
 		{
 			start = s;
-			while (*s && !is_space(*s))
+			while (*s && *s != c)
 				s++;
 			len = s - start;
 			str[i] = (char *)malloc((len + 1) * sizeof(char));
@@ -78,14 +78,14 @@ static char	**str_all_fill(char **str, char const *s)
 	return (str);
 }
 
-char	**ft_split(char const *s)
+char	**ft_split(char const *s, char c)
 {
 	char		**str;
 
 	if (!s)
 		return (0);
-	str = malloc((word_count(s) + 1) * sizeof(char *));
+	str = malloc((word_count(s, c) + 1) * sizeof(char *));
 	if (!str)
 		return (NULL);
-	return (str_all_fill(str, s));
+	return (str_all_fill(str, s, c));
 }

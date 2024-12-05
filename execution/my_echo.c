@@ -1,10 +1,9 @@
-#include "builtins.h"
+#include "../includes/minishell.h"
 
-bool check_newline(int ac, char **av, int *start_i)
+bool check_newline( int ac, char **av, int *start_i)
 {
     bool new_line = true;
     *start_i = 1;
-
     while (*start_i < ac && av[*start_i][0] == '-') 
     {
         int i = 1;
@@ -19,30 +18,44 @@ bool check_newline(int ac, char **av, int *start_i)
         }
         (*start_i)++;
     }
-
     return new_line;
 }
 
-int my_echo (int ac, char **av)
+int my_echo (int fd , int fda, int ac, char **av)
 {
     int start_i;
     bool new_line;
-
-    new_line = check_newline(ac, av, &start_i);
-    while (start_i < ac)
+    if(!av[1])
     {
-        printf ("%s", av[start_i]);
+        if(fda == 1)
+            ft_printf(fd, "\n");
+        else
+            ft_printf(fda , "\n");
+        return false;
+    }
+    new_line = check_newline(ac, av, &start_i);
+    while (av[start_i] && start_i < ac)
+    {
+        if(fda == 1)
+            ft_printf (fd, "%s", av[start_i]);
+        else
+            ft_printf(fda , "%s", av[start_i]); 
         if (start_i < ac - 1)
-            printf(" ");
+        {
+            if(fda == 1)
+                ft_printf(fd, " ");
+            else
+                ft_printf(fda , " ");
+        }
         start_i++;
     }
 
     if (new_line)
-        printf ("\n");
+    {
+        if(fda == 1)
+                ft_printf(fd, "\n");
+        else
+                ft_printf(fda , "\n");
+    }
     return 0;
 }
-
-// int main (int ac , char **av)
-// {
-//     my_echo(ac, av);
-// }

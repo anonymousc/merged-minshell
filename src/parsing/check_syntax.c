@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_syntax.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aessadik <aessadik@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/27 14:14:18 by aessadik          #+#    #+#             */
-/*   Updated: 2024/09/04 11:14:35 by aessadik         ###   ########.fr       */
+/*   Updated: 2024/11/26 21:06:53 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,8 @@ char *check_syntax(char *s)
 
 t_token *free_spaces (t_token *curr)
 {
-
 	while (curr && curr->value == WHITESPACE)
-	{
 		curr = curr->next;
-	}
 	return curr;
 }
 
@@ -59,13 +56,13 @@ int check_pipe(t_token **final)
 	{
         if (curr->value == PIPE)
 		 {
-            if (!curr->next || curr->next->value == HEREDOC || curr->next->value == PIPE ||  curr->next->value == APPEND || curr->next->value == REDIRECTION_IN || curr->next->value == REDIRECTION_OUT) 
+            if (!curr->next || curr->next->value == PIPE)
 				return (free_stack(&curr) ,ft_printf(2, "syntax error\n"), 1);
 			curr = curr->next;
 			if(curr->value == WHITESPACE)
 			{
             	curr = free_spaces(curr);
-				if (!curr || curr->value == HEREDOC || curr->value == PIPE ||  curr->value == APPEND || curr->value == REDIRECTION_IN || curr->value == REDIRECTION_OUT) 
+				if (!curr || curr->value == PIPE) 
                 	return (free_stack(&curr) ,ft_printf(2, "syntax error\n"), 1);
 			}
 		}
@@ -105,7 +102,7 @@ int check_redir(t_token **final)
 	{
 		if(curr->value == REDIRECTION_IN || curr->value == REDIRECTION_OUT)
 		{
-			if (!curr->next || curr->next->value == HEREDOC || curr->next->value == PIPE ||  curr->next->value == APPEND || curr->next->value == REDIRECTION_IN || curr->next->value == REDIRECTION_OUT) 
+			if (!curr->next || curr->next->value == HEREDOC || curr->next->value == PIPE ||  curr->next->value == APPEND || curr->next->value == REDIRECTION_OUT || curr->next->value == REDIRECTION_IN) 
 				return (free_stack(&curr) ,ft_printf(2, "syntax error\n"), 1);
 			curr = curr->next;
 			if(curr->value == WHITESPACE)
