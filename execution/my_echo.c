@@ -21,32 +21,34 @@ bool check_newline( int ac, char **av, int *start_i)
     return new_line;
 }
 
-int my_echo (int fd , int fda, int ac, char **av, int *flag)
+int my_echo (int fd , int fda, int ac, char **av)
 {
-    
     int start_i;
     bool new_line;
-    (void)flag;
     if(!av[1])
     {
         if(fda == 1)
             ft_printf(fd, "\n");
-        else
+        if(fd == 1)
             ft_printf(fda , "\n");
         return false;
     }
     new_line = check_newline(ac, av, &start_i);
     while (av[start_i] && start_i < ac)
     {
-        if(fda == 1)
-            ft_printf (fd, "%s", av[start_i]);
-        else
+        // if(fda != 1)
             ft_printf (fda, "%s", av[start_i]);
+            ft_printf(2 , "fda = %d\n", fda);
+            ft_printf(2 , "fd = %d\n", fd);
+        // if(fd != 1)
+        //     ft_printf (fd, "%s", av[start_i]);
+        // else
+        //     ft_printf(fd , "%s", av[start_i]);
         if (start_i < ac - 1)
         {
             if(fda == 1)
                 ft_printf(fd, " ");
-            else
+            if(fd == 1)
                 ft_printf(fda , " ");
         }
         start_i++;
@@ -54,9 +56,9 @@ int my_echo (int fd , int fda, int ac, char **av, int *flag)
 
     if (new_line)
     {
-         if(fda == 1)
-                ft_printf(fd, "\n");
-            else
+         if(fda != 1)
+                ft_printf(fda, "\n");
+        if(fd == 1)
                 ft_printf(fda , "\n");
     }
     return 0;

@@ -59,10 +59,10 @@ int     my_unset(t_execution **exec, t_env **env);
 //cd
 int     my_cd(t_execution *exec , t_env *env);
 //echo
-int     my_echo (int fd, int fda, int ac, char **av, int *flag);
+int     my_echo (int fd, int fda, int ac, char **av);
 char 	*find_env_variable2 (t_env *env, char *varname);
 //execute builtins
-int     execute_builtins(t_execution *exec, t_env **env, char **envs , int *flag);
+int     execute_builtins(t_execution *exec, t_env **env, char **envs);
 int check_builtins(t_execution *exec);
 void    execute_bins(t_execution **exec, char **env, t_env **env1);
 

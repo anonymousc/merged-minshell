@@ -27,12 +27,6 @@ void update_oldpwd(t_env *env, const char *old_pwd)
     update_env_value(env, "OLDPWD", old_pwd);
 }
 
-void _update_pwd(t_env *env)
-{
-    char *update = ft_strjoin2 (find_env_variable2(env, "#PWD"), "/..");
-    update_env_value(env, "#PWD", update);
-}
-
 void update_pwd(t_env *env)
 {
     char cwd[4096];
@@ -42,7 +36,6 @@ void update_pwd(t_env *env)
     else
         perror("getcwd error");
 }
-
 int check_path (char *path)
 {
     struct stat path_stat;
@@ -63,6 +56,7 @@ int check_path (char *path)
     }
     return 0;
 }
+
 char *find_env_variable2 (t_env *env, char *varname)
 {
     while (env)
@@ -83,7 +77,7 @@ int my_cd(t_execution *exec , t_env *env)
     if (!exec->cmd[1])
     {
         if (chdir(find_env_variable2(env, "HOME")) != 0)
-            perror("cd");
+            perror("cd : HOME not set");
         update_oldpwd (env, find_env_variable2(env, "PWD"));
         update_pwd(env);
         return 1;
@@ -92,7 +86,7 @@ int my_cd(t_execution *exec , t_env *env)
 
     if (getcwd(old_pwd, sizeof(old_pwd)) == NULL)
     {
-        perror("getcwd error");
+        perror("getcwd");
         return 1;
     }
 

@@ -10,7 +10,7 @@ void printenv(char **s)
 	}
 }
 
-int execute_builtins(t_execution *exec  ,t_env **env, char **envs, int *flag)
+int execute_builtins(t_execution *exec  ,t_env **env, char **envs)
 {
     (void) envs;
 	int ret = 0;
@@ -18,7 +18,7 @@ int execute_builtins(t_execution *exec  ,t_env **env, char **envs, int *flag)
      if(!*(exec->cmd))
             return (0);
 	if (strncmp(exec->cmd[0], "echo", 5) == 0)
-		ret = my_echo(exec->fds[0], exec->fds[2],  exec->cmd_len, exec->cmd, flag);
+		ret = my_echo(exec->fds[0], exec->fds[2],  exec->cmd_len, exec->cmd);
 	if (strncmp (exec->cmd[0], "cd", 3) == 0)
 		ret = my_cd(exec , *env);
 	if (strncmp(exec->cmd[0], "pwd", 4) == 0)
@@ -80,8 +80,6 @@ char *find_path(char *cmd, char **env)
         else
             return NULL;
     }
-
-
 
     int j = 0;
     while (env && env[j])
@@ -148,7 +146,7 @@ int handle_output_redirection(t_execution **exec, int *flag)
     if ((*exec)->fds[0] != 1)
     {
         if ((*exec)->fds[4] == -1)
-            return (printf("permission denied1\n"), -1);
+            return (printf("permission denied\n"), -1);
         *flag = 1;
         dup2((*exec)->fds[0], STDOUT_FILENO);
         if ((*exec)->fds[0] != STDOUT_FILENO)
@@ -157,12 +155,13 @@ int handle_output_redirection(t_execution **exec, int *flag)
     return 0;
 }
 
-int handle_append_redirection(t_execution **exec)
+int handle_append_redirection(t_execution **exec , int *flag)
 {
     if ((*exec)->fds[2] != 1)
     {
         if ((*exec)->fds[4] == 1)
             return (printf("permission denied\n"), -1);
+        *flag = 1;
         dup2((*exec)->fds[2], STDOUT_FILENO);
         close((*exec)->fds[2]);
     }
@@ -204,7 +203,7 @@ int redirect_io(t_execution **exec, int *flag)
         return (printf("no such a file or directory\n"), -1);
     if (handle_output_redirection(exec, flag) == -1)
         return -1;
-    if (handle_append_redirection(exec) == -1)
+    if (handle_append_redirection(exec , flag) == -1)
         return -1;
     if (handle_input_redirection(exec) == -1)
         return -1;
@@ -258,7 +257,7 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
     int prev_pipe[2] = {0, 1};
     int curr_pipe[2];
     int flag = 0;
-    int tmp;
+    int tmp = 0;
     pipe_count = ft_pip_count(curr);
     pids = malloc(sizeof(pid_t) * pipe_count);
     if (!pids)
@@ -269,7 +268,7 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
         if (i < pipe_count - 1)
             pipe(curr_pipe);
         if (pipe_count == 1 && check_builtins(curr))
-            return (exit_status = execute_builtins(curr, env1, env, &flag), free(pids), env = env_to_arr2(*env1), (void)0);
+            return (exit_status = execute_builtins(curr, env1, env), free(pids), env = env_to_arr2(*env1), (void)0);
         pids[i] = fork();
         signal(SIGQUIT , sig_handler1);
         signal(SIGINT, sigfork);
@@ -300,28 +299,25 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
                     dup2 (STDOUT_FILENO, curr->fds[0]);
                     close(STDOUT_FILENO);
                 }
-                exit_status = execute_builtins(curr, env1, env, &flag);
+                exit_status = execute_builtins(curr, env1, env);
                 return (ft_combine_free(pids, NULL , NULL), exit (0), (void)0);
             }
             else
             {
+                fullcmd = find_path(curr->cmd[0], env);
                 if((curr->cmd[0][0]) != '\0')
                 {
-                    fullcmd = find_path(curr->cmd[0], env);
-                    if (!fullcmd)
-                    {
-                        fprintf(stderr, "Command not found: %s\n", curr->cmd[0]);
-                        return (free(pids) ,ft_combine_free(fullcmd , NULL , NULL) ,exit(127) ,(void)0);
-                    }
-                 struct stat data;
-                 if (stat(fullcmd, &data) == 0 && S_ISDIR(data.st_mode))
-                 {
-                    free(fullcmd);
-                    return (printf("%s is directory\n", fullcmd), exit(126) , (void)0);
-                 }
+                    struct stat data;
+                    if (stat(fullcmd, &data) == 0 && S_ISDIR(data.st_mode))
+                        return (printf("%s is directory\n", fullcmd) ,exit(126) , (void)0);
+                if (!fullcmd)
+                {
+                    fprintf(stderr, "Command not found: %s\n", curr->cmd[0]);
+                    return (free(pids) ,ft_combine_free(fullcmd , NULL , NULL) ,exit(127) ,(void)0);
+                }
                 }
                 if (execve(fullcmd, curr->cmd, env) == -1)
-                    return (ft_combine_free(pids, NULL , NULL) ,perror("minishell")  ,exit(1) ,(void)0);
+                    return (ft_combine_free(pids, NULL , NULL) ,perror("minishell")  ,exit(126) ,(void)0);
             }
         }
         else
@@ -338,12 +334,11 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
         i++;
     }
 
-    tmp = exit_status;
     i = -1;
-    printf("exit_status %d\n", tmp);
     while (++i < pipe_count)
         waitpid(pids[i], &exit_status, 0);
     if(WIFEXITED(exit_status))
-        exit_status = WEXITSTATUS(exit_status);
+        exit_status = (char)WEXITSTATUS(exit_status);
+    tmp = exit_status;
     ft_combine_free(pids, NULL, NULL);
 }

@@ -173,6 +173,7 @@ int main (int ac, char **av, char **envp)
 		{
 			continue;
 		}
+		// print_tokens(*final);
 		my_export(NULL, &env, 0, 0);
 		execution( data, envp, &env);
 		ft_combine_free(NULL, data, final);

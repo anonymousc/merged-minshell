@@ -25,23 +25,12 @@ t_env *make_env(char **env_original)
         add_back(&envir, new);
         i++;
     }
-    printf("exited -------------\n");
-    for (t_env *tmp = envir; tmp ; tmp=tmp->next)
-        printf("%s = [%s]\n", tmp->variable, tmp->value);
-    printf("exited-------------\n");
     return envir;
 }
 
 int my_env(int fd, int fda, t_env **env)
 {
     t_env *curr = *env;
-    // my_unset(NULL, env);
-    int i = 1;
-    if(i > 1)
-    {
-        i--;
-        my_env(1 , 2 , env);
-    }
     while (curr)
     {
         if (curr->value[0] == '\0' || curr->variable[0] == '#') 
