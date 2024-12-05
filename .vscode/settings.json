@@ -1,6 +1,4 @@
 {
-  "makefile.configurationCachePath": "cache",
-  "C_Cpp.intelliSenseCachePath": "%LocalAppData%/Microsoft/vscode-cpptools",
   "C_Cpp_Runner.cCompilerPath": "gcc",
   "C_Cpp_Runner.cppCompilerPath": "g++",
   "C_Cpp_Runner.debuggerPath": "gdb",
