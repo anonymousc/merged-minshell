@@ -81,6 +81,15 @@ void delete_file(char *filename)
 	}
 	return (ft_strjoin2(expanded_word, expander(tmp, envp)));
 }
+void sig_heredoc(int test)
+{
+    (void)test;
+    printf("\n");
+    exit(130);
+}
+
+
+
 void here_doc_child(t_token *final , int *fd1 ,t_env *env)
 {
     t_token *curr = final;
@@ -93,12 +102,12 @@ void here_doc_child(t_token *final , int *fd1 ,t_env *env)
     if(check)
         delim = remove_quotes(delim);
     int pid = fork();
+    //signal(SIGINT, sig_heredoc);
     if (pid == 0)
     {
+        signal(SIGINT, sig_heredoc);
         while (1)   
         {
-            if(signal(SIGINT, SIG_DFL) == 0)
-                exit_status = 130;
             line = readline(">");
             if(!line)
             {
@@ -125,6 +134,10 @@ void here_doc_child(t_token *final , int *fd1 ,t_env *env)
         exit(0);
     }
     waitpid (pid, &exit_status, 0);
+    printf("%d\n", exit_status);
+    if (WIFEXITED(exit_status))
+        exit_status = WEXITSTATUS(exit_status);
+    printf("%d\n", exit_status);
     close(fd);
     fd = open(filename, O_RDONLY);
     delete_file(filename);

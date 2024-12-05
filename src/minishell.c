@@ -18,7 +18,7 @@ char  *retline()
 		
 		signal(SIGINT , sig_handler);
 		signal(SIGQUIT, SIG_IGN);
-		line = readline("\e[32mminishell$ \e[0m");
+		line = readline("minishell$ ");
 		signal(SIGINT , sig_handler);
 		add_history(line);
 		if(!line)

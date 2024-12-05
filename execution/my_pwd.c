@@ -17,8 +17,9 @@ int	my_pwd(int fd, int fda, t_env *env)
 		return 1;
 	}
 	if(fda == 1)
-        ft_printf(fd, "%s\n", find_env_variable2(env , "#PWD"));
+        ft_printf(fd, "%s\n", getcwd(s, PATH_MAX));
 	else
-        ft_printf(fda, "%s\n", find_env_variable2(env , "#PWD"));
-    return (getcwd(s, PATH_MAX) ,free(s) ,0);
+        ft_printf(fda, "%s\n", getcwd(s, PATH_MAX));
+	free(s);
+	return 0;
 }
