@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signal.c                                           :+:      :+:    :+:   */
+/*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/11 00:07:35 by aessadik          #+#    #+#             */
-/*   Updated: 2024/10/01 04:25:14 by kali             ###   ########.fr       */
+/*   Updated: 2024/11/28 20:59:44 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,14 @@ void sig_handler(int test)
 	rl_on_new_line ();
 	rl_replace_line ("", 0);
 	rl_redisplay();
+	exit_status = 130;
 	return ;
 }
 
 void sig_handler1(int test)
 {
 	(void)test;
-	// rl_replace_line ("", 0);
-	// rl_on_new_line ();
-	signal(SIGQUIT, SIG_IGN);
-	// rl_redisplay();
-	// return ;
+	exit_status = 131;
+	printf("\n");
+	return ;
 }

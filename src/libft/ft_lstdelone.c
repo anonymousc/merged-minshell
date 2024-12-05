@@ -21,16 +21,16 @@ void	free_stack(t_token **stack)
 	stack = NULL;
 }
 
-void	free_env(t_env **stack)
-{
-	t_env	*tmp;
+// void	free_env(t_env **stack)
+// {
+// 	t_env	*tmp;
 
-	tmp = *stack;
-	while (tmp)
-	{
-		*stack = (*stack)->next;
-		free(tmp);
-		tmp = *stack;
-	}
-	stack = NULL;
-}
+// 	tmp = *stack;
+// 	while (tmp)
+// 	{
+// 		*stack = (*stack)->next;
+// 		free(tmp);
+// 		tmp = *stack;
+// 	}
+// 	stack = NULL;
+// }

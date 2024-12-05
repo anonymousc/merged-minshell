@@ -1,4 +1,4 @@
-#include "builtins.h"
+#include "../includes/minishell.h"
 
 int is_alpha (int c)
 {
@@ -16,6 +16,110 @@ void swap(char **s1, char **s2)
     tmp = *s1;
     *s1 = *s2;
     *s2 = tmp;
+}
+
+
+int env_size(t_env *env)
+{
+    int count = 0;
+    while (env)
+    {
+        count++;
+        env = env->next;
+    }
+    return count;
+}
+
+char **env_to_arr2(t_env *env)
+{
+    int size = env_size(env);
+    char **envir = malloc(sizeof(char *) * (size + 1));
+    if (!envir)
+        return NULL;
+
+    int i = 0;
+    while (env)
+    {
+        int var_len = ft_strlen(env->variable);
+        int val_len = ft_strlen(env->value);
+        int len = var_len + val_len + 1 + 3 * (val_len != 0);
+
+        envir[i] = malloc(len);
+        int j = 0;
+        if (!envir[i])
+        {
+            while (j < i)
+            {
+                // free(envir[j]);
+                j++;
+            }
+            // free(envir);
+            return NULL;
+        }
+        j = 0;
+        int k = 0;
+        while (k < var_len)
+            envir[i][j++] = env->variable[k++];
+        if(val_len)
+        {
+            envir[i][j++] = '=';
+            // envir[i][j++] = '"';
+            k = 0;
+            while (k < val_len)
+                envir[i][j++] = env->value[k++];
+            // envir[i][j++] = '"';
+        }
+        envir[i][j] = '\0';
+        env = env->next;
+        i++;
+    }
+    envir[i] = NULL;
+
+    return envir;
+}
+
+char **env_to_arr(t_env *env)
+{
+    int size = env_size(env);
+    char **envir = malloc(sizeof(char *) * (size + 1));
+    if (!envir)
+        return NULL;
+
+    int i = 0;
+    while (env)
+    {
+        int var_len = ft_strlen(env->variable);
+        int val_len = ft_strlen(env->value);
+        int len = var_len + val_len + 2;
+
+        envir[i] = malloc(len);
+        int j = 0;
+        if (!envir[i])
+        {
+            while (j < i)
+            {
+                // free(envir[j]);
+                j++;
+            }
+            // free(envir);
+            return NULL;
+        }
+        j = 0;
+        int k = 0;
+        while (k < var_len)
+            envir[i][j++] = env->variable[k++];
+        envir[i][j++] = '=';
+        k = 0;
+        while (k < val_len)
+            envir[i][j++] = env->value[k++];
+        envir[i][j] = '\0';
+
+        env = env->next;
+        i++;
+    }
+    envir[i] = NULL;
+
+    return envir;
 }
 
 char **sort_strings(char **str, int len) 
@@ -42,7 +146,7 @@ t_env *find_env_variable (t_env *env, char *varname)
 {
     while (env)
     {
-        if (strcmp(env->variable, varname) == 0)
+        if (ft_strcmp(env->variable, varname) == 0)
         {
             return env;
         }
@@ -61,19 +165,20 @@ t_env *creat_env_var (char *varname, char *value)
     return new_var;
 }
 
-int is_valid_identifier (char *arg)
+int is_valid_identifier (int fd, char *arg)
 {
     int  i = 1;
+    fd = 2;
     if (!is_alpha(arg[0]) && arg[0] != '_')
     {
-        printf ("%s not a valid identifier\n", arg);
+        ft_printf (fd ,"%s not a valid identifier\n", arg);
         return -1;
     }
     while (arg[i] && (arg[i] != '+' && arg[i] != '='))
     {
         if (!is_alphanum(arg[i]) && arg[i] != '_')
         {
-            printf ("%s not a valid identifier\n", arg);
+            ft_printf (fd, "%s not a valid identifier\n", arg);
             return -1;
         }
         i++;
@@ -90,7 +195,7 @@ int update_existing_var(t_env *existing, char *value, int is_append)
         new_value = ft_strjoin(existing->value, value);
         if (!new_value)
             return 0; 
-        free(existing->value);
+        // free(existing->value);
         existing->value = new_value;
     }
     else
@@ -98,17 +203,16 @@ int update_existing_var(t_env *existing, char *value, int is_append)
         new_value = ft_strdup(value);
         if (!new_value)
             return 0;
-        free(existing->value);
+        // free(existing->value);
         existing->value = new_value;
     }
-    printf("Updated: %s=%s\n", existing->variable, existing->value);
     return 1;
 }
 
 
-int handle_existing_var(t_execution *exec, char *var_name, char *value, int is_append)
+int handle_existing_var(t_env *env, char *var_name, char *value, int is_append)
 {
-    t_env *existing = find_env_variable(exec->env, var_name);
+    t_env *existing = find_env_variable(env, var_name);
     t_env *new_var;
 
     if (existing)
@@ -125,13 +229,12 @@ int handle_existing_var(t_execution *exec, char *var_name, char *value, int is_a
         if (!new_var)
             return 0;
 
-        add_back(&(exec->env), new_var);
-        printf("Exported: %s=%s\n", var_name, value);
+        add_back(&(env), new_var);
     }
     return 1;
 }
 
-int export_with_value(t_execution *exec, char *arg, char *equal, char *plus)
+int export_with_value(t_env *env, char *arg, char *equal, char *plus)
 {
     int is_append = (plus && plus + 1 == equal);
     int name_len;
@@ -150,19 +253,17 @@ int export_with_value(t_execution *exec, char *arg, char *equal, char *plus)
 
     char *value = equal + 1;
 
-    if (!handle_existing_var(exec, var_name, value, is_append))
+    if (!handle_existing_var(env, var_name, value, is_append))
     {
         free(var_name);
         return 0;
     }
-
-    // free(var_name);
     return 1;
 }
 
-int export_without_value(t_execution *exec, char *arg)
+int export_without_value(t_env *env, char *arg)
 {
-    t_env *existing = find_env_variable(exec->env, arg);
+    t_env *existing = find_env_variable(env, arg);
     t_env *new_var;
 
     if (!existing)
@@ -171,7 +272,7 @@ int export_without_value(t_execution *exec, char *arg)
         if (!new_var)
             return 0;
 
-        add_back(&(exec->env), new_var);
+        add_back(&(env), new_var);
         printf("Exported: %s\n", arg);
     }
     else
@@ -180,55 +281,62 @@ int export_without_value(t_execution *exec, char *arg)
     return 1;
 }
 
-int process_export_arg(t_execution *exec, char *arg)
+int process_export_arg(t_env *env, char *arg)
 {
     char *equal = strchr(arg, '=');
     char *plus = strchr(arg, '+');
 
     if (!equal)
-    {
-        return export_without_value(exec, arg);
-    }
+        return export_without_value(env, arg);
     else
-    {
-        return export_with_value(exec, arg, equal, plus);
-    }
+        return export_with_value(env, arg, equal, plus);
 }
 
-int my_export(t_execution *exec)
+int my_export(t_execution *exec , t_env **env, int fd, int fda)
 {
     int i = 1;
-    while (exec->av[i])
+    char *secure_value = find_env_variable2(*env, "PWD");
+    char *secure_pwd = "#PWD=";
+    char *lekher = ft_strjoin2(secure_pwd, secure_value);
+    if(!exec)
     {
-        char *arg = exec->av[i];
+        process_export_arg(*env , lekher);
+        return 0;
+    }
+    if (!exec->cmd[1])
+    {
+        char **env_array = env_to_arr2(*env);
+        sort_strings(env_array, env_size(*env));
+        
+        i = 0;
+        while (env_array[i])
+        {
+            if (env_array[i][0] == '#') 
+            {
+                i++;
+                continue;
+            }
+            if(fda == 1)
+                ft_printf(fd, "declare -x %s\n", env_array[i]);
+            else
+                ft_printf(fda, "declare -x %s\n", env_array[i]);
+            free(env_array[i]);
+            i++;
+        }
+        free(env_array);
+        return 0;
+    }
+    while (exec->cmd[i])
+    {
+        char *arg = exec->cmd[i];
 
-        if (is_valid_identifier(arg) < 0)
+        if (is_valid_identifier(fd, arg) < 0)
             return 1;
 
-        if (!process_export_arg(exec, arg))
+        if (!process_export_arg(*env, arg))
             return 1;
 
         i++;
-		printf("data == %s\n", arg);
     }
     return 0;
 }
-
-// int main(int ac, char **av, char **env)
-// {
-//     t_execution *exec = malloc(sizeof(t_execution));
-//     exec->ac = ac;
-//     exec->av = av;
-//     exec->env_orginal = env;
-//     t_env * envir = make_env(exec);
-//     exec->env = envir;
-
-//     int result = my_export(exec);
-//     if (result != 0)
-//     {
-//         printf("Export failed\n");
-//         return 1;
-//     }
-//     my_env(exec->env);
-//     return 0;
-// }

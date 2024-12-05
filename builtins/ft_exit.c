@@ -6,21 +6,22 @@
 /*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 10:03:12 by aessadik          #+#    #+#             */
-/*   Updated: 2024/10/01 04:27:58 by kali             ###   ########.fr       */
+/*   Updated: 2024/11/25 23:17:22 by kali             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-void	ft_pwd(void)
+void my_exit(t_execution *list)
 {
-	char	*s;
-
-	s = malloc(sizeof(char) * (PATH_MAX + 1));
-	if (!s)
+	if((long long)ft_atoi(list->cmd[1]) < INT_MAX)
+	{
+		printf("exit\n");
+		exit(ft_atoi(list->cmd[1]));
+	}
+	if(list->cmd[2])
+	{
+		printf("too many arguements\n");
 		return ;
-	if (!getcwd(s, PATH_MAX))
-		return (perror(strerror(errno)), free(s));
-	printf("%s\n", getcwd(s, PATH_MAX));
-	free(s);
+	}
 }
