@@ -295,7 +295,9 @@ static t_execution *process_command_tokens(t_token **curr, t_env *env)
         {
             if ((*curr)->next && (*curr)->next->data)
             {
-                if(fds[0] != 1)
+                if(fds[0] != 1 || fds[2] == 1)
+                    fds[0] = open((*curr)->next->data, O_CREAT | O_RDWR | O_APPEND, 0666);
+                else
                     fds[2] = open((*curr)->next->data, O_CREAT | O_RDWR | O_APPEND, 0666);
                 if (access((*curr)->next->data, R_OK | W_OK) == -1)
                     fds[4] = 1;
