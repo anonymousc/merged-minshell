@@ -166,131 +166,13 @@ int count_cmds(t_token **data)
 }
 int cmd_len (char **cmd)
 {
-	int i = 0;
+	int i;
+
+    i = 0;
 	while (cmd[i])
 		i++;
-	return i;
+	return (i);
 }
-
-// void for_execute(t_token **final, t_execution **data, t_env *env)
-// {
-// 	struct stat dstat;
-//     t_token *curr = *final;
-// 	*data = NULL;
-//     while (curr)
-//     {
-//         int word_count = 0;
-//         t_token *temp = curr;
-//         while (temp && temp->value != PIPE)
-//         {
-//             if (temp->value == WORD)
-//                 word_count++;
-//             temp = temp->next;
-//         }
-//         if (word_count == 0)
-//         {
-//             curr = curr->next;
-//             continue;
-//         }
-//         char **cmd = (char **)malloc(sizeof(char *) * (word_count + 1));
-//        	int k = -1;
-// 	   	while(++k <= word_count)
-// 	   		cmd[k] = NULL;
-//         int i = 0;
-//         int fd_in = 0;
-// 		int fd_append = 1;
-// 		int fd_heredoc = 0;
-// 		int fd_out = 1;
-// 		int fflag = 0;
-// 		int dflag = 0;
-// 		int cmdlen = word_count;
-//         while (curr && curr->value != PIPE)
-//         {
-//             if (!curr->data)
-//             {
-//                 curr = curr->next;
-//                 continue;
-//             }
-//             if (curr->value == REDIRECTION_IN)
-//             {
-// 				if (curr->next->value == REDIRECTION_OUT && !fflag)
-// 				{
-// 					open(curr->next->next->data , O_CREAT | O_RDWR | O_TRUNC, 0666);
-// 					curr = curr->next->next;
-// 				}
-//                 if (curr->next && curr->next->data)
-//                 {
-//                     fd_in = open(curr->next->data, O_RDONLY, 0444);
-// 					if (fd_in == -1)
-// 					{
-// 						fd_out = -1;
-// 						fd_append = -1;
-// 					}
-// 					else if (!ft_strncmp(curr->next->data, "/dev/stdin" , ft_strlen("/dev/stdin")))
-// 						fd_in--;
-// 					curr = curr->next;
-//                 }
-//             }
-//             else if (curr->value == REDIRECTION_OUT && !dflag)
-//             {
-//                 if (curr->next && curr->next->data)
-//                 {
-// 					if (stat(curr->next->data , &dstat) > -1)
-// 					{
-// 						if (S_ISDIR(dstat.st_mode))
-// 						{
-// 							dflag = 1;
-// 						}
-// 					}
-// 					if(*(curr->next->data))
-// 					{
-// 						if(fd_out != -1)
-// 							fd_out = open(curr->next->data, O_CREAT | O_RDWR | O_TRUNC, 0666);
-// 						if(access(curr->next->data , R_OK | W_OK) == -1)
-// 							fflag = 1;
-// 						if (!ft_strncmp(curr->next->data, "/dev/stdout" , ft_strlen("/dev/stdout")) && !curr->next->next)
-// 							fd_out--;
-// 					}
-//                     curr = curr->next;
-//                 }
-//             }
-// 			else if(curr->value == HEREDOC)
-// 			{
-// 				if(curr->next && curr->next->data)
-// 				{
-// 					fd_heredoc = here_doc(&curr ,env);
-// 					curr = curr->next;
-// 				}
-// 			}
-// 			else if(curr->value == APPEND)
-// 			{
-// 				if (curr->next && curr->next->data)
-//                 {
-// 					fd_append = open(curr->next->data, O_CREAT | O_RDWR | O_APPEND, 0666);
-// 					if(access(curr->next->data , R_OK | W_OK) == -1)
-// 						fflag = 1;
-// 					curr = curr->next;
-// 				}
-// 			}
-//             else if (curr->value == WORD && i < word_count)
-//             {
-// 					cmd[i] = ft_strdup(curr->data);
-//                 	i++;
-//             }
-//             curr = curr->next;
-//         }
-//         t_execution *new_cmd = ft_lstnew_exec(cmd, fd_in, fd_out ,fd_append , fd_heredoc, fflag, dflag , cmdlen);
-// 		if (!*data)
-//             *data = new_cmd;
-//         else
-//             ft_lstadd_back_exec(data, new_cmd);
-//         if (curr && curr->value == PIPE)
-// 		{
-//             curr = curr->next;
-// 		}
-//     }
-// }
-
 
 static int count_words1(t_token *tokens)
 {
@@ -303,15 +185,16 @@ static int count_words1(t_token *tokens)
             word_count++;
         temp = temp->next;
     }
-    return word_count;
+    return (word_count);
 }
 
-/* Initialize command array with NULL pointers */
 static char **init_cmd_array(int word_count)
 {
-    char **cmd = (char **)malloc(sizeof(char *) * (word_count + 1));
-    int k = -1;
+    char **cmd;
+    int k;
 
+    cmd = (char **)malloc(sizeof(char *) * (word_count + 1));
+    k = -1;
     while (++k <= word_count)
         cmd[k] = NULL;
     return cmd;
@@ -338,8 +221,9 @@ int *init_fds(int *array)
 
 static int handle_input_redirection(t_token **curr, int *fd_out, int *fd_append)
 {
-    int fd_in = 0;
+    int fd_in;
 
+    fd_in = 0;
     if ((*curr)->next && (*curr)->next->data)
     {
         fd_in = open((*curr)->next->data, O_RDONLY, 0444);
@@ -405,16 +289,14 @@ static t_execution *process_command_tokens(t_token **curr, t_env *env)
         else if ((*curr)->value == HEREDOC)
         {
             if ((*curr)->next && (*curr)->next->data)
-            {
-                fds[3] = here_doc(curr, env);
-                *curr = (*curr)->next;
-            }
+                (void)(fds[3] = here_doc(curr, env), *curr = (*curr)->next);
         }
         else if ((*curr)->value == APPEND)
         {
             if ((*curr)->next && (*curr)->next->data)
             {
-                fds[2] = open((*curr)->next->data, O_CREAT | O_RDWR | O_APPEND, 0666);
+                if(fds[0] != 1)
+                    fds[2] = open((*curr)->next->data, O_CREAT | O_RDWR | O_APPEND, 0666);
                 if (access((*curr)->next->data, R_OK | W_OK) == -1)
                     fds[4] = 1;
                 *curr = (*curr)->next;
@@ -427,7 +309,6 @@ static t_execution *process_command_tokens(t_token **curr, t_env *env)
     return ft_lstnew_exec(fds, cmd, cmdlen);
 }
 
-/* Main execution parsing function */
 void for_execute(t_token **final, t_execution **data, t_env *env)
 {
     t_token *curr = *final;
