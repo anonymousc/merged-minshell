@@ -24,7 +24,7 @@ void update_env_value(t_env *env, const char *variable_name, const char *new_val
 
 void update_oldpwd(t_env *env, const char *old_pwd)
 {
-    update_env_value(env, "OLDPWD", old_pwd);
+        update_env_value(env, "OLDPWD", old_pwd);
 }
 
 void update_pwd(t_env *env)
@@ -74,11 +74,11 @@ int my_cd(t_execution *exec , t_env *env)
 {
     char old_pwd[4096];
 
-    if (!exec->cmd[1])
+    if (!exec->cmd[1] || !(*exec->cmd[1]))
     {
         if (chdir(find_env_variable2(env, "HOME")) != 0)
-            perror("cd : HOME not set");
-        update_oldpwd (env, find_env_variable2(env, "PWD"));
+           perror("cd : HOME not set");
+        update_oldpwd (env, find_env_variable2(env, "#PWD"));
         update_pwd(env);
         return 1;
     }

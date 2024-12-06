@@ -264,7 +264,6 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
         return;
     while (curr && i < cmd_count)
     {
-        wait(NULL);
         if (i < cmd_count - 1)
             pipe(curr_pipe);
         if (cmd_count == 1 && check_builtins(curr))
@@ -274,7 +273,7 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
         signal(SIGINT, sigfork);
         if (pids[i] == 0)
         {
-            signal(SIGINT, SIG_DFL);
+            signal(SIGINT, sig_heredoc);
             signal(SIGQUIT , SIG_DFL);
             if (redirect_io(&curr, &flag) == -1)
                 return (free(pids) , exit(1) , (void)0);
@@ -341,12 +340,14 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
         curr = curr->next;
         i++;
     }
-
     i = -1;
+    int tmp1 = exit_status;
     while (++i < cmd_count)
-        waitpid(pids[i], &exit_status, 0);
+       waitpid(pids[i], &exit_status, 0);
     if(WIFEXITED(exit_status))
         exit_status = (char)WEXITSTATUS(exit_status);
     tmp = exit_status;
+    if(tmp1 == 130)
+        exit_status = tmp1;
     ft_combine_free(pids, NULL, NULL);
 }

@@ -290,6 +290,7 @@ static t_execution *process_command_tokens(t_token **curr, t_env *env)
         {
             if ((*curr)->next && (*curr)->next->data)
                 (void)(fds[3] = here_doc(curr, env), *curr = (*curr)->next);
+                
         }
         else if ((*curr)->value == APPEND)
         {

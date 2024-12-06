@@ -127,4 +127,6 @@ char	*before_dollar_word(char	*str);
 char	*ft_strjoin2(char *s, char *s1);
 void extra_sanitize(t_token **head);
 
+
+void sig_heredoc(int test);
 #endif
