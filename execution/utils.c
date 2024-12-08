@@ -112,24 +112,6 @@ char *ft_strndup(char *str, size_t n)
 	return res;
 }
 
-// char *ft_strdup (char *str)
-// {
-// 	char *res;
-// 	size_t len = ft_strlen(str);
-
-// 	res = malloc(len + 1);
-// 	if (!res)
-// 		return NULL;
-// 	int i = 0;
-// 	while (i < len)
-// 	{
-// 		res[i] = str[i];
-// 		i++;
-// 	}
-// 	res[i] = '\0';
-// 	return res;
-// }
-
 void add_back(t_env **envir, t_env *var)
 {
     t_env *last = get_last(*envir);

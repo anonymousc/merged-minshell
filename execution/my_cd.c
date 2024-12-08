@@ -16,10 +16,8 @@ void update_env_value(t_env *env, const char *variable_name, const char *new_val
     t_env *var = find_variable(env, variable_name);
 
     if (var)
-    {
-        free(var->value);
-        var->value = strdup(new_value);
-    }
+           var->value = strdup(new_value);
+    gc_add(0, var->value, NULL);
 }
 
 void update_oldpwd(t_env *env, const char *old_pwd)

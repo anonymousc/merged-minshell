@@ -111,8 +111,6 @@ char *skip_checker(char *s, int *len)
 char *isnt_asep(char **str , int *i, int *len, char *start)
 {
 	str[(*i)] = (char *)malloc(((*len) + 1) * sizeof(char));
-	if(!str[(*i)])
-		return (ft_free11(str), NULL);
 	ft_memcpy(str[(*i)], start, (*len));
 	str[(*i)][(*len)] = '\0';
 	return (str[(*i)]);
@@ -154,7 +152,5 @@ char	**split_to_lex(char *s)
 	if (!s)
 		return (NULL);
 	str = malloc((word_count_v2(s) + 1) * sizeof(char *));
-	if (!str)
-		return (NULL);
 	return (str_all_fill_v2(str,  s));
 }

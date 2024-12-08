@@ -94,7 +94,10 @@ char *find_path(char *cmd, char **env)
     if (!path_var)
         return NULL;
     if(ft_strchr(path_var , ':'))
+    {
         paths = ft_split(path_var, ':');
+        gc_add_double(MEMGRP_DEFAULT, (void **)paths, NULL);
+    }
     else
     {
         paths = (char **)malloc(16);
@@ -102,26 +105,17 @@ char *find_path(char *cmd, char **env)
         paths[1] = NULL;
 
     }
-    if (!paths)
-    {
-        ft_free11(paths);
-        return NULL;
-    }
     int i = 0;
     while (paths && paths[i])
     {
         full_path = ft_strjoin(paths[i], "/");
+        gc_add(0 , full_path, NULL);
         full_command = ft_strjoin(full_path, cmd);
+        gc_add(0 , full_command, NULL);
         if (access(full_command, F_OK | X_OK) == 0)
-        {   
-            free(full_path);
-            return (ft_free11(paths) ,full_command);
-        }
-        free(full_path);
-        free(full_command);
+            return (full_command);
         i++;    
 	}
-    ft_free11(paths);
     return NULL;
 }
 
@@ -260,14 +254,13 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
     int tmp = 0;
     cmd_count = ft_cmd_count(curr);
     pids = malloc(sizeof(pid_t) * cmd_count);
-    if (!pids)
-        return;
+    gc_add(0 , pids, NULL);
     while (curr && i < cmd_count)
     {
         if (i < cmd_count - 1)
             pipe(curr_pipe);
         if (cmd_count == 1 && check_builtins(curr))
-            return (exit_status = execute_builtins(curr, env1, env), free(pids), env = env_to_arr2(*env1), (void)0);
+            return (exit_status = execute_builtins(curr, env1, env), env = env_to_arr2(*env1) , gc_add(0 , env , NULL), (void)0);
         pids[i] = fork();
         signal(SIGQUIT , sig_handler1);
         signal(SIGINT, sigfork);
@@ -276,7 +269,7 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
             signal(SIGINT, sig_heredoc);
             signal(SIGQUIT , SIG_DFL);
             if (redirect_io(&curr, &flag) == -1)
-                return (free(pids) , exit(1) , (void)0);
+                return (exit_minishell(1) , (void)0);
             if (i > 0)
             {
                 dup2(prev_pipe[0], STDIN_FILENO);
@@ -289,8 +282,9 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
                 ft_close(&curr_pipe[0] , &curr_pipe[1]);
             }
             if (curr->cmd[0] == NULL)
-                return (ft_combine_free(pids , NULL, NULL) ,exit(1) ,(void)0);
+                return (exit_minishell(1) ,(void)0);
             env = env_to_arr2(*env1);
+            gc_add(0 , env, NULL);
             if (cmd_count > 1 && check_builtins(curr))
             {
                 if (flag == 1)
@@ -307,7 +301,7 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
                     }
                 }
                 exit_status = execute_builtins(curr, env1, env);
-                return (ft_combine_free(pids, NULL , NULL), exit (0), (void)0);
+                return (exit_minishell(0), (void)0);
             }
             else
             {
@@ -316,15 +310,15 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
                 {
                     struct stat data;
                     if (stat(fullcmd, &data) == 0 && S_ISDIR(data.st_mode))
-                        return (printf("%s is directory\n", fullcmd) ,exit(126) , (void)0);
-                if (!fullcmd)
-                {
-                    fprintf(stderr, "Command not found: %s\n", curr->cmd[0]);
-                    return (free(pids) ,ft_combine_free(fullcmd , NULL , NULL) ,exit(127) ,(void)0);
-                }
+                        return (printf("%s is directory\n", fullcmd) ,exit_minishell(126) , (void)0);
+                    if (!fullcmd)
+                    {
+                        fprintf(stderr, "Command not found: %s\n", curr->cmd[0]);
+                        exit_minishell(127);
+                    }
                 }
                 if (execve(fullcmd, curr->cmd, env) == -1)
-                    return (ft_combine_free(pids, NULL , NULL) ,perror("minishell")  ,exit(126) ,(void)0);
+                    return (perror("minishell")  ,exit_minishell(126) ,(void)0);
             }
         }
         else
@@ -349,5 +343,4 @@ void execute_bins(t_execution **exec, char **env, t_env **env1 )
     tmp = exit_status;
     if(tmp1 == 130)
         exit_status = tmp1;
-    ft_combine_free(pids, NULL, NULL);
 }

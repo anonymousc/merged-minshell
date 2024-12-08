@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: aessadik <aessadik@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 20:48:19 by kali              #+#    #+#             */
-/*   Updated: 2024/12/01 23:02:20 by kali             ###   ########.fr       */
+/*   Updated: 2024/12/08 00:58:11 by aessadik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,9 +95,14 @@ char *expander(char *expansion, t_env *envp)
 	if (tmp && *tmp == '?')
 	{
 		exit = ft_itoa(exit_status);
+		gc_add(0, exit , NULL);
 		before_dollar = before_dollar_word(tmp + 1);
+		gc_add(0 , before_dollar , NULL);
 		exit = ft_strjoin2(exit, before_dollar);
-		return(ft_strjoin2(exit, expander(tmp + ft_strlen(before_dollar) + 1, envp)));
+		gc_add(0, exit , NULL);
+		char *ref = ft_strjoin2(exit, expander(tmp + ft_strlen(before_dollar) + 1, envp));
+		gc_add(0 , ref, NULL);
+		return(ref);
 	}
 	if (*tmp)
 		tmp++;
@@ -105,17 +110,22 @@ char *expander(char *expansion, t_env *envp)
 		tmp++;
 	int l = tmp - expansion;
 	char *to_expand = malloc (l + 1);
+	gc_add(0 , to_expand, NULL);
 	strncpy(to_expand, expansion, l);
 	to_expand[l] = '\0';
 	expanded_word = find_env_variable2(envp , to_expand);
 	if (*tmp && *tmp != '$')
 	{
 		before_dollar = before_dollar_word(tmp);
+		gc_add(0 , before_dollar , NULL);
 		while (*tmp && *tmp != '$')
 			tmp++;
 		expanded_word = ft_strjoin2(expanded_word, before_dollar);
+		gc_add(0, expanded_word, NULL);
 	}
-	return (ft_strjoin2(expanded_word, expander(tmp, envp)));
+	char *ref2 = ft_strjoin2(expanded_word, expander(tmp, envp));
+	gc_add(0 , ref2 , NULL);
+	return (ref2);
 }
 
 t_token *make_token_list(char **split)
@@ -128,7 +138,9 @@ t_token *make_token_list(char **split)
 	while (split && split[i])
 	{
 		new_token = malloc (sizeof(t_token));
+		gc_add(0, new_token, NULL);
 		new_token->data = ft_strdup(split[i]);
+		gc_add(0, new_token->data, NULL);
 		new_token->value = WORD;
 		new_token->next = NULL;
 		if (!head)
@@ -151,6 +163,7 @@ t_token *make_token_list2(char **split)
 	{
 		new_token = malloc (sizeof(t_token));
 		new_token->data = ft_strdup(split[i]);
+		gc_add(0, new_token->data, NULL);
 		new_token->value = get_token(split[i]);
 		new_token->next = NULL;
 		if (!head)
@@ -165,6 +178,7 @@ t_token *make_token_list2(char **split)
 char **token_to_char(t_token *list)
 {
 	char **split = malloc(sizeof(char *) * (ft_lstsize(list) + 1));
+	// gc_add_double(0, (void **)split, NULL);
 	int i = 0;
 	while (list)
 	{
@@ -193,6 +207,7 @@ void expander_final(t_token **final ,t_env *env)
 			if (check_in_db_or_sq(curr->data) == 2)
 			{
 				curr->data = ft_strdup(curr->data);
+				gc_add(0 ,curr->data , NULL);
 				int i = 0;
 				while (curr->data[i])
 				{
@@ -200,16 +215,10 @@ void expander_final(t_token **final ,t_env *env)
 					{
 						tmp = expander(curr->data + i , env);
 						*(curr->data + i) = '\0';
-						if(tmp && *tmp == '\v')
-						{
-							i++;
-							continue;
-						}
 						if(tmp && *tmp)
 						{
-							tmp = ft_strjoin(curr->data ,tmp);
-							free(curr->data);
-							curr->data = tmp; 
+							curr->data = ft_strjoin(curr->data ,tmp);
+							gc_add(0, curr->data, NULL);
 						}
 						else
 							*(curr->data + i) = '\0';
@@ -220,21 +229,26 @@ void expander_final(t_token **final ,t_env *env)
 			if(!check_in_db_or_sq(curr->data))
 			{
 				curr->data = ft_strdup(curr->data);
+				gc_add(MEMGRP_DEFAULT, curr->data, NULL);
 				int i = 0;
 				while (curr->data[i])
 				{
 					if(curr->data[i] == '$')
 					{
 						tmp = expander(curr->data + i , env);
+						// gc_add(MEMGRP_DEFAULT, tmp, NULL);
 						*(curr->data + i) = '\0';
 						if(tmp && *tmp)
 						{
 							tmp = ft_strjoin(curr->data ,tmp);
+							gc_add(MEMGRP_DEFAULT, tmp, NULL);
 							if (ft_strchr(tmp, ' '))
 							{
 								
-								char **split = ft_split(tmp, ' ');
+								char **split = ft_split(tmp, ' ');// ToDo add white spaces
+								gc_add_double(0, (void **)split, NULL);
 								char **next = token_to_char(curr->next);
+								gc_add_double(0, (void **)next, NULL);
 								if (*final == curr)
 								{
 									*final = make_token_list(split);
@@ -255,6 +269,8 @@ void expander_final(t_token **final ,t_env *env)
 									while (copy)
 										copy = copy->next;
 									copy = make_token_list2(next);
+									gc_add(0 , copy , NULL);
+									gc_add(0 , copy2 , NULL);
 									last->next = copy;	
 								}
 							}

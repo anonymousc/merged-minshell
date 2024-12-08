@@ -10,19 +10,21 @@ t_env *make_env(char **env_original)
     while (env_original && env_original[i])
     {
         new = malloc(sizeof(t_env));
-        if (!new)
-            return NULL;
-        delimiter = strchr(env_original[i], '=');
+        gc_add(0 , new, NULL);
+        delimiter = ft_strchr(env_original[i], '=');
         if (!delimiter)
-            return (/*free_env(new),*/NULL);
-        new->variable = strndup(env_original[i], delimiter - env_original[i]);
+            return (NULL);
+        new->variable = ft_strndup(env_original[i], delimiter - env_original[i]);
+        gc_add(0, new->variable, NULL);
         if (!new->variable)
-            return (/*free_env(new),*/NULL);
-        new->value = strdup(delimiter + 1);
+            return (NULL);
+        char *tmp = ft_strdup(delimiter + 1);
+        new->value = tmp;
         if (!new->value)
-            return (/*free_env(new),*/NULL);
+            return (NULL);
         new->next = NULL;
         add_back(&envir, new);
+        gc_add(0, tmp, NULL);
         i++;
     }
     return envir;
@@ -45,17 +47,4 @@ int my_env(int fd, int fda, t_env **env)
         curr = curr->next;
     }
     return 0;
-}
-
-void free_env(t_env *env)
-{
-    t_env *temp;
-    while (env)
-    {
-        temp = env;
-        env = env->next;
-        free(temp->variable);
-        free(temp->value);
-        free(temp);
-    }
 }

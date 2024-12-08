@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strjoin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: aessadik <aessadik@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 22:10:55 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/10/02 20:19:33 by kali             ###   ########.fr       */
+/*   Updated: 2024/12/07 01:31:35 by aessadik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,5 @@ char	*ft_strjoin(char *s, char *s1)
 	if (s1)
 		while (s1[i])
 			*(p++) = s1[i++];
-	// free(s);
-	// free(s1);
 	return (str);
 }

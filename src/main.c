@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: aessadik <aessadik@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 12:03:40 by aessadik          #+#    #+#             */
-/*   Updated: 2024/12/01 22:27:23 by kali             ###   ########.fr       */
+/*   Updated: 2024/12/08 00:45:27 by aessadik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,11 +77,11 @@ void process_quotes(t_token **final)
         else if (curr->value == WORD) 
 		{
             processed = remove_quotes(curr->data);
+			gc_add(0, processed , NULL);
             curr->data = processed;
         }
         curr = curr->next;
     }
-	// free(processed);
 }
 
 void	free_stackhhh(t_execution **stack)
@@ -119,9 +119,8 @@ void extra_sanitize(t_token **head)
                 if (prev) 
                     prev->next = current;
             }
-
-            free(tmp);
-        } 
+			gc_add(0 , tmp , NULL);
+		} 
 		else 
             current = current->next;
     }
@@ -137,16 +136,15 @@ int parsing(t_token **final ,t_env **env ,t_execution **data)
 	if(!readline)
 		return 1;
 	line = split_to_lex(readline);
-	free(readline);
 	tokenization(line , final);
+	gc_add_double(0 , (void **)line, NULL);
 	sanitizer(final);
 	expander_final(final , *env);
 	process_quotes(final);
 	if (check_syntax_extended(final))
-		return (ft_free11(line), exit_status = 2, 1);
+		return (exit_status = 2, 1);
 	free_spaces2(final);
 	for_execute(final , data , *env);
-	ft_free11(line);
 	return 0;
 }
 
@@ -154,6 +152,13 @@ void execution(t_execution **data ,char **envp ,t_env **env)
 {
 	execute_bins(data, envp , env);
 }
+
+void exit_minishell(int exit_code)
+{
+	gc_free_all();
+	exit(exit_code);
+}
+
 int main (int ac, char **av, char **envp)
 {
 	(void)ac;
@@ -165,17 +170,16 @@ int main (int ac, char **av, char **envp)
 	env = NULL;
 	while(1)
 	{
-		final = (t_token  **)malloc(sizeof(t_token  *));
+		final = (t_token  **)malloc(sizeof(t_token *));
 		data = (t_execution  **)malloc(sizeof(t_execution  *));
+		gc_add(MEMGRP_DEFAULT , final , NULL);
+		gc_add(MEMGRP_DEFAULT, data, NULL);
 		if (!env)
 			env = make_env(envp);
 		if(!data || parsing(final , &env, data) || !final)
-		{
 			continue;
-		}
-		//print_tokens(*final);
 		my_export(NULL, &env, 0, 0);
 		execution( data, envp, &env);
-		ft_combine_free(NULL, data, final);
+		
 	}
 }

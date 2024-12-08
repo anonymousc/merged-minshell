@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: aessadik <aessadik@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/06 13:23:23 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/12/01 01:01:46 by kali             ###   ########.fr       */
+/*   Updated: 2024/12/07 21:52:00 by aessadik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,7 @@ char  *retline()
 		signal(SIGINT , sig_handler);
 		add_history(line);
 		if(!line)
-		{
-			return (free(line) ,printf("exit\n") ,exit(1) ,NULL);
-		}
+			return (printf("exit\n"),exit_minishell(1) ,NULL);
 		else if(line)
 		{
 			line = check_syntax(line);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Lexer_Tokens.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: aessadik <aessadik@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:11:54 by aessadik          #+#    #+#             */
-/*   Updated: 2024/12/01 23:03:00 by kali             ###   ########.fr       */
+/*   Updated: 2024/12/08 00:51:15 by aessadik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,6 @@ void free_spaces2(t_token **head)
                 if (prev) 
                     prev->next = current;
             }
-
             free(tmp);
         } 
 		else 
@@ -111,13 +110,13 @@ void sanitizer(t_token **fill_line)
 		{
 			tmp = data->next;
             (data)->data = ft_strjoin((data)->data, (data)->next->data);
+            gc_add(0 , data->data, NULL);
             (data)->next = (data)->next->next;
-            free(tmp);
+            // gc_add(0 , tmp, NULL);
         } 
 		else 
             data = (data)->next;
     }
-	fill_line = &data;
 }
 
 void	ft_lstadd_back_exec(t_execution  **stacks, t_execution  *new)
@@ -206,6 +205,7 @@ int *init_fds(int *array)
 
     i = 0;
     array = malloc(sizeof(int) * 7);
+    gc_add(0 , array, NULL);
     if(!array)
         return NULL;
     while (i < 7)
@@ -274,6 +274,7 @@ static t_execution *process_command_tokens(t_token **curr, t_env *env)
 
     fds = NULL;
     cmd = init_cmd_array(word_count);
+    gc_add_double(0 , (void **)cmd, NULL);
     (void)(i = 0 ,cmdlen = word_count, fds = init_fds(fds));
     while (*curr && (*curr)->value != PIPE)
     {
@@ -306,7 +307,11 @@ static t_execution *process_command_tokens(t_token **curr, t_env *env)
             }
         }
         else if ((*curr)->value == WORD && i < word_count)
-            cmd[i++] = ft_strdup((*curr)->data);
+        {
+            cmd[i] = ft_strdup((*curr)->data);
+            gc_add(0 , cmd[i], NULL);
+            i++;
+        }
         *curr = (*curr)->next;
     }
     return ft_lstnew_exec(fds, cmd, cmdlen);
@@ -320,7 +325,7 @@ void for_execute(t_token **final, t_execution **data, t_env *env)
     while (curr)
     {
         t_execution *new_cmd = process_command_tokens(&curr, env);
-        
+        gc_add(0 ,new_cmd , NULL);
         if (new_cmd)
         {
             if (!*data)

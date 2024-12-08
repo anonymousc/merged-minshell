@@ -18,16 +18,6 @@ typedef struct s_env
     struct s_env *next;
 } t_env;
 
-// typedef struct s_exec
-// {
-//     int ac;
-//     char **env_orginal;
-//     char **av;
-//     char *input;
-//     t_env  *env;
-// } t_exec;
-
-
 
 //utils
 int     list_len(t_env *env);

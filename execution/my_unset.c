@@ -12,9 +12,6 @@ t_env **unset_var(t_execution **exec, char *s, t_env **env)
         tmp = curr;
         curr = curr->next;
         *env = curr;
-        free(tmp->variable);
-        free(tmp->value);
-        free(tmp);
     }
     else
     {
@@ -24,9 +21,6 @@ t_env **unset_var(t_execution **exec, char *s, t_env **env)
 	    	{
                 tmp = curr->next;
                 curr->next = curr->next->next;
-                free(tmp->variable);
-                free(tmp->value);
-                free(tmp);
             }
             curr = curr->next;
         }

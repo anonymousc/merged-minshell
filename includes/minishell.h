@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kali <kali@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: aessadik <aessadik@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/06 13:21:40 by hatalhao          #+#    #+#             */
-/*   Updated: 2024/12/01 21:38:46 by kali             ###   ########.fr       */
+/*   Updated: 2024/12/07 20:53:53 by aessadik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,6 +127,40 @@ char	*before_dollar_word(char	*str);
 char	*ft_strjoin2(char *s, char *s1);
 void extra_sanitize(t_token **head);
 
-
 void sig_heredoc(int test);
+
+////////////////////////////////////////////////////////////
+# define MEMGRP_DEFAULT 0
+
+typedef struct s_memref
+{
+	void				*mem_data;
+	struct s_memref		*next;
+}						t_memref;
+
+typedef struct s_memgroup
+{
+	int					id;
+	t_memref			*mem_refs;
+	struct s_memgroup	*next;
+}						t_memgroup;
+
+t_memgroup				**gc_get_memgroups(void);
+t_memgroup				*gc_create_mem_group(int id);
+t_memgroup				*gc_get_specific_memgroup(int id);
+t_memref				**gc_get_memrefs(int id);
+void					gc_free_memrefs(t_memref *mem_ref);
+void					gc_free_specific_memref(t_memref **mem_ref_head,
+							t_memref *mem_ref_to_free);
+void					*gc_calloc(int mem_group_id, size_t count, size_t size,
+							t_memref **store_memref);
+void					*gc_malloc(int mem_group_id, size_t size,
+							t_memref **store_memref);
+void					gc_add(int mem_group_id, void *mem,
+							t_memref **store_memref);
+void					gc_add_double(int mem_group_id, void **mem,t_memref **store_memref);
+void					gc_free_memgrp(int mem_group_id);
+void					gc_free_all(void);
+void					exit_minishell(int exit_code);
+////////////////////////////////////////////////////////////
 #endif

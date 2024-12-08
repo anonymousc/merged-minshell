@@ -120,16 +120,15 @@ void here_doc_child(t_token *final , int *fd1 ,t_env *env)
                 line = ft_strchr(line, '$');
                 line = ft_strjoin2(before_dollar, expander(line, env));
                 if(!line)
+                {
                     line = ft_strdup("");
+                    gc_add(0 , line , NULL);
+                }
             }
             if (!ft_strncmp(delim, line, ft_strlen(delim) + 1))
-            {
-                free(line);
                 break;
-            }
             ft_printf(fd, "%s\n", line);
-            free(line);
-        
+            gc_add(0 , line , NULL);
         }
         exit(0);
     }

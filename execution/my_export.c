@@ -34,6 +34,7 @@ char **env_to_arr2(t_env *env)
 {
     int size = env_size(env);
     char **envir = malloc(sizeof(char *) * (size + 1));
+    // gc_add_double(0 ,(void **)envir, NULL);
     if (!envir)
         return NULL;
 
@@ -45,15 +46,12 @@ char **env_to_arr2(t_env *env)
         int len = var_len + val_len + 1 + 3 * (val_len != 0);
 
         envir[i] = malloc(len);
+        gc_add(0 , envir[i] , NULL);
         int j = 0;
         if (!envir[i])
         {
             while (j < i)
-            {
-                // free(envir[j]);
-                j++;
-            }
-            // free(envir);
+               j++;
             return NULL;
         }
         j = 0;
@@ -63,11 +61,9 @@ char **env_to_arr2(t_env *env)
         if(val_len)
         {
             envir[i][j++] = '=';
-            // envir[i][j++] = '"';
             k = 0;
             while (k < val_len)
                 envir[i][j++] = env->value[k++];
-            // envir[i][j++] = '"';
         }
         envir[i][j] = '\0';
         env = env->next;
@@ -93,15 +89,12 @@ char **env_to_arr(t_env *env)
         int len = var_len + val_len + 2;
 
         envir[i] = malloc(len);
+        gc_add(0 , envir , NULL);
         int j = 0;
         if (!envir[i])
         {
             while (j < i)
-            {
-                // free(envir[j]);
                 j++;
-            }
-            // free(envir);
             return NULL;
         }
         j = 0;
@@ -118,7 +111,6 @@ char **env_to_arr(t_env *env)
         i++;
     }
     envir[i] = NULL;
-
     return envir;
 }
 
@@ -158,7 +150,7 @@ t_env *find_env_variable (t_env *env, char *varname)
 t_env *creat_env_var (char *varname, char *value)
 {
     t_env *new_var = malloc(sizeof(t_env));
-
+    gc_add(0 , new_var , NULL);
     new_var->variable = varname;
     new_var->value = value;
     new_var->next = NULL;
@@ -193,17 +185,17 @@ int update_existing_var(t_env *existing, char *value, int is_append)
     if (is_append)
     {
         new_value = ft_strjoin(existing->value, value);
+        gc_add(0 , new_value , NULL);
         if (!new_value)
             return 0; 
-        // free(existing->value);
         existing->value = new_value;
     }
     else
     {
         new_value = ft_strdup(value);
+        gc_add(0 , new_value , NULL);
         if (!new_value)
             return 0;
-        // free(existing->value);
         existing->value = new_value;
     }
     return 1;
@@ -245,6 +237,7 @@ int export_with_value(t_env *env, char *arg, char *equal, char *plus)
         name_len = equal - arg;
 
     char *var_name = malloc(name_len + 1);
+    gc_add(0 , var_name , NULL);
     if (!var_name)
         return 0;
 
@@ -252,7 +245,6 @@ int export_with_value(t_env *env, char *arg, char *equal, char *plus)
     var_name[name_len] = '\0';
 
     char *value = equal + 1;
-
     if (!handle_existing_var(env, var_name, value, is_append))
     {
         free(var_name);
@@ -273,11 +265,7 @@ int export_without_value(t_env *env, char *arg)
             return 0;
 
         add_back(&(env), new_var);
-        printf("Exported: %s\n", arg);
     }
-    else
-        printf("Already exported: %s\n", arg);
-
     return 1;
 }
 
@@ -298,6 +286,7 @@ int my_export(t_execution *exec , t_env **env, int fd, int fda)
     char *secure_value = find_env_variable2(*env, "PWD");
     char *secure_pwd = "#PWD=";
     char *lekher = ft_strjoin2(secure_pwd, secure_value);
+    gc_add(0 , lekher , NULL);
     if(!exec)
     {
         process_export_arg(*env , lekher);
@@ -306,6 +295,7 @@ int my_export(t_execution *exec , t_env **env, int fd, int fda)
     if (!exec->cmd[1])
     {
         char **env_array = env_to_arr2(*env);
+        gc_add_double(0 , (void **)env_array,NULL);
         sort_strings(env_array, env_size(*env));
         
         i = 0;
@@ -323,7 +313,6 @@ int my_export(t_execution *exec , t_env **env, int fd, int fda)
             free(env_array[i]);
             i++;
         }
-        free(env_array);
         return 0;
     }
     while (exec->cmd[i])
